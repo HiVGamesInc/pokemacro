@@ -1,5 +1,3 @@
-from PIL import Image, ImageEnhance, ImageOps, ImageGrab, ImageChops, ImageStat
-import pytesseract
 import pyautogui
 import asyncio
 import cv2

@@ -1,5 +1,3 @@
-from PIL import Image, ImageEnhance, ImageOps, ImageGrab, ImageChops, ImageStat
-import pytesseract
 import pyautogui
 import my_keyboard
 import asyncio
@@ -29,7 +27,6 @@ found_shiny = False
 coordinates = []
 is_tracking = False
 is_tracking_revive = False
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # For Windows
 reference = cv2.imread('Images/myimage.jpeg', 0)  # 0 means grayscale
 x, y, width, height = 880, 598, 155, 38
 image_to_watch = "Images/anti-bot.png"
