@@ -9,7 +9,6 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ('Images/', 'Images'), 
         ('config.json', '.'),
         ('alarm.mp3', '.'),
         ('aqui-acabou.mp3', '.'),

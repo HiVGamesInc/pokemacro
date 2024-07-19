@@ -10,7 +10,6 @@ from pynput import mouse
 import pyperclip
 import time
 import flet as ft
-import imagehash
 import threading
 from utils.global_state import GlobalState
 
@@ -27,80 +26,41 @@ found_shiny = False
 coordinates = []
 is_tracking = False
 is_tracking_revive = False
-reference = cv2.imread('Images/myimage.jpeg', 0)  # 0 means grayscale
 x, y, width, height = 880, 598, 155, 38
-image_to_watch = "Images/anti-bot.png"
 is_resolving = False
 global_state = GlobalState()
 
-# Make functions async
-async def resolveCaptcha():
-    global audio2, is_resolving
-    print("Is Resolving")
-    is_resolving = True
-    captchaText = drag_and_copy_text(130, 979, 300, 979)
-    numbers = captchaText.split("*")
-    print(numbers)
+# async def clickOnImage(fileName):
+#     image_to_find = f"Images/{fileName}.png"
+#     print(f"Looking for {image_to_find}")
 
-    for number in numbers:
-        await clickOnImage(number)
-    await clickOnImage("ok")
-
-    location = pyautogui.locateOnScreen(image_to_watch, confidence=0.8)
-    if not location:
-        is_resolving = False
-        audio2.play()
+#     location = pyautogui.locateOnScreen(image_to_find)  # Adjust confidence as needed
 
 
-async def clickOnImage(fileName):
-    image_to_find = f"Images/{fileName}.png"
-    print(f"Looking for {image_to_find}")
-
-    location = pyautogui.locateOnScreen(image_to_find)  # Adjust confidence as needed
-
-
-    if location is not None:
-        center = pyautogui.center(location)
-        print(f"Clicking at {center}")  # Debugging line
-        pyautogui.click(center)
-        await asyncio.sleep(0.3)  # Optional: sleep for 0.3 seconds after clicking
-    else:
-        print(f"Image {image_to_find} not found on screen.")
-
-def drag_and_copy_text(start_x, start_y, end_x, end_y):
-    pyperclip.copy('')
-    pyautogui.moveTo(start_x, start_y)
-    time.sleep(0.5)  
-    pyautogui.mouseDown()
-    pyautogui.moveTo(end_x, end_y, duration=1)
-    pyautogui.mouseUp()
-    pyautogui.keyDown('ctrl')
-    time.sleep(0.2)
-    pyautogui.press('c')
-    time.sleep(0.2)
-    pyautogui.keyUp('ctrl')
-    time.sleep(0.5)
-    
-    copied_text = pyperclip.paste()
-    
-    return copied_text
+#     if location is not None:
+#         center = pyautogui.center(location)
+#         print(f"Clicking at {center}")  # Debugging line
+#         pyautogui.click(center)
+#         await asyncio.sleep(0.3)  # Optional: sleep for 0.3 seconds after clicking
+#     else:
+#         print(f"Image {image_to_find} not found on screen.")
 
 
-async def catchShiny(pokemon, key, confidence):
-    global found_shiny
-    print(f"Images/shiny-{pokemon}.png")
-    location = pyautogui.locateCenterOnScreen(f"Images/shiny-{pokemon}.png", confidence=confidence)
-    if location:
-        print("found")
-        found_shiny = True
-        update_status()
-        pyautogui.moveTo(location)
-        my_keyboard.press(key)
+# async def catchShiny(pokemon, key, confidence):
+#     global found_shiny
+#     print(f"Images/shiny-{pokemon}.png")
+#     location = pyautogui.locateCenterOnScreen(f"Images/shiny-{pokemon}.png", confidence=confidence)
+#     if location:
+#         print("found")
+#         found_shiny = True
+#         update_status()
+#         pyautogui.moveTo(location)
+#         my_keyboard.press(key)
 
-        pyautogui.click(location)
-        await asyncio.sleep(0.6) 
-    found_shiny = False
-    update_status()
+#         pyautogui.click(location)
+#         await asyncio.sleep(0.6) 
+#     found_shiny = False
+#     update_status()
 
 # def catchAll(pokemon, confidence):
 #     print(f"Images/{pokemon}.png")
@@ -148,25 +108,25 @@ async def catchShiny(pokemon, key, confidence):
 # should_catch = True
 
 
-def catchAll(pokemon, confidence):
-    end_time = time.time() + 6  # Set the end time to 4 seconds from now
+# def catchAll(pokemon, confidence):
+#     end_time = time.time() + 6  # Set the end time to 4 seconds from now
     
-    while time.time() < end_time:  # Keep running until 4 seconds have passed
-        print(f"Looking for Images/{pokemon}.png")
+#     while time.time() < end_time:  # Keep running until 4 seconds have passed
+#         print(f"Looking for Images/{pokemon}.png")
         
-        location = pyautogui.locateOnScreen(
-            f"Images/{pokemon}.png", 
-            confidence=confidence, 
-            grayscale=True  # Use grayscale for faster matching
-        )
+#         location = pyautogui.locateOnScreen(
+#             f"Images/{pokemon}.png", 
+#             confidence=confidence, 
+#             grayscale=True  # Use grayscale for faster matching
+#         )
         
-        if location:
-            print("found")
+#         if location:
+#             print("found")
             
-            center = pyautogui.center(location)
-            pyautogui.moveTo(center)
-            pyautogui.press('1')
-            pyautogui.click(center)
+#             center = pyautogui.center(location)
+#             pyautogui.moveTo(center)
+#             pyautogui.press('1')
+#             pyautogui.click(center)
 
 # def catchAll(pokemon, confidence):
 #     global should_catch  # Use the global flag
@@ -184,18 +144,18 @@ def catchAll(pokemon, confidence):
             
 
 # Function to start the thread
-def start_catch_thread(pokemon, confidence):
-    global should_catch  # Use the global flag
-    should_catch = True  # Set the flag to True
+# def start_catch_thread(pokemon, confidence):
+#     global should_catch  # Use the global flag
+#     should_catch = True  # Set the flag to True
     
-    # Create and start the thread
-    catch_thread = threading.Thread(target=catchAll, args=(pokemon, confidence))
-    catch_thread.start()
+#     # Create and start the thread
+#     catch_thread = threading.Thread(target=catchAll, args=(pokemon, confidence))
+#     catch_thread.start()
 
-# Function to stop the thread
-def stop_catch_thread():
-    global should_catch  # Use the global flag
-    should_catch = False  # Set the flag to False
+# # Function to stop the thread
+# def stop_catch_thread():
+#     global should_catch  # Use the global flag
+#     should_catch = False  # Set the flag to False
 
             
     
@@ -277,11 +237,11 @@ def extract_coordinates():
 async def loop():
     global is_fishing, is_resolving
     if not is_resolving:
-        location = pyautogui.locateOnScreen(image_to_watch, confidence=0.8)
-        if location:
-            print(f"Image found at {location}")
-            screenshot = pyautogui.screenshot(region=(location))
-            await resolveCaptcha()
+        # location = pyautogui.locateOnScreen(image_to_watch, confidence=0.8)
+        # if location:
+        #     print(f"Image found at {location}")
+        #     screenshot = pyautogui.screenshot(region=(location))
+        #     await resolveCaptcha()
 
         if fishing_lock.locked() == False and should_fish:
             is_fishing = True

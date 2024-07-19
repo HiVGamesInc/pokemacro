@@ -92,6 +92,3 @@ def press(hotkey, delay=0.8):
     key_down(hexKeyCode)
     time.sleep(delay)
     release_key(hexKeyCode)
-
-# directx scan codes
-# http://www.gamespp.com/directx/directInputKeyboardScanCodes.html

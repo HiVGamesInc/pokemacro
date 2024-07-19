@@ -16,6 +16,11 @@ pynput = "*"
 pyperclip = "*"
 flet = "*"
 imagehash = "*"
+pyinstaller = "*"
 
 [requires]
 python_version = "3.12"
+
+[scripts]
+start = "python main.py"
+build = "pyinstaller Botiada.spec"
