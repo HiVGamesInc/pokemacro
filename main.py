@@ -12,6 +12,8 @@ import time
 import flet as ft
 import threading
 from utils.global_state import GlobalState
+import sys
+import os
 
 is_running = False  # Global flag to control the automation loop
 shiny_types = ["karp", "buzz"]
@@ -29,6 +31,13 @@ is_tracking_revive = False
 x, y, width, height = 880, 598, 155, 38
 is_resolving = False
 global_state = GlobalState()
+
+if getattr(sys, 'frozen', False):
+    # Running in a bundle
+    bundle_dir = sys._MEIPASS
+else:
+    # Running in normal Python environment
+    bundle_dir = os.path.abspath(os.path.dirname(__file__))
 
 # async def clickOnImage(fileName):
 #     image_to_find = f"Images/{fileName}.png"
@@ -848,7 +857,7 @@ def main(page: ft.Page):
 
     keyboard.add_hotkey('ctrl+alt+x', lambda e=None: stop_automation())
 
-    keyboard.add_hotkey('ctrl+shift+s', lambda e=None: global_state.save_to_file('config.json'))
+    keyboard.add_hotkey('ctrl+shift+s', lambda e=None: global_state.save_to_file(os.path.join(bundle_dir, 'config.json')))
 
     def handle_key_press(event):
         if event.event_type == 'down' and event.name == "'":
@@ -865,7 +874,7 @@ def main(page: ft.Page):
     # keyboard.add_hotkey('*\'', lambda e=None: iterate_and_process_items(item_list))
     # keyboard.add_hotkey("2", lambda e=None: catchAll("current", 0.8))
 
-global_state.load_from_file('config.json')
+global_state.load_from_file(os.path.join(bundle_dir, 'config.json'))
 ft.app(target=main)
 
 keyboard.wait()
