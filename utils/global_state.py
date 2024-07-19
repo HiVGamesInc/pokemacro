@@ -32,7 +32,6 @@ class GlobalState:
             cls._instance.coordinates = []
             cls._instance.is_tracking = False
             cls._instance.is_tracking_revive = False
-            cls._instance.is_resolving = False
             cls._instance.combos = {}
             # ... add all other global variables
             
@@ -53,7 +52,6 @@ class GlobalState:
             'coordinates': self.coordinates,
             'is_tracking': self.is_tracking,
             'is_tracking_revive': self.is_tracking_revive,
-            'is_resolving': self.is_resolving,
             'revive_position': self.revive_position,
             'revive_hotkey_field': self.revive_hotkey_field,
             'pokestop_hotkey_field': self.pokestop_hotkey_field,
@@ -82,7 +80,6 @@ class GlobalState:
         self.coordinates = config_dict.get('coordinates', [])
         self.is_tracking = config_dict.get('is_tracking', False)
         self.is_tracking_revive = config_dict.get('is_tracking_revive', False)
-        self.is_resolving = config_dict.get('is_resolving', False)
         self.revive_position = config_dict.get('revive_position', False)
         self.revive_hotkey_field = config_dict.get('revive_hotkey_field', False)
         self.pokestop_hotkey_field = config_dict.get('pokestop_hotkey_field', False)
@@ -105,3 +102,6 @@ class GlobalState:
             with open(file_path, 'r') as f:
                 config_dict = json.load(f)
             self.from_dict(config_dict)
+
+
+global_state = GlobalState()

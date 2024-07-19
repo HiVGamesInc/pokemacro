@@ -33,7 +33,6 @@
     "coordinates": [],
     "is_tracking": false,
     "is_tracking_revive": false,
-    "is_resolving": false,
     "revive_position": "1749,116",
     "revive_hotkey_field": "Y",
     "pokestop_hotkey_field": "4",
@@ -41,7 +40,7 @@
     "use_revive": true,
     "item_objects": [
         {
-            "name": "",
+            "name": "asdad",
             "hotkey": "F5"
         }
     ],
@@ -104,6 +103,16 @@
             "item_list": [
                 [
                     "",
+                    "F5"
+                ]
+            ]
+        },
+        "atata": {
+            "revive_slider_value": 0.9,
+            "attack_delay_slider_value": 0,
+            "item_list": [
+                [
+                    "asdad",
                     "F5"
                 ]
             ]
