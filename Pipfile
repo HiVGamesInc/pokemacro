@@ -14,5 +14,7 @@ pyinstaller = "*"
 python_version = "3.12"
 
 [scripts]
-start = "python main.py"
+start = "npm run build --prefix app && python main.py"
 build = "pyinstaller main.spec"
+start-flask = "set FLASK_APP=main.py && flask run"
+dev = "npx concurrently \"npm run start --prefix app\" \"pipenv run start\""
