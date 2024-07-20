@@ -3,3 +3,13 @@ body {
   text-align: center;
   margin-top: 50px;
 }
+
+.toggle-buttons {
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 16px;
+}

@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 pywebview = "*"
 flask = "*"
+pyinstaller = "*"
 
 [dev-packages]
 
