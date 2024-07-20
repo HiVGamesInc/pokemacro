@@ -1,11 +1,11 @@
-import React, { PropsWithChildren, useContext, useEffect } from 'react';
-import { RouterContext } from './router';
+import { PropsWithChildren, useContext, useEffect } from "react";
+import { RouterContext } from "./router";
 
-type Route = {
+type RouteProps = {
   path: string;
 };
 
-const Route = ({ children, path }: PropsWithChildren<Route>) => {
+const Route = ({ children, path }: PropsWithChildren<RouteProps>) => {
   const router = useContext(RouterContext);
 
   useEffect(() => {

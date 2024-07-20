@@ -1,8 +1,8 @@
-import { KeyboardKeys } from '../utils/keys';
+import { KeyboardKeys } from "../utils/keys";
 
 export type HotkeyObject = (typeof KeyboardKeys)[keyof typeof KeyboardKeys];
 
-export type Hotkey = HotkeyObject | HotkeyObject[];
+export type Hotkey = HotkeyObject[];
 
 export interface Combo {
   name: string;
@@ -17,7 +17,7 @@ export interface ComboItem {
 }
 
 export type IconType = React.ForwardRefExoticComponent<
-  Omit<React.SVGProps<SVGSVGElement>, 'ref'> & {
+  Omit<React.SVGProps<SVGSVGElement>, "ref"> & {
     title?: string;
     titleId?: string;
   } & React.RefAttributes<SVGSVGElement>

@@ -25,12 +25,14 @@ const Home = () => {
           by Nekou & Birolho
         </span>
       </h2>
-      <Button active={antiLogout} onClick={toggleAntiLogout}>
-        Anti Logout
-      </Button>
-      <Button active={autoCombo} onClick={toggleAutoCombo}>
-        Auto Combo
-      </Button>
+      <div className="flex gap-4">
+        <Button active={antiLogout} onClick={toggleAntiLogout}>
+          Anti Logout
+        </Button>
+        <Button active={autoCombo} onClick={toggleAutoCombo}>
+          Auto Combo
+        </Button>
+      </div>
     </div>
   );
 };

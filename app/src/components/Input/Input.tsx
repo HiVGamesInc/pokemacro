@@ -1,16 +1,29 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren } from "react";
 
-type Input = {
+type InputProps = {
   label?: string;
   defaultValue?: string;
+  wrapperClassName?: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
 };
 
-const Input = ({ label, ...rest }: PropsWithChildren<Input>) => {
+const Input = ({
+  label,
+  wrapperClassName,
+  ...rest
+}: PropsWithChildren<InputProps>) => {
   return (
-    <label className="flex items-center gap-2 mt-4">
-      {label && <span className="min-w-12">{label}</span>}
-      <input type="text" className="p-2 w-32 bg-black border border-slate-500 text-sm" {...rest} />
+    <label
+      className={`flex flex-col justify-center gap-2 mt-4 ${
+        wrapperClassName && wrapperClassName
+      }`}
+    >
+      {label && <span className="min-w-12 text-xs">{label}</span>}
+      <input
+        type="text"
+        className="p-2 w-32 bg-black border border-slate-500 text-sm rounded-lg w-full"
+        {...rest}
+      />
     </label>
   );
 };

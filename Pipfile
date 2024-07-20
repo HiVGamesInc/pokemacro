@@ -15,6 +15,7 @@ python_version = "3.12"
 
 [scripts]
 start = "npm run build --prefix app && python main.py"
+front = "npm run start --prefix app"
 build = "pyinstaller main.spec"
 start-flask = "set FLASK_APP=main.py && flask run"
 dev = "npx concurrently \"npm run start --prefix app\" \"pipenv run start\""
