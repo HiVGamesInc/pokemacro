@@ -18,11 +18,6 @@ from modules.fishing import Fishing
 from modules.attack_combo import AttackCombo
 from models.item import Item, ItemList
 
-if getattr(sys, 'frozen', False):
-    bundle_dir = sys._MEIPASS
-else:
-    bundle_dir = os.path.abspath(os.path.dirname(__file__))
-
 
 def create_status_row(text: str, is_active: bool, contentValue: str, container: ft.Container = None) -> ft.Row:
     status_text = ft.Text(text)
@@ -82,11 +77,11 @@ def main(page: ft.Page):
 
     keyboard.add_hotkey('ctrl+alt+x', lambda e=None: fishing.stop_automation())
 
-    keyboard.add_hotkey('ctrl+shift+s', lambda e=None: global_state.save_to_file(os.path.join(bundle_dir, 'config.json')))
+    keyboard.add_hotkey('ctrl+shift+s', lambda e=None: global_state.save_to_file(globals.configFile))
 
     
 
-global_state.load_from_file(os.path.join(bundle_dir, 'config.json'))
+global_state.load_from_file(globals.configFile)
 ft.app(target=main)
 
 keyboard.wait()
