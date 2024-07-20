@@ -1,16 +1,74 @@
 import threading
 import time
 import pyautogui
+import keyboard
 
-keyboard_events_enabled = False
-mouse_events_enabled = False
+auto_combo_enabled = False
+anti_logout_enabled = False
 
-def toggle_keyboard_events():
-    global keyboard_events_enabled
-    keyboard_events_enabled = not keyboard_events_enabled
-    if keyboard_events_enabled:
-        start_keyboard_events()
-    return "Keyboard events " + ("enabled" if keyboard_events_enabled else "disabled")
+def press_keys(keys):
+    for key_combination in keys:
+        keyboard.press_and_release(key_combination['key'])
+
+        time.sleep(key_combination['delay'] or 0.3)
+
+# example: toggle_anti_logout()
+def toggle_anti_logout():
+    global anti_logout_enabled
+    anti_logout_enabled = not anti_logout_enabled
+
+    def run():
+        while anti_logout_enabled:
+            with pyautogui.hold('ctrl'):
+                pyautogui.press('a')
+                time.sleep(1)
+                pyautogui.press('d')
+            time.sleep(5)
+
+    threading.Thread(target=run).start()
+
+    return "Keyboard events " + ("enabled" if anti_logout_enabled else "disabled")
+
+# example: toggle_auto_combo('ctrl+b', [{'key': 'p', 'delay': 1}, {'key': 'ctrl+v', 'delay': 1}])
+def toggle_auto_combo(trigger_key, keys):
+    global auto_combo_enabled
+    auto_combo_enabled = not auto_combo_enabled
+
+    if auto_combo_enabled:
+        keyboard.add_hotkey(trigger_key, fire_combo, args=[keys])
+    else:
+        keyboard.remove_hotkey(trigger_key)
+
+    return "Keyboard events " + ("enabled" if auto_combo_enabled else "disabled")
+
+def fire_combo(keys):
+    mousePosition = pyautogui.position()
+    offensiveHotkey = '1'
+    deffensiveHotkey = '2'
+    pokestopHotkey = '3'
+    medicineHotkey = 'f'
+    reviveHotkey = 'r'
+    pokemonPosition = [1746, 265]
+
+    keyboard.press_and_release(pokestopHotkey)
+    time.sleep(0.1)
+    keyboard.press_and_release(offensiveHotkey)
+    time.sleep(0.1)
+    keyboard.press_and_release(medicineHotkey)
+    time.sleep(0.1)
+    press_keys(keys)
+    time.sleep(0.3)
+    pyautogui.moveTo(*pokemonPosition)
+    time.sleep(0.1)
+    pyautogui.rightClick()
+    time.sleep(0.1)
+    keyboard.press_and_release(reviveHotkey)
+    time.sleep(0.3)
+    pyautogui.rightClick()
+    time.sleep(0.1)
+    pyautogui.moveTo(mousePosition)
+    time.sleep(0.1)
+    keyboard.press_and_release(deffensiveHotkey)
 
 def toggle_mouse_events():
     global mouse_events_enabled
@@ -18,14 +76,6 @@ def toggle_mouse_events():
     if mouse_events_enabled:
         start_mouse_events()
     return "Mouse events " + ("enabled" if mouse_events_enabled else "disabled")
-
-def start_keyboard_events():
-    def run():
-        while keyboard_events_enabled:
-            pyautogui.typewrite("Hello from PyWebView!\n")
-            time.sleep(5)
-    
-    threading.Thread(target=run).start()
 
 def start_mouse_events():
     def run():

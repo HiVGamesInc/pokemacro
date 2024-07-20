@@ -1,13 +1,13 @@
 from flask import jsonify
 from modules import app
-from modules.events import toggle_keyboard_events, toggle_mouse_events
+from modules.events import toggle_auto_combo, toggle_anti_logout
 
-@app.route('/toggle_keyboard', methods=['POST'])
-def toggle_keyboard():
-    message = toggle_keyboard_events()
+@app.route('/anti-logout', methods=['POST'])
+def anti_logout():
+    message = toggle_anti_logout()
     return jsonify({"message": message})
 
-@app.route('/toggle_mouse', methods=['POST'])
-def toggle_mouse():
-    message = toggle_mouse_events()
+@app.route('/auto-combo', methods=['POST'])
+def auto_combo():
+    message = toggle_auto_combo('q', [{'key': 'F7', 'delay': 1}, {'key': 'F6', 'delay': 1}, {'key': 'F5', 'delay': 1}])
     return jsonify({"message": message})
