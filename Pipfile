@@ -1,26 +1,17 @@
 [[source]]
-name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
-
-[dev-packages]
+name = "pypi"
 
 [packages]
-Pillow = "*"
-pyautogui = "*"
-asyncio = "*"
-opencv-python = "*"
-numpy = "*"
-keyboard = "*"
-pynput = "*"
-pyperclip = "*"
-flet = "*"
-imagehash = "*"
-pyinstaller = "*"
+pywebview = "*"
+flask = "*"
+
+[dev-packages]
 
 [requires]
 python_version = "3.12"
 
 [scripts]
 start = "python main.py"
-build = "pyinstaller Botiada.spec"
+build = "pyinstaller main.spec"
