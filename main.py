@@ -14,13 +14,9 @@ import sys
 import os
 from utils.global_state import global_state
 from utils.globals import globals
-import modules.fishing as fishing
-import modules.attack_combo as attack_combo
+from modules.fishing import Fishing
+from modules.attack_combo import AttackCombo
 from models.item import Item, ItemList
-
-revive_slider_value = 3
-is_tracking_revive = False
-# x, y, width, height = 880, 598, 155, 38
 
 if getattr(sys, 'frozen', False):
     bundle_dir = sys._MEIPASS
@@ -51,8 +47,8 @@ def process_item(name, hotkey):
        
 def main(page: ft.Page):
     # Modules initialization
-    fishingModule = fishing.Fishing(page)
-    attackComboModule = attack_combo.AttackCombo(page)
+    fishingModule = Fishing(page)
+    attackComboModule = AttackCombo(page)
 
     # Page defaults
     page.title = "Botiada"
@@ -78,11 +74,10 @@ def main(page: ft.Page):
     page.window_minimizable = True
     
     if attackComboModule.selected_combo:
-        print(attackComboModule.selected_combo)
-        attackComboModule.update_second_tab_content("Gyarados")
+        attackComboModule.update_second_tab_content(attackComboModule.selected_combo)
     
     page.update()
-    
+
     keyboard.add_hotkey('ctrl+alt+s', lambda e=None: fishing.start_automation())
 
     keyboard.add_hotkey('ctrl+alt+x', lambda e=None: fishing.stop_automation())
