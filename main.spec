@@ -4,11 +4,11 @@ block_cipher = None
 
 a = Analysis(
     ['main.py'],
-    pathex=[],
+    pathex=['.'],
     binaries=[],
     datas=[
-        ('templates/*.html', 'templates'),
-        ('static/*', 'static')
+        ('app/build', 'app/build'),
+        ('modules', 'modules'),
     ],
     hiddenimports=[],
     hookspath=[],
@@ -33,5 +33,16 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=False,
+    console=True,
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='botiada'
 )

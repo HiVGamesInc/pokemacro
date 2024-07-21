@@ -9,5 +9,5 @@ def anti_logout():
 
 @app.route('/auto-combo', methods=['POST'])
 def auto_combo():
-    message = toggle_auto_combo('q', [{'key': 'F7', 'delay': 1}, {'key': 'F6', 'delay': 1}, {'key': 'F5', 'delay': 1}])
+    message = toggle_auto_combo('v', [{'key': 'F7', 'delay': 1}, {'key': 'F6', 'delay': 1}, {'key': 'F5', 'delay': 1}])
     return jsonify({"message": message})
