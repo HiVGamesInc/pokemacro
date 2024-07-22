@@ -129,3 +129,5 @@ Desktop.ini
 # Other
 *.mypy_cache
 *__pycache__/
+
+./config.json

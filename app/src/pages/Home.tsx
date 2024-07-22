@@ -1,6 +1,10 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { BotContext } from "../router/router";
-import { handleAntiLogout, handleAutoCombo } from "../utils/actions";
+import {
+  handleAntiLogout,
+  handleAutoCombo,
+  loadConfig,
+} from "../utils/actions";
 import Button from "../components/Button/Button";
 import { AutoComboContext } from "../router/router";
 
@@ -17,6 +21,15 @@ const Home = () => {
     setAutoCombo(!autoCombo);
     handleAutoCombo(currentCombo);
   };
+
+  useEffect(() => {
+    const getConfig = async () => {
+      const config = await loadConfig();
+      console.log(config);
+    };
+
+    getConfig();
+  }, []);
 
   return (
     <div>

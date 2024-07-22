@@ -14,4 +14,4 @@ if __name__ == '__main__':
     flask_thread.daemon = True
     flask_thread.start()
 
-    webview.start()
+    webview.start(debug=True)

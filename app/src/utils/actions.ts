@@ -29,3 +29,27 @@ export const updateAutoCombo = async (combo: Combo) => {
   const data = await response.json();
   return data;
 };
+
+export const saveConfig = async (combo: Combo) => {
+  const response = await fetch("/save-config", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ combo }),
+  });
+  const data = await response.json();
+  return data;
+};
+
+export const loadConfig = async () => {
+  const response = await fetch("/load-config", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  });
+  const data = await response.json();
+  return data;
+};

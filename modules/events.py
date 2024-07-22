@@ -2,6 +2,7 @@ import threading
 import time
 import pyautogui
 import keyboard
+from modules.utils import save_to_file, load_from_file
 
 auto_combo_enabled = False
 anti_logout_enabled = False
@@ -45,14 +46,13 @@ def toggle_auto_combo(trigger_key, currentCombo):
 def update_current_combo(trigger_key, currentCombo):
     try:
         try:
-            # keyboard.remove_hotkey(trigger_key)
             keyboard.remove_all_hotkeys()
         except KeyError:
             print(f"The key '{trigger_key}' does not exist.")
-        
+
         keyboard.add_hotkey(trigger_key, fire_combo, args=[currentCombo])
-    except:
-        print("An error occurred while updating")
+    except Exception as e:
+        print("An error occurred while updating:", str(e))
 
 def fire_combo(currentCombo):
     global auto_combo_enabled
@@ -87,20 +87,8 @@ def fire_combo(currentCombo):
         time.sleep(0.1)
         keyboard.press_and_release(deffensiveHotkey)
 
-def toggle_mouse_events():
-    global mouse_events_enabled
-    mouse_events_enabled = not mouse_events_enabled
-    if mouse_events_enabled:
-        start_mouse_events()
-    return "Mouse events " + ("enabled" if mouse_events_enabled else "disabled")
+def save_config(currentCombo):
+    save_to_file(currentCombo)
 
-def start_mouse_events():
-    def run():
-        while mouse_events_enabled:
-            pyautogui.moveRel(100, 0, duration=0.5)
-            pyautogui.moveRel(0, 100, duration=0.5)
-            pyautogui.moveRel(-100, 0, duration=0.5)
-            pyautogui.moveRel(0, -100, duration=0.5)
-            time.sleep(5)
-
-    threading.Thread(target=run).start()
+def load_config():
+    return load_from_file()
