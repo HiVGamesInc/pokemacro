@@ -3,10 +3,12 @@ import { BotContext } from "../router/router";
 import { handleAntiLogout, handleAutoCombo } from "../utils/actions";
 import Button from "../components/Button/Button";
 import { KeyboardKeys } from "../utils/keys";
+import { AutoComboContext } from "../router/router";
 
 const Home = () => {
   const { antiLogout, setAntiLogout } = useContext(BotContext);
   const { autoCombo, setAutoCombo } = useContext(BotContext);
+  const { currentCombo } = useContext(AutoComboContext);
 
   const toggleAntiLogout = () => {
     setAntiLogout(!antiLogout);
@@ -14,7 +16,7 @@ const Home = () => {
   };
   const toggleAutoCombo = () => {
     setAutoCombo(!autoCombo);
-    handleAutoCombo(KeyboardKeys.V);
+    handleAutoCombo(KeyboardKeys.V, currentCombo);
   };
 
   return (

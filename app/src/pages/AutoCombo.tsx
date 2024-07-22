@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Combo } from "../types/types";
 import { KeyboardKeys } from "../utils/keys";
 import Card from "../components/Card/Card";
 import AutoComboEdit from "./AutoCombo.edit";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { AutoComboContext } from "../router/router";
+import { updateAutoCombo } from "../utils/actions";
 
 const initialCombos: Combo[] = [
   {
@@ -54,6 +56,23 @@ const AutoComboTab = () => {
   const [combos, setCombos] = useState(initialCombos);
   const [activeCombo, setActiveCombo] = useState<number>(0);
   const [isEditing, setIsEditing] = useState<typeof activeCombo | null>(null);
+  const { currentCombo, setCurrentCombo } = useContext(AutoComboContext);
+
+  useEffect(() => {
+    setCurrentCombo(combos[activeCombo]);
+  }, [activeCombo, combos, setCurrentCombo]);
+
+  useEffect(() => {
+    if (currentCombo) {
+      updateAutoCombo(KeyboardKeys.V, currentCombo)
+        .then((response) => {
+          console.log("Combo updated:", response);
+        })
+        .catch((error) => {
+          console.error("Error updating combo:", error);
+        });
+    }
+  }, [currentCombo]);
 
   return (
     <div>
@@ -68,6 +87,7 @@ const AutoComboTab = () => {
               const updatedCombos = [...combos];
               updatedCombos[isEditing] = data;
               setCombos(updatedCombos);
+              setCurrentCombo(updatedCombos[activeCombo]);
               setIsEditing(null);
             }}
           />

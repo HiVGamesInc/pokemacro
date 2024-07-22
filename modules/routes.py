@@ -1,6 +1,6 @@
-from flask import jsonify
+from flask import Flask, request, jsonify
 from modules import app
-from modules.events import toggle_auto_combo, toggle_anti_logout
+from modules.events import toggle_auto_combo, toggle_anti_logout, update_current_combo
 
 @app.route('/anti-logout', methods=['POST'])
 def anti_logout():
@@ -9,5 +9,29 @@ def anti_logout():
 
 @app.route('/auto-combo', methods=['POST'])
 def auto_combo():
-    message = toggle_auto_combo('v', [{'key': 'F7', 'delay': 1}, {'key': 'F6', 'delay': 1}, {'key': 'F5', 'delay': 1}])
+    data = request.get_json()
+
+    key = data.get('key')
+    combo = data.get('combo')
+
+    print(f"Received key: {key}")
+    print(f"Received combo: {combo}")
+
+    message = toggle_auto_combo(key['keyName'], combo)
+
+    return jsonify({"message": message})
+
+
+@app.route('/update-combo', methods=['PUT'])
+def update_combo():
+    data = request.get_json()
+
+    key = data.get('key')
+    combo = data.get('combo')
+
+    print(f"Received key: {key}")
+    print(f"Received combo: {combo}")
+
+    message = update_current_combo(key['keyName'], combo)
+
     return jsonify({"message": message})
