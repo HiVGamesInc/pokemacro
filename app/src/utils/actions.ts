@@ -1,5 +1,4 @@
 import { Combo } from "../types/types";
-import { Key } from "./keys";
 
 export const handleAntiLogout = async () => {
   const response = await fetch("/anti-logout", { method: "POST" });
@@ -7,25 +6,25 @@ export const handleAntiLogout = async () => {
   return data;
 };
 
-export const handleAutoCombo = async (key: Key, combo: Combo) => {
+export const handleAutoCombo = async (combo: Combo) => {
   const response = await fetch("/auto-combo", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ key, combo }),
+    body: JSON.stringify({ key: combo.triggerKey[0], combo }),
   });
   const data = await response.json();
   return data;
 };
 
-export const updateAutoCombo = async (key: Key, combo: Combo) => {
+export const updateAutoCombo = async (combo: Combo) => {
   const response = await fetch("/update-combo", {
-    method: "PUT",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ key, combo }),
+    body: JSON.stringify({ key: combo.triggerKey[0], combo }),
   });
   const data = await response.json();
   return data;

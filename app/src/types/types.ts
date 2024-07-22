@@ -5,6 +5,7 @@ export type HotkeyObject = (typeof KeyboardKeys)[keyof typeof KeyboardKeys];
 export type Hotkey = HotkeyObject[];
 
 export interface Combo {
+  triggerKey: Hotkey;
   name: string;
   reviveSliderValue: number;
   itemList: ComboItem[];

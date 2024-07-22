@@ -4,6 +4,7 @@ from modules.events import toggle_auto_combo, toggle_anti_logout, update_current
 
 @app.route('/anti-logout', methods=['POST'])
 def anti_logout():
+    print("opaaaaa")
     message = toggle_anti_logout()
     return jsonify({"message": message})
 
@@ -22,7 +23,7 @@ def auto_combo():
     return jsonify({"message": message})
 
 
-@app.route('/update-combo', methods=['PUT'])
+@app.route('/update-combo', methods=['POST'])
 def update_combo():
     data = request.get_json()
 

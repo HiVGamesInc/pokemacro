@@ -6,10 +6,25 @@ import Input from "../components/Input/Input";
 import { findKey } from "../utils/keys";
 import KeyboardKeysSelect from "../components/Select/KeyboardKeysSelect";
 import Button from "../components/Button/Button";
+import Select from "../components/Select/Select";
+import { actions } from "./AutoCombo.data";
+import AddItemButton from "../components/Button/AddItemButton";
 
 type AutoComboEditProps = {
   data: Combo;
-  updateCombo: (combo: Combo) => void;
+  updateCombo: (combo: Combo | {}) => void;
+};
+
+const defaultNewCombo: Combo = {
+  name: "New Combo",
+  triggerKey: [
+    {
+      keyName: "V",
+      keyNumber: 90,
+    },
+  ],
+  reviveSliderValue: 1,
+  itemList: [],
 };
 
 const defaultNewSkill = {
@@ -19,7 +34,13 @@ const defaultNewSkill = {
 };
 
 const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
-  const [combo, setCombo] = useState(data);
+  const [combo, setCombo] = useState(
+    data || {
+      name: "",
+      triggerKey: [],
+      itemList: [],
+    }
+  );
   const [isAdding, setIsAdding] = useState(false);
   const [newSkill, setNewSkill] = useState<ComboItem>(defaultNewSkill);
 
@@ -31,6 +52,37 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
 
   return (
     <div>
+      <h2 className="text-lg font-medium">
+        {combo.name || defaultNewCombo.name}
+      </h2>
+
+      <div className="flex gap-4 mb-8">
+        <Input
+          wrapperClassName="flex-1"
+          label="Combo Name"
+          defaultValue={combo.name}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setCombo({
+              ...combo,
+              name: e.target.value,
+            });
+          }}
+        />
+
+        <KeyboardKeysSelect
+          wrapperClassName="flex-1"
+          title="Trigger Key"
+          defaultValue={combo.triggerKey?.[0]?.keyNumber?.toString() || ""}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+            const key = findKey(false, Number(e.target.value));
+
+            setCombo({
+              ...combo,
+              triggerKey: [key],
+            });
+          }}
+        />
+      </div>
       <h2 className="text-md font-medium my-4">Skills</h2>
       {combo.itemList.map((item, index) => (
         <Card
@@ -67,37 +119,24 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
           className="mb-4 bg-transparent outline-dashed w-full hover:outline-slate-500 transition-all"
         >
           <div className="flex gap-4">
-            <Input
+            <Select
               wrapperClassName="flex-1"
-              label="Skill Name"
-              defaultValue={""}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setNewSkill({ ...newSkill, skillName: e.target.value });
-              }}
-            />
-
-            <KeyboardKeysSelect
-              wrapperClassName="flex-1"
-              title="Select a hotkey"
-              defaultValue={""}
+              className="bg-black text-slate-50 border border-slate-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5"
+              title="Select an action"
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                const key = findKey(false, Number(e.target.value));
+                const [key, label] = e.target.value.split("+");
+                const keyObj = findKey(key);
 
                 setNewSkill({
                   ...newSkill,
-                  hotkey: [key],
+                  skillName: label,
+                  hotkey: [keyObj],
                 });
               }}
-              options={[
-                {
-                  value: "1",
-                  label: "option1",
-                },
-                {
-                  value: "2",
-                  label: "option2",
-                },
-              ]}
+              options={actions.map((action) => ({
+                value: `${action.hotkey}+${action.label}`,
+                label: action.label,
+              }))}
             />
 
             <Input
@@ -113,39 +152,58 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
             />
           </div>
 
-          <Button
-            active={false}
-            inactiveClass="outline-none"
-            className="mt-4 bg-blue-900 p-4 rounded-lg min-w-[160px]"
-            onClick={() => {
-              setCombo({
-                ...combo,
-                itemList: [...combo.itemList, newSkill],
-              });
-              setIsAdding(false);
-              setNewSkill(defaultNewSkill);
-            }}
-          >
-            Add
-          </Button>
+          <div className="flex justify-end">
+            <Button
+              active={false}
+              inactiveClass="outline-none"
+              className="mt-4 bg-blue-800 p-4 rounded-lg min-w-[160px]"
+              onClick={() => {
+                setCombo({
+                  ...combo,
+                  itemList: [...combo.itemList, newSkill],
+                });
+                setNewSkill(defaultNewSkill);
+              }}
+            >
+              Add
+            </Button>
+          </div>
         </Card>
       ) : (
-        <Card
-          active={false}
-          className="mb-4 bg-transparent outline-dashed w-full hover:outline-slate-500 transition-all"
-          onClick={() => setIsAdding(true)}
-        >
+        <AddItemButton onClick={() => setIsAdding(true)}>
           <div className="flex items-center justify-center">
             <div className="text-md font-medium">Add Skill</div>
           </div>
-        </Card>
+        </AddItemButton>
       )}
       <div className="flex justify-end">
         <Button
           active={false}
           inactiveClass="outline-none"
-          className="mt-16 p-4 bg-blue-900 rounded-lg min-w-[160px]"
-          onClick={() => updateCombo(combo)}
+          className="mt-16 p-4 bg-slate-800 rounded-lg min-w-[160px]"
+          onClick={() => updateCombo({})}
+        >
+          Delete
+        </Button>
+        <Button
+          active={false}
+          inactiveClass="outline-none"
+          className="mt-16 p-4 bg-blue-800 rounded-lg min-w-[160px]"
+          onClick={() =>
+            updateCombo({
+              name: combo.name || defaultNewCombo.name,
+              triggerKey:
+                combo.triggerKey.length > 0
+                  ? combo.triggerKey
+                  : defaultNewCombo.triggerKey,
+              itemList:
+                combo.itemList.length > 0
+                  ? combo.itemList
+                  : defaultNewCombo.itemList,
+              reviveSliderValue:
+                combo.reviveSliderValue ?? defaultNewCombo.reviveSliderValue,
+            })
+          }
         >
           Save
         </Button>

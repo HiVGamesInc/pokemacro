@@ -1,8 +1,7 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { BotContext } from "../router/router";
 import { handleAntiLogout, handleAutoCombo } from "../utils/actions";
 import Button from "../components/Button/Button";
-import { KeyboardKeys } from "../utils/keys";
 import { AutoComboContext } from "../router/router";
 
 const Home = () => {
@@ -16,7 +15,7 @@ const Home = () => {
   };
   const toggleAutoCombo = () => {
     setAutoCombo(!autoCombo);
-    handleAutoCombo(KeyboardKeys.V, currentCombo);
+    handleAutoCombo(currentCombo);
   };
 
   return (

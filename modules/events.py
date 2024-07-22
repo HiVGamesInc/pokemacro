@@ -35,47 +35,57 @@ def toggle_auto_combo(trigger_key, currentCombo):
     auto_combo_enabled = not auto_combo_enabled
 
     if auto_combo_enabled:
-        keyboard.add_hotkey(trigger_key, fire_combo, args=(currentCombo,))
+        keyboard.add_hotkey(trigger_key, fire_combo, args=[currentCombo])
     else:
-        keyboard.remove_hotkey(trigger_key)
+        # keyboard.remove_hotkey(trigger_key)
+        keyboard.remove_all_hotkeys()
 
     return "Keyboard events " + ("enabled" if auto_combo_enabled else "disabled")
 
 def update_current_combo(trigger_key, currentCombo):
-    keyboard.remove_hotkey(trigger_key)
-    keyboard.add_hotkey(trigger_key, fire_combo, args=(currentCombo,))
-
-    return "Combo updated"
+    try:
+        try:
+            # keyboard.remove_hotkey(trigger_key)
+            keyboard.remove_all_hotkeys()
+        except KeyError:
+            print(f"The key '{trigger_key}' does not exist.")
+        
+        keyboard.add_hotkey(trigger_key, fire_combo, args=[currentCombo])
+    except:
+        print("An error occurred while updating")
 
 def fire_combo(currentCombo):
-    mousePosition = pyautogui.position()
-    offensiveHotkey = '1'
-    deffensiveHotkey = '2'
-    pokestopHotkey = '3'
-    medicineHotkey = 'f'
-    reviveHotkey = 'r'
-    pokemonPosition = [1746, 265]
+    global auto_combo_enabled
 
-    keyboard.press_and_release(pokestopHotkey)
-    time.sleep(0.1)
-    keyboard.press_and_release(offensiveHotkey)
-    time.sleep(0.1)
-    keyboard.press_and_release(medicineHotkey)
-    time.sleep(0.1)
+    if auto_combo_enabled:
+        mousePosition = pyautogui.position()
+        offensiveHotkey = '1'
+        deffensiveHotkey = '2'
+        pokestopHotkey = '3'
+        medicineHotkey = 'f'
+        reviveHotkey = 'r'
+        pokemonPosition = [1746, 265]
 
-    press_keys(currentCombo['itemList'])
-    time.sleep(0.3)
-    pyautogui.moveTo(*pokemonPosition)
-    time.sleep(0.1)
-    pyautogui.rightClick()
-    time.sleep(0.1)
-    keyboard.press_and_release(reviveHotkey)
-    time.sleep(0.3)
-    pyautogui.rightClick()
-    time.sleep(0.1)
-    pyautogui.moveTo(mousePosition)
-    time.sleep(0.1)
-    keyboard.press_and_release(deffensiveHotkey)
+        keyboard.press_and_release(pokestopHotkey)
+        time.sleep(0.1)
+        keyboard.press_and_release(offensiveHotkey)
+        time.sleep(0.1)
+        keyboard.press_and_release(medicineHotkey)
+        time.sleep(0.1)
+
+        press_keys(currentCombo['itemList'])
+        time.sleep(0.3)
+        pyautogui.moveTo(*pokemonPosition)
+        time.sleep(0.1)
+        pyautogui.rightClick()
+        time.sleep(0.1)
+        keyboard.press_and_release(reviveHotkey)
+        time.sleep(0.3)
+        pyautogui.rightClick()
+        time.sleep(0.1)
+        pyautogui.moveTo(mousePosition)
+        time.sleep(0.1)
+        keyboard.press_and_release(deffensiveHotkey)
 
 def toggle_mouse_events():
     global mouse_events_enabled

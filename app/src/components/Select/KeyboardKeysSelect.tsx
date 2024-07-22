@@ -1,20 +1,19 @@
 import { KeyboardKeys } from "../../utils/keys";
-import Select, { Option } from "./Select";
+import Select from "./Select";
 
 type KeyboardKeysSelectProps = {
   className?: string;
   wrapperClassName?: string;
   label?: string;
-  options: Option[];
   defaultValue?: string;
   title?: string;
   onChange: (value: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 
 const KeyboardKeysSelect = ({
-  options,
   label,
   className,
+  defaultValue,
   ...props
 }: KeyboardKeysSelectProps) => {
   return (
@@ -24,6 +23,7 @@ const KeyboardKeysSelect = ({
         className && className
       }`}
       placeholder={label}
+      defaultValue={defaultValue}
       options={Object.values(KeyboardKeys).map((key) => ({
         value: key.keyNumber,
         label: key.keyName,

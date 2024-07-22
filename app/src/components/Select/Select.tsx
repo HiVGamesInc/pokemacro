@@ -10,6 +10,7 @@ type SelectProps = {
   className?: string;
   wrapperClassName?: string;
   placeholder?: string;
+  defaultValue?: string;
   onChange?: (value: React.ChangeEvent<HTMLSelectElement>) => void;
   options: Option[];
 };
@@ -19,9 +20,10 @@ const Select = ({
   title,
   wrapperClassName,
   onChange,
+  defaultValue,
   ...props
 }: SelectProps) => {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(defaultValue || "");
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setValue(e.target.value);
