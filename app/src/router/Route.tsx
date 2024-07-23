@@ -1,12 +1,12 @@
 import { PropsWithChildren, useContext, useEffect } from "react";
-import { RouterContext } from "./router";
+import * as RouterContext from "../contexts/RouterContext";
 
 type RouteProps = {
   path: string;
 };
 
 const Route = ({ children, path }: PropsWithChildren<RouteProps>) => {
-  const router = useContext(RouterContext);
+  const router = useContext(RouterContext.Context);
 
   useEffect(() => {
     // window.location.href = '/';

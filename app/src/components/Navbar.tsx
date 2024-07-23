@@ -1,13 +1,13 @@
-import React, { useContext } from 'react';
-import { FireIcon, Cog6ToothIcon, BoltIcon } from '@heroicons/react/24/outline';
+import React, { useContext } from "react";
+import { FireIcon, Cog6ToothIcon, BoltIcon } from "@heroicons/react/24/outline";
 import {
   FireIcon as FireIconActive,
   Cog6ToothIcon as Cog6ToothIconActive,
   BoltIcon as BoltIconActive,
-} from '@heroicons/react/24/solid';
+} from "@heroicons/react/24/solid";
 
-import { IconType } from '../types/types';
-import { RouterContext, Routes } from '../router/router';
+import { IconType } from "../types/types";
+import * as RouterContext from "../contexts/RouterContext";
 
 const IconButton = ({
   active,
@@ -24,41 +24,45 @@ const IconButton = ({
 
   return (
     <button onClick={onClick}>
-      <Icon className={`size-6 ${active ? 'text-blue-500' : ''}`} />
+      <Icon className={`size-6 ${active ? "text-blue-500" : ""}`} />
     </button>
   );
 };
 
 const Navbar = () => {
-  const router = useContext(RouterContext);
+  const router = useContext(RouterContext.Context);
 
   return (
     <ul className="flex flex-col gap-4 p-4">
       <li>
         <IconButton
-          active={router.currentRoute === Routes.HOME}
+          active={router.currentRoute === RouterContext.Routes.HOME}
           icon={FireIcon}
           activeIcon={FireIconActive}
-          onClick={() => router.setCurrentRoute(Routes.HOME)}
+          onClick={() => router.setCurrentRoute(RouterContext.Routes.HOME)}
         />
       </li>
       <li>
         <button>
           <IconButton
-            active={router.currentRoute === Routes.AUTO_COMBO}
+            active={router.currentRoute === RouterContext.Routes.AUTO_COMBO}
             icon={BoltIcon}
             activeIcon={BoltIconActive}
-            onClick={() => router.setCurrentRoute(Routes.AUTO_COMBO)}
+            onClick={() =>
+              router.setCurrentRoute(RouterContext.Routes.AUTO_COMBO)
+            }
           />
         </button>
       </li>
       <li>
         <button>
           <IconButton
-            active={router.currentRoute === Routes.MOVE_BINDINGS}
+            active={router.currentRoute === RouterContext.Routes.MOVE_BINDINGS}
             icon={Cog6ToothIcon}
             activeIcon={Cog6ToothIconActive}
-            onClick={() => router.setCurrentRoute(Routes.MOVE_BINDINGS)}
+            onClick={() =>
+              router.setCurrentRoute(RouterContext.Routes.MOVE_BINDINGS)
+            }
           />
         </button>
       </li>

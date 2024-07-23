@@ -87,8 +87,8 @@ def fire_combo(currentCombo):
         time.sleep(0.1)
         keyboard.press_and_release(deffensiveHotkey)
 
-def save_config(currentCombo):
-    save_to_file(currentCombo)
+def save_config(config, filename):
+    return save_to_file(config, filename)
 
-def load_config():
-    return load_from_file()
+def load_config(filename):
+    return load_from_file(filename)

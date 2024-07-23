@@ -1,17 +1,13 @@
-import { useContext, useEffect } from "react";
-import { BotContext } from "../router/router";
-import {
-  handleAntiLogout,
-  handleAutoCombo,
-  loadConfig,
-} from "../utils/actions";
+import { useContext } from "react";
+import { handleAntiLogout, handleAutoCombo } from "../utils/actions";
 import Button from "../components/Button/Button";
-import { AutoComboContext } from "../router/router";
+import * as GlobalContext from "../contexts/GlobalContext";
+import * as AutoComboContext from "../contexts/AutoComboContext";
 
 const Home = () => {
-  const { antiLogout, setAntiLogout } = useContext(BotContext);
-  const { autoCombo, setAutoCombo } = useContext(BotContext);
-  const { currentCombo } = useContext(AutoComboContext);
+  const { antiLogout, setAntiLogout } = useContext(GlobalContext.Context);
+  const { autoCombo, setAutoCombo } = useContext(GlobalContext.Context);
+  const { currentCombo } = useContext(AutoComboContext.Context);
 
   const toggleAntiLogout = () => {
     setAntiLogout(!antiLogout);
@@ -21,15 +17,6 @@ const Home = () => {
     setAutoCombo(!autoCombo);
     handleAutoCombo(currentCombo);
   };
-
-  useEffect(() => {
-    const getConfig = async () => {
-      const config = await loadConfig();
-      console.log(config);
-    };
-
-    getConfig();
-  }, []);
 
   return (
     <div>

@@ -1,66 +1,19 @@
 import { useContext, useState, useEffect, useMemo } from "react";
 import { Combo } from "../types/types";
-import { KeyboardKeys } from "../utils/keys";
 import Card from "../components/Card/Card";
 import AutoComboEdit from "./AutoCombo.edit";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { AutoComboContext } from "../router/router";
 import { updateAutoCombo } from "../utils/actions";
 import AddItemButton from "../components/Button/AddItemButton";
-
-const initialCombos: Combo[] = [
-  {
-    triggerKey: [KeyboardKeys.V],
-    name: "Gyarados",
-    reviveSliderValue: 3,
-    itemList: [
-      {
-        skillName: "Skill 1",
-        hotkey: [KeyboardKeys.F7],
-        afterAttackDelay: 300,
-      },
-      {
-        skillName: "Skill 2",
-        hotkey: [KeyboardKeys.F6],
-        afterAttackDelay: 300,
-      },
-      {
-        skillName: "Skill 3",
-        hotkey: [KeyboardKeys.F5],
-        afterAttackDelay: 300,
-      },
-    ],
-  },
-  {
-    triggerKey: [KeyboardKeys.B],
-    name: "Jynx",
-    reviveSliderValue: 3,
-    itemList: [
-      {
-        skillName: "Skill 1",
-        hotkey: [KeyboardKeys.F7],
-        afterAttackDelay: 300,
-      },
-      {
-        skillName: "Skill 2",
-        hotkey: [KeyboardKeys.F6],
-        afterAttackDelay: 300,
-      },
-      {
-        skillName: "Skill 3",
-        hotkey: [KeyboardKeys.F5],
-        afterAttackDelay: 300,
-      },
-    ],
-  },
-];
+import * as AutoComboContext from "../contexts/AutoComboContext";
 
 const AutoComboTab = () => {
-  const [combos, setCombos] = useState(initialCombos);
-  const { currentCombo, setCurrentCombo } = useContext(AutoComboContext);
+  const { combos, setCombos, currentCombo, setCurrentCombo } = useContext(
+    AutoComboContext.Context
+  );
 
   const activeComboIndex = useMemo(
-    () => combos.findIndex((c) => c.name === currentCombo.name),
+    () => combos.findIndex((c) => c.name === currentCombo?.name) ?? 0,
     [combos, currentCombo]
   );
 
@@ -68,17 +21,17 @@ const AutoComboTab = () => {
     null
   );
 
-  useEffect(() => {
-    if (currentCombo) {
-      updateAutoCombo(currentCombo)
-        .then((response) => {
-          console.log("Combo updated:", response);
-        })
-        .catch((error) => {
-          console.error("Error updating combo:", error);
-        });
-    }
-  }, [currentCombo]);
+  // useEffect(() => {
+  //   if (currentCombo && Object.keys(currentCombo).length) {
+  //     updateAutoCombo(currentCombo)
+  //       .then((response) => {
+  //         console.log("Combo updated:", response);
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error updating combo:", error);
+  //       });
+  //   }
+  // }, [currentCombo]);
 
   return (
     <div>

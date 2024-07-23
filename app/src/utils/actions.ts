@@ -30,26 +30,27 @@ export const updateAutoCombo = async (combo: Combo) => {
   return data;
 };
 
-export const saveConfig = async (combo: Combo) => {
+export const saveConfig = async (config: any, filename?: string) => {
   const response = await fetch("/save-config", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ combo }),
+    body: JSON.stringify({ config, filename }),
   });
   const data = await response.json();
   return data;
 };
 
-export const loadConfig = async () => {
+export const loadConfig = async (filename?: string) => {
   const response = await fetch("/load-config", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({}),
+    body: JSON.stringify({ filename }),
   });
   const data = await response.json();
+  console.log(data);
   return data;
 };
