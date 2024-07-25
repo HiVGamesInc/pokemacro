@@ -9,6 +9,7 @@ import Button from "../components/Button/Button";
 import Select from "../components/Select/Select";
 import { actions } from "./AutoCombo.data";
 import AddItemButton from "../components/Button/AddItemButton";
+import Checkbox from "../components/Checkbox/Checkbox";
 
 type AutoComboEditProps = {
   data: Combo;
@@ -25,6 +26,7 @@ const defaultNewCombo: Combo = {
   ],
   reviveSliderValue: 1,
   itemList: [],
+  useRevive: false,
 };
 
 const defaultNewSkill = {
@@ -39,6 +41,7 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
       name: "",
       triggerKey: [],
       itemList: [],
+      useRevive: false,
     }
   );
   const [isAdding, setIsAdding] = useState(false);
@@ -79,6 +82,18 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
             setCombo({
               ...combo,
               triggerKey: [key],
+            });
+          }}
+        />
+
+        <Checkbox
+          wrapperClassName="flex-1"
+          label="Use Revive on Combo"
+          defaultValue={combo.useRevive}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setCombo({
+              ...combo,
+              useRevive: e.target.checked,
             });
           }}
         />
@@ -202,6 +217,7 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
                   : defaultNewCombo.itemList,
               reviveSliderValue:
                 combo.reviveSliderValue ?? defaultNewCombo.reviveSliderValue,
+              useRevive: combo.useRevive ?? defaultNewCombo.useRevive,
             })
           }
         >

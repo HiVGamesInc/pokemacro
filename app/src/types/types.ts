@@ -9,6 +9,7 @@ export interface Combo {
   name: string;
   reviveSliderValue: number;
   itemList: ComboItem[];
+  useRevive: boolean;
 }
 
 export interface ComboItem {

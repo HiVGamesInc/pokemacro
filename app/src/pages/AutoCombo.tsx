@@ -77,7 +77,7 @@ const AutoComboTab = () => {
                         Hotkey: {combo.triggerKey[0].keyName}
                       </div>
                     </div>
-                    {combo.reviveSliderValue && (
+                    {combo.useRevive && (
                       <div className="text-xs font-normal my-4">
                         Use Revive em{" "}
                         <span className="text-blue-200 font-bold">
