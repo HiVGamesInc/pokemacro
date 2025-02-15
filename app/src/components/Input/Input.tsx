@@ -3,6 +3,7 @@ import React, { PropsWithChildren } from "react";
 type InputProps = {
   label?: string;
   defaultValue?: string;
+  value: string;
   wrapperClassName?: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
 };

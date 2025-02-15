@@ -21,7 +21,7 @@ const Card = ({
 
   return (
     <Comp
-      className={`py-4 px-4 bg-slate-800 rounded-xl basis-96 grow text-left ${className}`}
+      className={`py-4 px-4 bg-slate-800 rounded-xl basis-48 grow text-left ${className}`}
       active={active}
       {...(Comp === Button && {
         onClick: active && onDoubleClick ? onDoubleClick : onClick,

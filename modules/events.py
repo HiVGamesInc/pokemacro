@@ -37,7 +37,7 @@ def toggle_auto_combo(trigger_key, currentCombo, stop_key = 'home', revive_key =
     if auto_combo_enabled:
         keyboard.add_hotkey(trigger_key, run_combo, args=[currentCombo])
         keyboard.add_hotkey(stop_key, stop_function, args=[combo_event])
-        keyboard.add_hotkey(revive_key, use_revive)
+        keyboard.add_hotkey(revive_key, use_revive, args=[combo_event])
     else:
         keyboard.remove_all_hotkeys()
 
@@ -56,7 +56,9 @@ def run_combo(currentCombo):
     threading.Thread(target=fire_combo, args=[currentCombo]).start()
 
 def stop_function(event):
+    event.clear()
     event.set()
+    keyboard.press_and_release('2')
 
 def execute_key_action(event, key, delay):
     if event.is_set():
@@ -75,7 +77,7 @@ def execute_mouse_action(event, action, position=None, delay=0.1):
     time.sleep(delay)
     return True
 
-def use_revive():
+def use_revive(event = False):
     def run():
         currentPos = pyautogui.position()
         
@@ -93,6 +95,9 @@ def use_revive():
             return
     
     revive_event.clear()
+    if event:
+        stop_function(event)
+
     threading.Thread(target=run).start()
 
 def fire_combo(currentCombo):

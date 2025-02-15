@@ -21,17 +21,17 @@ const AutoComboTab = () => {
     null
   );
 
-  // useEffect(() => {
-  //   if (currentCombo && Object.keys(currentCombo).length) {
-  //     updateAutoCombo(currentCombo)
-  //       .then((response) => {
-  //         console.log("Combo updated:", response);
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error updating combo:", error);
-  //       });
-  //   }
-  // }, [currentCombo]);
+  useEffect(() => {
+    if (currentCombo && Object.keys(currentCombo).length) {
+      updateAutoCombo(currentCombo)
+        .then((response) => {
+          console.log("Combo updated:", response);
+        })
+        .catch((error) => {
+          console.error("Error updating combo:", error);
+        });
+    }
+  }, [currentCombo]);
 
   return (
     <div>
@@ -48,7 +48,7 @@ const AutoComboTab = () => {
               if (Object.keys(data).length > 0)
                 (updatedCombos[isEditing] as Combo | {}) = data;
               else updatedCombos.splice(isEditing, 1);
-
+              console.log("ue", updatedCombos[activeComboIndex]);
               setCurrentCombo(updatedCombos[activeComboIndex]);
               setCombos(updatedCombos);
               setIsEditing(null);
@@ -69,12 +69,12 @@ const AutoComboTab = () => {
                     active={activeComboIndex === index}
                     onClick={() => setCurrentCombo(combos[index])}
                     onDoubleClick={() => setIsEditing(index)}
-                    className="flex flex-col items-start"
+                    className="flex flex-col items-start !m-0"
                   >
                     <div className="flex justify-between items-center w-full">
                       <div className="text-lg font-medium">{combo.name}</div>
                       <div className="text-md font-medium text-slate-300">
-                        Hotkey: {combo.triggerKey[0].keyName}
+                        {combo.triggerKey[0].keyName}
                       </div>
                     </div>
                     {combo.useRevive && (
@@ -85,7 +85,7 @@ const AutoComboTab = () => {
                         </span>
                       </div>
                     )}
-                    {combo.itemList &&
+                    {/* {combo.itemList &&
                       combo.itemList.map((item, index) => (
                         <div
                           key={item.skillName + index}
@@ -95,7 +95,7 @@ const AutoComboTab = () => {
                           {item.hotkey.map((k) => k.keyName).join("+")} -{" "}
                           {item.afterAttackDelay / 1000} segundos
                         </div>
-                      ))}
+                      ))} */}
                   </Card>
                 ))}
               </div>

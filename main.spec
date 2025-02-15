@@ -10,9 +10,9 @@ a = Analysis(
         ('app/build', 'app/build'),
         ('modules', 'modules'),
     ],
-    hiddenimports=[],
-    hookspath=[],
-    runtime_hooks=[],
+    hiddenimports=['keyboard'],  # Add hidden imports if necessary
+    hookspath=[],  # Add paths to custom hooks if needed
+    runtime_hooks=[],  # Add runtime hooks if needed
     excludes=[],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
@@ -33,7 +33,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,
+    console=True,  # Set to False if you don't need a console window
 )
 
 coll = COLLECT(

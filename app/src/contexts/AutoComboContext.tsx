@@ -30,7 +30,7 @@ const Provider = ({ children }: PropsWithChildren) => {
     (async () => {
       setIsLoadingConfig(true);
       const config = await loadConfig("autocombo.json");
-      console.log(config);
+
       if (config && config.length) {
         setCombos(config);
         setCurrentCombo(config[0]);
@@ -39,10 +39,8 @@ const Provider = ({ children }: PropsWithChildren) => {
   }, []);
 
   useEffect(() => {
-    console.log(1, JSON.stringify(combos));
     if (isLoadingConfig) setIsLoadingConfig(false);
     else if (combos && combos.length && !isLoadingConfig) {
-      console.log(combos, combos.length, !isLoadingConfig);
       saveConfig(combos, "autocombo.json");
     }
   }, [JSON.stringify(combos), isLoadingConfig]);

@@ -1,7 +1,7 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
 import Card from "../components/Card/Card";
 import { Combo, ComboItem } from "../types/types";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Input from "../components/Input/Input";
 import { findKey } from "../utils/keys";
 import KeyboardKeysSelect from "../components/Select/KeyboardKeysSelect";
@@ -9,7 +9,9 @@ import Button from "../components/Button/Button";
 import Select from "../components/Select/Select";
 import { actions } from "./AutoCombo.data";
 import AddItemButton from "../components/Button/AddItemButton";
-import Checkbox from "../components/Checkbox/Checkbox";
+// import Checkbox from "../components/Checkbox/Checkbox";
+
+import * as AutoComboContext from "../contexts/AutoComboContext";
 
 type AutoComboEditProps = {
   data: Combo;
@@ -32,7 +34,7 @@ const defaultNewCombo: Combo = {
 const defaultNewSkill = {
   skillName: "",
   hotkey: [],
-  afterAttackDelay: 0,
+  afterAttackDelay: 500,
 };
 
 const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
@@ -46,6 +48,8 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
   );
   const [isAdding, setIsAdding] = useState(false);
   const [newSkill, setNewSkill] = useState<ComboItem>(defaultNewSkill);
+
+  const { setCurrentCombo } = useContext(AutoComboContext.Context);
 
   const removeSkill = (index: number) =>
     setCombo({
@@ -63,7 +67,7 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
         <Input
           wrapperClassName="flex-1"
           label="Combo Name"
-          defaultValue={combo.name}
+          value={combo.name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setCombo({
               ...combo,
@@ -75,7 +79,7 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
         <KeyboardKeysSelect
           wrapperClassName="flex-1"
           title="Trigger Key"
-          defaultValue={combo.triggerKey?.[0]?.keyNumber?.toString() || ""}
+          value={combo.triggerKey?.[0]?.keyNumber?.toString() || ""}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
             const key = findKey(false, Number(e.target.value));
 
@@ -86,7 +90,7 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
           }}
         />
 
-        <Checkbox
+        {/* <Checkbox
           wrapperClassName="flex-1"
           label="Use Revive on Combo"
           defaultValue={combo.useRevive}
@@ -96,7 +100,7 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
               useRevive: e.target.checked,
             });
           }}
-        />
+        /> */}
       </div>
       <h2 className="text-md font-medium my-4">Skills</h2>
       {combo.itemList.map((item, index) => (
@@ -138,6 +142,11 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
               wrapperClassName="flex-1"
               className="bg-black text-slate-50 border border-slate-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5"
               title="Select an action"
+              value={
+                newSkill
+                  ? `${newSkill.hotkey?.[0]?.keyName}+${newSkill.skillName}`
+                  : ""
+              }
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                 const [key, label] = e.target.value.split("+");
                 const keyObj = findKey(key);
@@ -157,7 +166,9 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
             <Input
               wrapperClassName="flex-1"
               label="Delay (in milliseconds)"
-              defaultValue={""}
+              value={(
+                newSkill.afterAttackDelay || defaultNewSkill.afterAttackDelay
+              ).toString()}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setNewSkill({
                   ...newSkill,
@@ -204,7 +215,7 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
           active={false}
           inactiveClass="outline-none"
           className="mt-16 p-4 bg-blue-800 rounded-lg min-w-[160px]"
-          onClick={() =>
+          onClick={() => {
             updateCombo({
               name: combo.name || defaultNewCombo.name,
               triggerKey:
@@ -218,8 +229,10 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
               reviveSliderValue:
                 combo.reviveSliderValue ?? defaultNewCombo.reviveSliderValue,
               useRevive: combo.useRevive ?? defaultNewCombo.useRevive,
-            })
-          }
+            });
+
+            setCurrentCombo(combo);
+          }}
         >
           Save
         </Button>

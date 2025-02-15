@@ -36,7 +36,7 @@ const MoveBindings = () => {
           <Input
             key={key}
             label={key}
-            defaultValue={value.keyName}
+            value={value.keyName}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               const filteredKey: any = Object.values(KeyboardKeys).find(
                 (k) => k.keyName === e.target.value

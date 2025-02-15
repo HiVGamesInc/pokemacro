@@ -13,7 +13,6 @@ def load_from_file(filename='config.json'):
         with open(filename, 'r') as file:
             data = json.load(file)
         print(f"File loaded successfully from {filename}")
-        print(data)
         return data
     except FileNotFoundError:
         print(f"File {filename} not found. Returning an empty object.")

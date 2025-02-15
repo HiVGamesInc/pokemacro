@@ -6,6 +6,7 @@ type KeyboardKeysSelectProps = {
   wrapperClassName?: string;
   label?: string;
   defaultValue?: string;
+  value: string;
   title?: string;
   onChange: (value: React.ChangeEvent<HTMLSelectElement>) => void;
 };
