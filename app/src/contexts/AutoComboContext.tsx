@@ -43,6 +43,7 @@ const Provider = ({ children }: PropsWithChildren) => {
     else if (combos && combos.length && !isLoadingConfig) {
       saveConfig(combos, "autocombo.json");
     }
+    // eslint-disable-next-line
   }, [JSON.stringify(combos), isLoadingConfig]);
 
   return (
