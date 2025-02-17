@@ -49,10 +49,14 @@ export const actions = [
   },
   {
     hotkey: "R",
-    label: "Revive - R",
+    label: "Revive",
   },
   {
-    hotkey: "F",
-    label: "Medicine - F",
+    hotkey: "T",
+    label: "Medicine",
+  },
+  {
+    hotkey: "Space",
+    label: "Auto Loot",
   },
 ];

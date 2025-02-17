@@ -10,9 +10,9 @@ a = Analysis(
         ('app/build', 'app/build'),
         ('modules', 'modules'),
     ],
-    hiddenimports=['keyboard'],  # Add hidden imports if necessary
-    hookspath=[],  # Add paths to custom hooks if needed
-    runtime_hooks=[],  # Add runtime hooks if needed
+    hiddenimports=['keyboard'],  # Adicione imports ocultos se necessário
+    hookspath=[],                # Adicione caminhos para hooks customizados se necessário
+    runtime_hooks=[],            # Adicione runtime hooks se necessário
     excludes=[],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
@@ -33,16 +33,5 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,  # Set to False if you don't need a console window
-)
-
-coll = COLLECT(
-    exe,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    strip=False,
-    upx=True,
-    upx_exclude=[],
-    name='botiada'
+    console=False,  # Altere para True se precisar de um console
 )

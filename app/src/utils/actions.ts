@@ -51,6 +51,5 @@ export const loadConfig = async (filename?: string) => {
     body: JSON.stringify({ filename }),
   });
   const data = await response.json();
-  console.log(data);
   return data;
 };

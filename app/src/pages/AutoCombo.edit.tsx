@@ -13,6 +13,13 @@ import AddItemButton from "../components/Button/AddItemButton";
 
 import * as AutoComboContext from "../contexts/AutoComboContext";
 
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
+
 type AutoComboEditProps = {
   data: Combo;
   updateCombo: (combo: Combo | {}) => void;
@@ -56,6 +63,17 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
       ...combo,
       itemList: combo.itemList.filter((item, i) => i !== index),
     });
+
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination } = result;
+
+    if (!destination) return;
+    if (source.index === destination.index) return;
+    const newItemList = Array.from(combo.itemList);
+    newItemList.splice(source.index, 1);
+    newItemList.splice(destination.index, 0, combo.itemList[source.index]);
+    setCombo({ ...combo, itemList: newItemList });
+  };
 
   return (
     <div>
@@ -103,33 +121,58 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
         /> */}
       </div>
       <h2 className="text-md font-medium my-4">Skills</h2>
-      {combo.itemList.map((item, index) => (
-        <Card
-          as="div"
-          key={item.skillName + index}
-          active={false}
-          className="my-4"
-        >
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="text-md font-medium">{item.skillName}</div>
-              <div className="flex gap-4">
-                <div className="text-sm text-slate-300">
-                  <span className="font-medium">Hotkey:</span>{" "}
-                  {item.hotkey.map((k) => k.keyName).join("+")}
-                </div>
-                <div className="text-sm text-slate-300">
-                  <span className="font-medium">Delay:</span>{" "}
-                  {item.afterAttackDelay / 1000} segundos
-                </div>
-              </div>
+
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="droppable">
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef}>
+              {combo.itemList.map((item, index) => (
+                <Draggable
+                  key={item.skillName}
+                  draggableId={item.skillName}
+                  index={index}
+                >
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                    >
+                      <Card
+                        as="div"
+                        key={item.skillName + index}
+                        active={false}
+                        className="my-4"
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <div className="text-md font-medium">
+                              {item.skillName}
+                            </div>
+                            <div className="flex gap-4">
+                              <div className="text-sm text-slate-300">
+                                <span className="font-medium">Hotkey:</span>{" "}
+                                {item.hotkey.map((k) => k.keyName).join("+")}
+                              </div>
+                              <div className="text-sm text-slate-300">
+                                <span className="font-medium">Delay:</span>{" "}
+                                {item.afterAttackDelay / 1000} segundos
+                              </div>
+                            </div>
+                          </div>
+                          <button onClick={() => removeSkill(index)}>
+                            <TrashIcon className="size-6 text-blue-500" />
+                          </button>
+                        </div>
+                      </Card>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
             </div>
-            <button onClick={() => removeSkill(index)}>
-              <TrashIcon className="size-6 text-blue-500" />
-            </button>
-          </div>
-        </Card>
-      ))}
+          )}
+        </Droppable>
+      </DragDropContext>
 
       {isAdding ? (
         <Card

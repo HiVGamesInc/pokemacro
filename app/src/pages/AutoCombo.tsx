@@ -25,7 +25,7 @@ const AutoComboTab = () => {
     if (currentCombo && Object.keys(currentCombo).length) {
       updateAutoCombo(currentCombo)
         .then((response) => {
-          console.log("Combo updated:", response);
+          console.info("Combo updated:", response);
         })
         .catch((error) => {
           console.error("Error updating combo:", error);
@@ -48,7 +48,7 @@ const AutoComboTab = () => {
               if (Object.keys(data).length > 0)
                 (updatedCombos[isEditing] as Combo | {}) = data;
               else updatedCombos.splice(isEditing, 1);
-              console.log("ue", updatedCombos[activeComboIndex]);
+
               setCurrentCombo(updatedCombos[activeComboIndex]);
               setCombos(updatedCombos);
               setIsEditing(null);

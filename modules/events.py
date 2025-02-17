@@ -51,6 +51,8 @@ def update_current_combo(trigger_key, currentCombo):
 
     keyboard.add_hotkey(trigger_key, run_combo, args=[currentCombo])
 
+    return currentCombo
+
 def run_combo(currentCombo):
     combo_event.clear()
     threading.Thread(target=fire_combo, args=[currentCombo]).start()
@@ -104,22 +106,22 @@ def fire_combo(currentCombo):
     global auto_combo_enabled
 
     if auto_combo_enabled:
-        actions = [
-            ("press", '3', 0.1),  # pokestopHotkey
-            ("press", '1', 0.1),  # offensiveHotkey
-            ("press", 'f', 0.1),  # medicineHotkey
-        ]
+        # actions = [
+        #     ("press", '3', 0.1),  # pokestopHotkey
+        #     ("press", '1', 0.1),  # offensiveHotkey
+        #     ("press", 'f', 0.1),  # medicineHotkey
+        # ]
 
-        for action, key, delay in actions:
-            if not execute_key_action(combo_event, key, delay):
-                return
+        # for action, key, delay in actions:
+        #     if not execute_key_action(combo_event, key, delay):
+        #         return
 
         press_keys(currentCombo['itemList'])
 
-        if currentCombo['useRevive']:
-            use_revive()
+        # if currentCombo['useRevive']:
+        #     use_revive()
 
-        execute_key_action(combo_event, '2', 0.1)  # deffensiveHotkey
+        # execute_key_action(combo_event, '2', 0.1)  # deffensiveHotkey
 
 def save_config(config, filename):
     return save_to_file(config, filename)
