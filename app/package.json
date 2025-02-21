@@ -22,11 +22,6 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start:react": "npm run build:tailwind && react-scripts start",
-    "build:tailwind": "npx postcss src/tailwind.css -o src/index.css",
-    "start:flask": "set FLASK_APP=../main.py && flask run",
     "dev": "concurrently \"npm run start:react\" \"npm run start:flask\""
   },
   "eslintConfig": {
@@ -52,5 +47,6 @@
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.6"
-  }
+  },
+  "proxy": "http://127.0.0.1:5000"
 }

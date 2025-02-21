@@ -36,6 +36,7 @@ const Provider = ({ children }: PropsWithChildren) => {
         setCurrentCombo(config[0]);
       }
     })();
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {

@@ -14,6 +14,7 @@ qtpy = "*"
 pyqtwebengine = "*"
 cx-freeze = "*"
 nuitka = "*"
+livereload = "*"
 
 [dev-packages]
 
@@ -21,8 +22,6 @@ nuitka = "*"
 python_version = "3.12"
 
 [scripts]
-start = "npm run build --prefix app && python main.py"
-front = "npm run start --prefix app"
+dev = "set DEBUG_MODE=True && set FLASK_APP=modules:app && set FLASK_ENV=development && npx concurrently \"flask --debug run\" \"npm run start --prefix app\""
+start-flask = "set FLASK_APP=modules:app && flask --debug run"
 build = "npm run build --prefix app && pyinstaller main.spec"
-start-flask = "set FLASK_APP=main.py && flask run"
-dev = "npx concurrently \"npm run start --prefix app\" \"pipenv run start\""
