@@ -10,11 +10,15 @@ combo_event = threading.Event()
 
 def execute_move(moveList):
     for move in moveList:
-        if move['delay']:
-            time.sleep(move['delay'])
-        if move['hotkey']:
-            for hotkey in move['hotkey']:
-                execute_key_action(combo_event, hotkey['keyName'])
+
+        if move.get('delay'):
+            delay_sec = float(move['delay']) / 1000.0
+            print(f"waiting for {str(delay_sec)} seconds")
+            time.sleep(delay_sec)
+
+        for hotkey in move.get('hotkey', []):
+            execute_key_action(combo_event, hotkey['keyName'])
+            print(f"executing action {hotkey['keyName']}")
 
 def toggle_anti_logout():
     global anti_logout_enabled
@@ -37,8 +41,8 @@ def toggle_auto_combo(trigger_key, currentCombo, stop_key = 'home'):
     auto_combo_enabled = not auto_combo_enabled
 
     if auto_combo_enabled:
-        keyboard.add_hotkey(trigger_key, run_combo, args=[currentCombo])
-        keyboard.add_hotkey(stop_key, stop_function, args=[combo_event])
+        keyboard.on_press_key(trigger_key, lambda event: run_combo(currentCombo))
+        keyboard.on_press_key(stop_key, lambda event: stop_function(combo_event))
     else:
         keyboard.remove_all_hotkeys()
 
@@ -50,8 +54,7 @@ def update_current_combo(trigger_key, currentCombo):
     except KeyError:
         print(f"The key '{trigger_key}' does not exist.")
 
-    keyboard.add_hotkey(trigger_key, run_combo, args=[currentCombo])
-
+    keyboard.on_press_key(trigger_key, lambda event: run_combo(currentCombo))
     return currentCombo
 
 def run_combo(currentCombo):
@@ -61,13 +64,11 @@ def run_combo(currentCombo):
 def stop_function(event):
     event.clear()
     event.set()
-    keyboard.press_and_release('2')
 
-def execute_key_action(event, key, delay):
+def execute_key_action(event, key):
     if event.is_set():
         return False
     keyboard.press_and_release(key)
-    time.sleep(delay)
     return True
 
 def fire_combo(currentCombo):
