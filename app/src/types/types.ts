@@ -7,15 +7,13 @@ export type Hotkey = HotkeyObject[];
 export interface Combo {
   triggerKey: Hotkey;
   name: string;
-  reviveSliderValue: number;
-  itemList: ComboItem[];
-  useRevive: boolean;
+  moveList: ComboMove[];
 }
 
-export interface ComboItem {
-  skillName: string;
-  hotkey: Hotkey;
-  afterAttackDelay: number;
+export interface ComboMove {
+  skillName?: string;
+  hotkey?: Hotkey;
+  delay?: string;
 }
 
 export type IconType = React.ForwardRefExoticComponent<

@@ -6,7 +6,7 @@ type CardProps = {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   onDoubleClick?: React.MouseEventHandler<HTMLButtonElement>;
   className?: string;
-  active: boolean;
+  active?: boolean;
 };
 
 const Card = ({
@@ -21,12 +21,12 @@ const Card = ({
 
   return (
     <Comp
-      className={`py-4 px-4 bg-slate-800 rounded-xl basis-48 grow text-left ${className}`}
+      className={`py-4 px-4 bg-slate-800 rounded-xl grow text-left ${className} border-1`}
       active={active}
       {...(Comp === Button && {
         onClick: active && onDoubleClick ? onDoubleClick : onClick,
       })}
-      inactiveClass="outline-slate-700"
+      inactiveClass="border-slate-100"
     >
       {children}
     </Comp>

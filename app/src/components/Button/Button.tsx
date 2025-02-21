@@ -3,7 +3,7 @@ import React, { PropsWithChildren } from "react";
 type ButtonProps = {
   className?: string;
   onClick: React.MouseEventHandler<HTMLButtonElement>;
-  active: boolean;
+  active?: boolean;
   activeClass?: string;
   inactiveClass?: string;
 };
@@ -13,14 +13,18 @@ const Button = ({
   onClick,
   className,
   children,
-  activeClass = "outline-green-400",
-  inactiveClass = "outline-red-300",
+  activeClass = "border-green-400",
+  inactiveClass = "border-red-300",
 }: PropsWithChildren<ButtonProps>) => {
   return (
     <button
       type="button"
-      className={`mt-4 text-white bg-gray-900 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 outline ${
-        active ? activeClass : inactiveClass
+      className={`text-white bg-gray-900 font-medium rounded-lg text-sm px-5 py-2.5 border-2 hover:bg-gray-800 duration-100 ${
+        active === true
+          ? activeClass
+          : active === false
+          ? inactiveClass
+          : "border-slate-700"
       } ${className || ""} `}
       onClick={onClick}
     >

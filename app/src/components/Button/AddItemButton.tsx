@@ -11,8 +11,7 @@ const AddItemButton = ({
 }: PropsWithChildren<AddItemButtonProps>) => {
   return (
     <Card
-      active={false}
-      className="mb-4 bg-transparent outline-dashed w-full hover:outline-slate-500 transition-all"
+      className="mb-4 bg-transparent border-1 w-full hover:border-slate-500 transition-all"
       onClick={onClick}
     >
       {children}

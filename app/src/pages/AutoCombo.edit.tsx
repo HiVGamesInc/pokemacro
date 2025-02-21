@@ -1,19 +1,22 @@
+import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
+
 import Card from "../components/Card/Card";
-import { Combo, ComboItem } from "../types/types";
-import { useContext, useState } from "react";
+import { Combo, ComboMove } from "../types/types";
+import { useContext, useEffect, useState } from "react";
 import Input from "../components/Input/Input";
 import { findKey } from "../utils/keys";
 import KeyboardKeysSelect from "../components/Select/KeyboardKeysSelect";
 import Button from "../components/Button/Button";
 import Select from "../components/Select/Select";
 import { actions } from "./AutoCombo.data";
-import AddItemButton from "../components/Button/AddItemButton";
-// import Checkbox from "../components/Checkbox/Checkbox";
 
 import * as AutoComboContext from "../contexts/AutoComboContext";
 
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import ActionsList from "../components/ActionsList/ActionsList";
+import ActionsList, {
+  typeLabels,
+  Types,
+} from "../components/ActionsList/ActionsList";
 import ComboList from "../components/ComboList/ComboList";
 
 type AutoComboEditProps = {
@@ -25,19 +28,17 @@ const defaultNewCombo: Combo = {
   name: "New Combo",
   triggerKey: [
     {
-      keyName: "V",
-      keyNumber: 90,
+      keyName: "End",
+      keyNumber: 64,
     },
   ],
-  reviveSliderValue: 1,
-  itemList: [],
-  useRevive: false,
+  moveList: [],
 };
 
-const defaultNewSkill = {
+const defaultNewMove: ComboMove = {
   skillName: "",
   hotkey: [],
-  afterAttackDelay: 500,
+  delay: "",
 };
 
 const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
@@ -45,38 +46,70 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
     data || {
       name: "",
       triggerKey: [],
-      itemList: [],
-      useRevive: false,
+      moveList: [],
     }
   );
-  const [isAdding, setIsAdding] = useState(false);
-  const [newSkill, setNewSkill] = useState<ComboItem>(defaultNewSkill);
+  const [isAdding, setIsAdding] = useState<Types | null>();
+  const [newMove, setNewMove] = useState<ComboMove>(defaultNewMove);
 
   const { setCurrentCombo } = useContext(AutoComboContext.Context);
 
   const removeSkill = (index: number) =>
     setCombo({
       ...combo,
-      itemList: combo.itemList.filter((item, i) => i !== index),
+      moveList: combo.moveList.filter((item, i) => i !== index),
     });
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
-    console.log("entrou?", result);
+
     if (!destination) return;
+
+    const newMoveList =
+      Array.isArray(combo.moveList) && combo.moveList.length
+        ? Array.from(combo.moveList)
+        : [];
+
     if (source.index === destination.index) return;
-    const newItemList = Array.from(combo.itemList);
-    newItemList.splice(source.index, 1);
-    newItemList.splice(destination.index, 0, combo.itemList[source.index]);
-    setCombo({ ...combo, itemList: newItemList });
+    newMoveList.splice(source.index, 1);
+    newMoveList.splice(destination.index, 0, combo.moveList[source.index]);
+
+    setCombo({ ...combo, moveList: newMoveList });
   };
 
+  const handleNewMove = (value: string) => {
+    const [key, label] = value.split("+");
+    const keyObj = findKey(key);
+
+    setNewMove({
+      skillName: label,
+      hotkey: [keyObj],
+    });
+  };
+
+  useEffect(() => {
+    switch (isAdding) {
+      case "pokestop":
+        handleNewMove("F12+Pokestop");
+        break;
+      case "medicine":
+        handleNewMove("T+Medicine");
+        break;
+      case "revive":
+        handleNewMove("R+Revive");
+        break;
+      case "autoloot":
+        handleNewMove("Space+Auto Loot");
+        break;
+    }
+  }, [isAdding]);
+
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-8">
       <DragDropContext onDragEnd={onDragEnd}>
         <div>
-          <h2 className="text-lg font-medium">Actions</h2>
-          <ActionsList />
+          <h2 className="text-lg font-medium mb-[43px]">Actions</h2>
+          <ActionsList onClick={(type) => setIsAdding(type)} />
         </div>
         <div className="flex-1">
           <h2 className="text-lg font-medium">
@@ -87,7 +120,7 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
             <Input
               wrapperClassName="flex-1"
               label="Combo Name"
-              value={combo.name}
+              value={combo.name || defaultNewCombo.name}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setCombo({
                   ...combo,
@@ -99,7 +132,10 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
             <KeyboardKeysSelect
               wrapperClassName="flex-1"
               title="Trigger Key"
-              value={combo.triggerKey?.[0]?.keyNumber?.toString() || ""}
+              value={
+                combo.triggerKey?.[0]?.keyNumber?.toString() ||
+                defaultNewCombo.triggerKey?.[0]?.keyNumber?.toString()
+              }
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                 const key = findKey(false, Number(e.target.value));
 
@@ -109,107 +145,88 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
                 });
               }}
             />
-
-            {/* <Checkbox
-            wrapperClassName="flex-1"
-            label="Use Revive on Combo"
-            defaultValue={combo.useRevive}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setCombo({
-                ...combo,
-                useRevive: e.target.checked,
-              });
-            }}
-          /> */}
           </div>
           <h2 className="text-md font-medium my-4">Skills</h2>
 
           <ComboList combo={combo} onRemove={removeSkill} />
-          {isAdding ? (
-            <Card
-              as="div"
-              active={false}
-              className="mb-4 bg-transparent outline-dashed w-full hover:outline-slate-500 transition-all"
-            >
-              <div className="flex gap-4">
-                <Select
-                  wrapperClassName="flex-1"
-                  className="bg-black text-slate-50 border border-slate-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5"
-                  title="Select an action"
-                  value={
-                    newSkill
-                      ? `${newSkill.hotkey?.[0]?.keyName}+${newSkill.skillName}`
-                      : ""
-                  }
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                    const [key, label] = e.target.value.split("+");
-                    const keyObj = findKey(key);
 
-                    setNewSkill({
-                      ...newSkill,
-                      skillName: label,
-                      hotkey: [keyObj],
-                    });
-                  }}
-                  options={actions.map((action) => ({
-                    value: `${action.hotkey}+${action.label}`,
-                    label: action.label,
-                  }))}
-                />
+          {isAdding && (
+            <Card as="div" active={false} className="bg-slate-800 w-full mb-8">
+              <div className="flex gap-2 items-center">
+                {isAdding === "move" && (
+                  <Select
+                    wrapperClassName="flex-1 mt-0"
+                    className="bg-black text-slate-50 border border-slate-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5"
+                    value={
+                      newMove
+                        ? `${newMove.hotkey?.[0]?.keyName}+${newMove.skillName}`
+                        : ""
+                    }
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                      handleNewMove(e.target.value)
+                    }
+                    options={actions.map((action) => ({
+                      value: `${action.hotkey}+${action.label}`,
+                      label: action.label,
+                    }))}
+                  />
+                )}
 
-                <Input
-                  wrapperClassName="flex-1"
-                  label="Delay (in milliseconds)"
-                  value={(
-                    newSkill.afterAttackDelay ||
-                    defaultNewSkill.afterAttackDelay
-                  ).toString()}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setNewSkill({
-                      ...newSkill,
-                      afterAttackDelay: Number(e.target.value),
-                    });
-                  }}
-                />
-              </div>
+                {isAdding === "delay" && (
+                  <Input
+                    wrapperClassName="flex-1 mt-0"
+                    // className="text-right"
+                    value={newMove.delay || ""}
+                    placeholder="Delay in milliseconds"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setNewMove({
+                        delay: e.target.value,
+                      });
+                    }}
+                  />
+                )}
 
-              <div className="flex justify-end">
+                {(isAdding === "medicine" ||
+                  isAdding === "pokestop" ||
+                  isAdding === "revive" ||
+                  isAdding === "autoloot") && (
+                  <div className="w-full">Add {typeLabels[isAdding]}</div>
+                )}
+
                 <Button
-                  active={false}
-                  inactiveClass="outline-none"
-                  className="mt-4 bg-blue-800 p-4 rounded-lg min-w-[160px]"
+                  className="bg-blue-00 p-4 rounded-lg text-green-400 h-[42px] hover:bg-green-900 hover:text-white"
                   onClick={() => {
                     setCombo({
                       ...combo,
-                      itemList: [...combo.itemList, newSkill],
+                      moveList: [...combo.moveList, newMove],
                     });
-                    setNewSkill(defaultNewSkill);
+                    setNewMove(defaultNewMove);
+                    setIsAdding(null);
                   }}
                 >
-                  Add
+                  <CheckIcon className="size-4" />
+                </Button>
+                <Button
+                  className="bg-blue-900 p-4 rounded-lg text-red-400 h-[42px] hover:bg-red-900 hover:text-white"
+                  onClick={() => {
+                    setNewMove(defaultNewMove);
+                    setIsAdding(null);
+                  }}
+                >
+                  <XMarkIcon className="size-4" />
                 </Button>
               </div>
             </Card>
-          ) : (
-            <AddItemButton onClick={() => setIsAdding(true)}>
-              <div className="flex items-center justify-center">
-                <div className="text-md font-medium">Add Skill</div>
-              </div>
-            </AddItemButton>
           )}
-          <div className="flex justify-end">
+          <div className="flex gap-4 justify-end">
             <Button
-              active={false}
-              inactiveClass="outline-none"
-              className="mt-16 p-4 bg-slate-800 rounded-lg min-w-[160px]"
+              className="p-4 bg-slate-700 rounded-lg min-w-[160px]"
               onClick={() => updateCombo({})}
             >
               Delete
             </Button>
             <Button
-              active={false}
-              inactiveClass="outline-none"
-              className="mt-16 p-4 bg-blue-800 rounded-lg min-w-[160px]"
+              className="p-4 bg-blue-900 rounded-lg min-w-[160px]"
               onClick={() => {
                 updateCombo({
                   name: combo.name || defaultNewCombo.name,
@@ -217,14 +234,10 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
                     combo.triggerKey.length > 0
                       ? combo.triggerKey
                       : defaultNewCombo.triggerKey,
-                  itemList:
-                    combo.itemList.length > 0
-                      ? combo.itemList
-                      : defaultNewCombo.itemList,
-                  reviveSliderValue:
-                    combo.reviveSliderValue ??
-                    defaultNewCombo.reviveSliderValue,
-                  useRevive: combo.useRevive ?? defaultNewCombo.useRevive,
+                  moveList:
+                    combo.moveList.length > 0
+                      ? combo.moveList
+                      : defaultNewCombo.moveList,
                 });
 
                 setCurrentCombo(combo);

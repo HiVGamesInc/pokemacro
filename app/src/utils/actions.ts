@@ -12,7 +12,7 @@ export const handleAutoCombo = async (combo: Combo) => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ key: combo.triggerKey[0], combo }),
+    body: JSON.stringify({ key: combo?.triggerKey?.[0], combo }),
   });
   const data = await response.json();
   return data;
@@ -24,7 +24,7 @@ export const updateAutoCombo = async (combo: Combo) => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ key: combo.triggerKey[0], combo }),
+    body: JSON.stringify({ key: combo?.triggerKey?.[0], combo }),
   });
   const data = await response.json();
   return data;

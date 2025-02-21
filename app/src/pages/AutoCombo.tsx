@@ -77,23 +77,14 @@ const AutoComboTab = () => {
                         {combo.triggerKey[0].keyName}
                       </div>
                     </div>
-                    {combo.useRevive && (
-                      <div className="text-xs font-normal my-4">
-                        Use Revive em{" "}
-                        <span className="text-blue-200 font-bold">
-                          {combo.reviveSliderValue} segundos.
-                        </span>
-                      </div>
-                    )}
-                    {/* {combo.itemList &&
-                      combo.itemList.map((item, index) => (
+                    {/* {combo.moveList &&
+                      combo.moveList.map((item, index) => (
                         <div
                           key={item.skillName + index}
                           className="text-xs font-medium mt-1 text-red-300"
                         >
                           {item.skillName} -{" "}
-                          {item.hotkey.map((k) => k.keyName).join("+")} -{" "}
-                          {item.afterAttackDelay / 1000} segundos
+                          {item.hotkey.map((k) => k.keyName).join("+")}
                         </div>
                       ))} */}
                   </Card>

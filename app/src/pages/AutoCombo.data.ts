@@ -47,16 +47,4 @@ export const actions = [
     hotkey: "F12",
     label: "Move 12",
   },
-  {
-    hotkey: "R",
-    label: "Revive",
-  },
-  {
-    hotkey: "T",
-    label: "Medicine",
-  },
-  {
-    hotkey: "Space",
-    label: "Auto Loot",
-  },
 ];
