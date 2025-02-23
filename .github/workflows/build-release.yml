@@ -16,7 +16,15 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      - name: Install Node dependencies
+        run: npm install --prefix app
+
+      - name: Install Python dependencies
         run: pip install pipenv && pipenv install --dev
 
       - name: Build .exe
