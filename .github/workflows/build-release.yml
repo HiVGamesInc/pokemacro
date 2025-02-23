@@ -22,10 +22,10 @@ jobs:
           node-version: "16"
 
       - name: Install Node dependencies
-        run: cd app && npm install
+        run: npm install --prefix app
 
       - name: Install Python dependencies
-        run: cd ../ && pip install pipenv && pipenv install --dev
+        run: pip install pipenv && pipenv install --dev
 
       - name: Build .exe
         run: pipenv run build
