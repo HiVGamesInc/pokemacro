@@ -2,7 +2,7 @@ import Route from "./Route";
 import Layout from "../components/Layout";
 import AutoComboTab from "../pages/AutoCombo";
 import MoveBindings from "../pages/MoveBindings";
-import Home from "../pages/Home";
+import Header from "../components/Header/Header";
 import * as RouterContext from "../contexts/RouterContext";
 import * as GlobalContext from "../contexts/GlobalContext";
 import * as AutoComboContext from "../contexts/AutoComboContext";
@@ -12,10 +12,8 @@ const Router = () => {
     <RouterContext.Provider>
       <GlobalContext.Provider>
         <AutoComboContext.Provider>
+          <Header />
           <Layout>
-            <Route path={RouterContext.Routes.HOME}>
-              <Home />
-            </Route>
             <Route path={RouterContext.Routes.AUTO_COMBO}>
               <AutoComboTab />
             </Route>

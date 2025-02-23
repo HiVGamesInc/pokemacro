@@ -1,91 +1,95 @@
-import { Draggable, Droppable } from "react-beautiful-dnd";
-import Card from "../Card/Card";
-import { TrashIcon } from "@heroicons/react/24/outline";
-import { Combo } from "../../types/types";
-import { FC } from "react";
+import { FC, useState, useEffect } from "react";
+import {
+  DndContext,
+  closestCenter,
+  DragEndEvent,
+  useSensor,
+  MouseSensor,
+  KeyboardSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
 
-import colors from "tailwindcss/colors";
+import SortableItem from "./SortableItem";
+import { Combo } from "../../types/types";
 
 type ComboListType = {
   combo: Combo;
   onRemove: (index: number) => void;
+  onReorder?: (newOrder: any[]) => void;
 };
 
-const ComboList: FC<ComboListType> = ({ combo, onRemove }) => {
-  return (
-    <div>
-      <Droppable droppableId="move-list">
-        {(provided, snapshot) => (
-          <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            className="min-h-32 flex flex-col gap-4 justify-center p-4 border border-dashed border-slate-500 mb-4 rounded-lg duration-100 text-center"
-            style={
-              snapshot.isDraggingOver
-                ? { backgroundColor: colors.gray[900] }
-                : {}
-            }
-          >
-            {provided.placeholder}
-            {combo.moveList?.length ? (
-              combo.moveList?.map((item, index) => {
-                const ref = item.delay ? item.delay : item.skillName;
-                const key = ref + index.toString();
+const ComboList: FC<ComboListType> = ({ combo, onRemove, onReorder }) => {
+  // We assume each move has a unique id. If not, generate one using index.
+  const initialItems =
+    combo.moveList?.map((item, index) => ({
+      ...item,
+      id: item.delay ? `delay-${index}` : `skill-${index}`,
+    })) || [];
 
-                return (
-                  <Draggable key={key} draggableId={key} index={index}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        <Card
-                          as="div"
-                          key={key + index}
-                          active={false}
-                          className="m-0"
-                        >
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <div className="text-md font-medium">
-                                {item.delay ? "Delay" : ref}
-                              </div>
-                              {item.hotkey && item.hotkey.length > 0 && (
-                                <div className="flex gap-4">
-                                  <div className="text-sm text-slate-300">
-                                    <span className="font-medium">Hotkey:</span>{" "}
-                                    {item.hotkey
-                                      .map((k) => k.keyName)
-                                      .join("+")}
-                                  </div>
-                                </div>
-                              )}
-                              {item.delay && (
-                                <div className="flex gap-4">
-                                  <div className="text-sm text-slate-300">
-                                    {item.delay + " miliseconds"}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                            <button onClick={() => onRemove(index)}>
-                              <TrashIcon className="size-5 text-red-500 hover:text-blue-100" />
-                            </button>
-                          </div>
-                        </Card>
-                      </div>
-                    )}
-                  </Draggable>
-                );
-              })
-            ) : (
-              <div className="text-sm text-slate-300">No moves added yet</div>
-            )}
-          </div>
-        )}
-      </Droppable>
-    </div>
+  const [items, setItems] = useState(initialItems);
+
+  // If the combo prop changes, update our local state
+  useEffect(() => {
+    setItems(
+      (combo.moveList || []).map((item, index) => ({
+        ...item,
+        id: item.delay ? `delay-${index}` : `skill-${index}`,
+      }))
+    );
+  }, [combo.moveList]);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (active.id && over && active.id !== over.id) {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      const newItems = arrayMove(items, oldIndex, newIndex);
+      setItems(newItems);
+
+      // If a reorder callback was provided, call it with the new list
+      onReorder && onReorder(newItems);
+    }
+  };
+
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 10,
+    },
+  });
+  const keyboardSensor = useSensor(KeyboardSensor);
+  const sensors = useSensors(mouseSensor, keyboardSensor);
+
+  return (
+    <DndContext
+      collisionDetection={closestCenter}
+      sensors={sensors}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={items.map((item) => item.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="min-h-32 flex flex-col gap-4 justify-center p-4 border border-dashed border-slate-500 mb-4 rounded-lg duration-100 text-center">
+          {items.length ? (
+            items.map((item, index) => (
+              <SortableItem
+                key={item.id}
+                id={item.id}
+                item={item}
+                onRemove={() => onRemove(index)}
+              />
+            ))
+          ) : (
+            <div className="text-sm text-slate-300">No moves added yet</div>
+          )}
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 };
 

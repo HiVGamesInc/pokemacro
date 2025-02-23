@@ -2,12 +2,12 @@ import { useContext } from "react";
 import {
   FireIcon,
   // Cog6ToothIcon,
-  BoltIcon,
+  // BoltIcon,
 } from "@heroicons/react/24/outline";
 import {
   FireIcon as FireIconActive,
   // Cog6ToothIcon as Cog6ToothIconActive,
-  BoltIcon as BoltIconActive,
+  // BoltIcon as BoltIconActive,
 } from "@heroicons/react/24/solid";
 
 import { IconType } from "../types/types";
@@ -37,21 +37,21 @@ const Navbar = () => {
   const router = useContext(RouterContext.Context);
 
   return (
-    <ul className="flex flex-col gap-4 p-4">
-      <li>
+    <ul className="flex flex-col gap-4 p-4 bg-slate-950">
+      {/* <li>
         <IconButton
           active={router.currentRoute === RouterContext.Routes.HOME}
-          icon={FireIcon}
-          activeIcon={FireIconActive}
+          icon={BoltIcon}
+          activeIcon={BoltIconActive}
           onClick={() => router.setCurrentRoute(RouterContext.Routes.HOME)}
         />
-      </li>
+      </li> */}
       <li>
         <button>
           <IconButton
             active={router.currentRoute === RouterContext.Routes.AUTO_COMBO}
-            icon={BoltIcon}
-            activeIcon={BoltIconActive}
+            icon={FireIcon}
+            activeIcon={FireIconActive}
             onClick={() =>
               router.setCurrentRoute(RouterContext.Routes.AUTO_COMBO)
             }

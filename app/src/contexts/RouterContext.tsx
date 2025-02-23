@@ -20,7 +20,7 @@ type ContextType = {
 const Context = createContext<ContextType>({} as ContextType);
 
 const Provider = ({ children }: PropsWithChildren) => {
-  const [currentRoute, setCurrentRoute] = useState(Routes.HOME);
+  const [currentRoute, setCurrentRoute] = useState(Routes.AUTO_COMBO);
 
   return (
     <Context.Provider value={{ currentRoute, setCurrentRoute }}>
