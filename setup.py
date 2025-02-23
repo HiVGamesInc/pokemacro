@@ -10,10 +10,10 @@ build_exe_options = {
 }
 
 # Define executable
-executables = [Executable("main.py", base=None, target_name="botiada.exe")]
+executables = [Executable("main.py", base=None, target_name="pokemacro.exe")]
 
 setup(
-    name="Botiada",
+    name="Pokemacro",
     version="0.1",
     description="Your application description",
     options={"build_exe": build_exe_options},
