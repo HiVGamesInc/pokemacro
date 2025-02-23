@@ -27,8 +27,12 @@ jobs:
       - name: Install Python dependencies
         run: cd .. && pip install pipenv && pipenv install --dev
 
-      - name: Build .exe
-        run: pipenv run build
+      - name: Build React App
+        working-directory: app
+        run: npm run build
+
+      - name: Build .exe with PyInstaller
+        run: pipenv run pyinstaller main.spec
 
       - name: Create Release
         id: create_release
