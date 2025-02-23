@@ -10,7 +10,7 @@ a = Analysis(
         ('app/build', 'app/build'),
         ('modules', 'modules'),
     ],
-    hiddenimports=['keyboard'],  # Adicione imports ocultos se necessário
+    hiddenimports=['keyboard', 'pkg_resources.extern'],  # Adicione imports ocultos se necessário
     hookspath=[],                # Adicione caminhos para hooks customizados se necessário
     runtime_hooks=[],            # Adicione runtime hooks se necessário
     excludes=[],
