@@ -22,17 +22,20 @@ jobs:
           node-version: "16"
 
       - name: Install Node dependencies
-        run: cd app && npm install
-
-      - name: Install Python dependencies
-        run: cd .. && pip install pipenv && pipenv install --dev
+        working-directory: app
+        run: npm install
 
       - name: Build React App
         working-directory: app
         run: npm run build
 
+      - name: Install Python dependencies
+        run: pip install pipenv && pipenv install --dev
+
       - name: Build .exe with PyInstaller
-        run: pipenv run python -m PyInstaller main.spec
+        uses: m-geier/pyinstaller-windows@v1
+        with:
+          spec_file: main.spec
 
       - name: Create Release
         id: create_release
