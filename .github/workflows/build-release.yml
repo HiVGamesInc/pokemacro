@@ -23,7 +23,7 @@ jobs:
 
       - name: Install Node dependencies
         working-directory: app
-        run: npm install
+        run: cd app && npm install
 
       - name: Build React App
         working-directory: app
