@@ -50,6 +50,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref }}
+          overwrite: true
           files: dist/pokemacro.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
