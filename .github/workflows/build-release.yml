@@ -23,19 +23,20 @@ jobs:
 
       - name: Install Node dependencies
         working-directory: app
-        run: npm install
+        run: cd app && npm install
 
       - name: Build React App
         working-directory: app
         run: npm run build
 
       - name: Install Python dependencies
-        run: pip install pipenv && pipenv install --dev
+        run: |
+          pip install pipenv && pipenv install --dev
+          pip install pywin32 pefile pyinstaller
+          pip install pyinstaller
 
       - name: Build .exe with PyInstaller
-        uses: JackMcKew/pyinstaller-action-windows@main
-        with:
-          path: ./
+        run: pipenv run build
 
       - name: Create Release
         id: create_release
