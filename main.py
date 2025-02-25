@@ -16,4 +16,4 @@ if __name__ == '__main__':
     flask_thread.start()
 
     debug_mode = os.environ.get('DEBUG_MODE', 'False').lower().strip() in ['true', '1', 'yes']
-    webview.start(debug=debug_mode)
+    webview.start(debug=True)

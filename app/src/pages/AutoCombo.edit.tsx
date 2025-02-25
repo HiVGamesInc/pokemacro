@@ -226,17 +226,21 @@ const AutoComboEdit = ({
           <Button
             className="p-4 bg-slate-950 border-blue-900 rounded-lg min-w-[160px]"
             onClick={() => {
-              const comboToSend = comboWithHotkeys(combo.moveList, keybindings);
-
-              updateCombo({
+              const moveListToSend = comboWithHotkeys(
+                combo.moveList,
+                keybindings
+              );
+              const newCombo = {
                 name: combo.name || defaultNewCombo.name,
                 triggerKey:
                   combo.triggerKey.length > 0
                     ? combo.triggerKey
                     : defaultNewCombo.triggerKey,
-                moveList: comboToSend,
-              });
-              setCurrentCombo(combo);
+                moveList: moveListToSend,
+              };
+
+              updateCombo(newCombo);
+              setCurrentCombo(newCombo);
             }}
           >
             Save

@@ -30,9 +30,9 @@ exe = EXE(
     a.datas,
     [],
     name='pokemacro',
-    debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=False,  # Altere para True se precisar de um console
+    debug=True,
+    console=True,  # Altere para True se precisar de um console
 )

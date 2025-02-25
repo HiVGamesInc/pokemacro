@@ -12,7 +12,7 @@ export interface Combo {
 
 export interface ComboMove {
   skillName?: string;
-  hotkey?: Hotkey;
+  hotkey?: HotkeyObject;
   delay?: string;
 }
 
