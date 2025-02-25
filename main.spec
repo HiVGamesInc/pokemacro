@@ -9,6 +9,8 @@ a = Analysis(
     datas=[
         ('app/build', 'app/build'),
         ('modules', 'modules'),
+        ('defaultCombo.json', 'defaultCombo.json'),
+        ('defaultKeybindings.json', 'defaultKeybindings.json'),
     ],
     hiddenimports=['keyboard', 'pkg_resources.extern'],  # Adicione imports ocultos se necessário
     hookspath=[],                # Adicione caminhos para hooks customizados se necessário
