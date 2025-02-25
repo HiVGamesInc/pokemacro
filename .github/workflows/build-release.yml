@@ -33,7 +33,6 @@ jobs:
         run: |
           pip install pipenv && pipenv install --dev
           pip install pywin32 pefile pyinstaller
-          pip install pyinstaller
 
       - name: Build .exe with PyInstaller
         run: pipenv run build

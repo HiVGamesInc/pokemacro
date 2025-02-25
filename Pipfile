@@ -15,6 +15,7 @@ pyqtwebengine = "*"
 cx-freeze = "*"
 nuitka = "*"
 livereload = "*"
+pyautogui = "*"
 
 [dev-packages]
 

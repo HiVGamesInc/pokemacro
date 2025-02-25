@@ -1,7 +1,7 @@
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Card from "../components/Card/Card";
 import { Combo, ComboMove, HotkeyObject } from "../types/types";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import Input from "../components/Input/Input";
 import Button from "../components/Button/Button";
 import Select from "../components/Select/Select";
