@@ -33,6 +33,6 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    debug=True,
-    console=True,  # Altere para True se precisar de um console
+    debug=False,
+    console=False,  # Altere para True se precisar de um console
 )

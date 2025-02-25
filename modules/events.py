@@ -14,14 +14,12 @@ stop_hook = None
 
 def execute_move(move_list):
     for move in move_list:
-        print(move.get('hotkey'))
         if move.get('delay'):
             delay_sec = float(move['delay']) / 1000.0
             print(f"Waiting for {delay_sec} seconds")
             time.sleep(delay_sec)
         if move.get('hotkey'):
             hotkey = move.get('hotkey')
-            print(hotkey)
             if execute_key_action(combo_event, hotkey['keyName']):
                 print(f"Executing action {hotkey['keyName']}")
 
