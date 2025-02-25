@@ -5,7 +5,7 @@ const types = ["move", "delay", "pokestop", "medicine", "revive", "autoloot"];
 
 export type Types = (typeof types)[number];
 
-export const typeLabels: { [key: Types]: string } = {
+export const TYPE_LABELS: { [key: Types]: string } = {
   delay: "Delay",
   move: "Move",
   pokestop: "Pokestop",
@@ -14,13 +14,21 @@ export const typeLabels: { [key: Types]: string } = {
   autoloot: "Auto Loot",
 };
 
+export const TYPE_DELAYS: Record<string, string> = {
+  move: "350",
+  pokestop: "100",
+  medicine: "100",
+  revive: "100",
+  autoloot: "100",
+};
+
 const Action = ({ type, onClick }: { type: Types; onClick: () => void }) => {
   return (
     <Card
       className="w-full flex justify-between items-center text-slate-300 text-md font-normal duration-100 hover:border-slate-500 hover:text-slate-100 hover:bg-slate-700"
       onClick={onClick}
     >
-      <div>{typeLabels[type]}</div>
+      <div>{TYPE_LABELS[type]}</div>
       <PlusIcon className="size-4" />
     </Card>
   );

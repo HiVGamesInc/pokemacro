@@ -1,6 +1,6 @@
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Card from "../components/Card/Card";
-import { Combo, ComboMove } from "../types/types";
+import { Combo, ComboMove, HotkeyObject } from "../types/types";
 import { useContext, useEffect, useState } from "react";
 import Input from "../components/Input/Input";
 import Button from "../components/Button/Button";
@@ -9,12 +9,34 @@ import { actions } from "./AutoCombo.data";
 import * as AutoComboContext from "../contexts/AutoComboContext";
 import * as KeybindingsContext from "../contexts/KeybindingsContext";
 import ActionsList, {
-  typeLabels,
+  TYPE_DELAYS,
+  TYPE_LABELS,
   Types,
 } from "../components/ActionsList/ActionsList";
 import ComboList from "../components/ComboList/ComboList";
 import KeybindingPicker from "../components/KeybindingPicker";
 import { comboWithHotkeys } from "../utils/combo";
+
+const getMoveDelay = (moveName?: string) => {
+  if (!moveName) return;
+
+  const skillLower = moveName.toLowerCase();
+
+  let defaultDelay = "350";
+  if (skillLower.includes("pokestop")) {
+    defaultDelay = TYPE_DELAYS["pokestop"];
+  } else if (skillLower.includes("medicine")) {
+    defaultDelay = TYPE_DELAYS["medicine"];
+  } else if (skillLower.includes("revive")) {
+    defaultDelay = TYPE_DELAYS["revive"];
+  } else if (skillLower.includes("auto loot")) {
+    defaultDelay = TYPE_DELAYS["autoloot"];
+  } else {
+    defaultDelay = TYPE_DELAYS["move"];
+  }
+
+  return defaultDelay;
+};
 
 const defaultNewCombo: Combo = {
   name: "New Combo",
@@ -29,7 +51,7 @@ const defaultNewCombo: Combo = {
 
 const defaultNewMove: ComboMove = {
   skillName: "Move 1",
-  delay: "500",
+  delay: "350",
 };
 
 const AutoComboEdit = ({
@@ -59,39 +81,37 @@ const AutoComboEdit = ({
     setCombo({ ...combo, moveList: newMoveList });
   };
 
-  const handleNewMove = (value: string) => {
-    const [, label] = value.split("+");
-
+  const handleNewMove = (key: HotkeyObject["keyName"]) => {
     setNewMove({
-      skillName: label,
+      skillName: key,
     });
   };
-
-  useEffect(() => {
-    switch (isAdding) {
-      case "pokestop":
-        handleNewMove("F12+Pokestop");
-        break;
-      case "medicine":
-        handleNewMove("T+Medicine");
-        break;
-      case "revive":
-        handleNewMove("R+Revive");
-        break;
-      case "autoloot":
-        handleNewMove("Space+Auto Loot");
-        break;
-      default:
-        break;
-    }
-    // eslint-disable-next-line
-  }, [isAdding]);
 
   return (
     <div className="flex gap-8">
       <div>
         <h2 className="text-lg font-medium mb-[43px]">Actions</h2>
-        <ActionsList onClick={(type) => setIsAdding(type)} />
+        <ActionsList
+          onClick={(type) => {
+            if (["pokestop", "medicine", "revive", "autoloot"].includes(type)) {
+              setCombo({
+                ...combo,
+                moveList: [
+                  ...combo.moveList,
+                  ...(!combo.moveList[combo.moveList.length - 1]?.delay
+                    ? [{ delay: TYPE_DELAYS[type] }]
+                    : []),
+                  {
+                    skillName: TYPE_LABELS[type],
+                  },
+                ],
+              });
+            } else {
+              // opens accept/cancel ui
+              setIsAdding(type);
+            }
+          }}
+        />
       </div>
       <div className="flex-1">
         <h2 className="text-lg font-medium">
@@ -135,21 +155,12 @@ const AutoComboEdit = ({
                 <Select
                   wrapperClassName="flex-1 !mt-0"
                   className="bg-black text-slate-50 border border-slate-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5"
-                  value={
-                    newMove
-                      ? `${
-                          newMove.skillName
-                            ? keybindings[newMove.skillName]?.keyName ||
-                              newMove.skillName
-                            : ""
-                        }`
-                      : ""
-                  }
+                  value={newMove ? newMove.skillName || "" : ""}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     handleNewMove(e.target.value)
                   }
                   options={actions.map((action) => ({
-                    value: `${action.hotkey}+${action.label}`,
+                    value: action.label,
                     label: action.label,
                   }))}
                 />
@@ -165,12 +176,6 @@ const AutoComboEdit = ({
                   }
                 />
               )}
-              {(isAdding === "medicine" ||
-                isAdding === "pokestop" ||
-                isAdding === "revive" ||
-                isAdding === "autoloot") && (
-                <div className="w-full">Add {typeLabels[isAdding]}</div>
-              )}
               <Button
                 className="bg-blue-00 p-4 rounded-lg text-green-400 h-[42px] hover:bg-green-900 hover:text-white"
                 onClick={() => {
@@ -184,6 +189,9 @@ const AutoComboEdit = ({
                       ...combo,
                       moveList: [
                         ...combo.moveList,
+                        ...(!combo.moveList[combo.moveList.length - 1]?.delay
+                          ? [{ delay: getMoveDelay(newMove.skillName) }]
+                          : []),
                         {
                           skillName: newMove.skillName,
                         },

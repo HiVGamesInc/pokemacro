@@ -15,6 +15,7 @@ const Button = ({
   children,
   activeClass = "border-green-400",
   inactiveClass = "border-red-300",
+  ...rest
 }: PropsWithChildren<ButtonProps>) => {
   return (
     <button
@@ -27,6 +28,7 @@ const Button = ({
           : "border-slate-700"
       } ${className || ""} `}
       onClick={onClick}
+      {...rest}
     >
       {children}
     </button>

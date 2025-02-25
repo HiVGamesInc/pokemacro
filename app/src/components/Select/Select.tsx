@@ -41,7 +41,7 @@ const Select = ({
             <option value={option.value}>{option.label}</option>
           ))}
         </select>
-        <ChevronDownIcon className="size-4 absolute right-4 top-[50%] translate-y-[-50%]" />
+        <ChevronDownIcon className="size-4 absolute right-4 top-[50%] translate-y-[-50%] pointer-events-none" />
       </div>
     </label>
   );

@@ -16,6 +16,7 @@ import {
 
 import SortableItem from "./SortableItem";
 import { Combo } from "../../types/types";
+import colors from "tailwindcss/colors";
 
 type ComboListType = {
   combo: Combo;
@@ -74,7 +75,7 @@ const ComboList: FC<ComboListType> = ({ combo, onRemove, onReorder }) => {
         items={items.map((item) => item.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className="min-h-32 flex flex-col gap-4 justify-center p-4 border border-dashed border-slate-500 mb-4 rounded-lg duration-100 text-center">
+        <div className="min-h-32 flex flex-col gap-2 justify-center p-4 border border-dashed border-slate-500 mb-4 rounded-lg duration-100 text-center">
           {items.length ? (
             items.map((item, index) => (
               <SortableItem
@@ -82,6 +83,9 @@ const ComboList: FC<ComboListType> = ({ combo, onRemove, onReorder }) => {
                 id={item.id}
                 item={item}
                 onRemove={() => onRemove(index)}
+                {...(item.delay && {
+                  style: { backgroundColor: colors.slate[900] },
+                })}
               />
             ))
           ) : (

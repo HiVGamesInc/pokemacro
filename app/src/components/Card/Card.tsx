@@ -16,6 +16,7 @@ const Card = ({
   onDoubleClick,
   className,
   children,
+  ...rest
 }: PropsWithChildren<CardProps>) => {
   const Comp = as || (Button as any);
 
@@ -27,6 +28,7 @@ const Card = ({
         onClick: active && onDoubleClick ? onDoubleClick : onClick,
       })}
       inactiveClass="border-slate-100"
+      {...rest}
     >
       {children}
     </Comp>
