@@ -9,8 +9,7 @@ a = Analysis(
     datas=[
         ('app/build', 'app/build'),
         ('modules', 'modules'),
-        ('defaultCombo.json', 'defaultCombo.json'),
-        ('defaultKeybindings.json', 'defaultKeybindings.json'),
+        ('configs', 'configs'),
     ],
     hiddenimports=['keyboard', 'pkg_resources.extern', 'webview'],  # Adicione imports ocultos se necessário
     hookspath=[],                # Adicione caminhos para hooks customizados se necessário
@@ -35,5 +34,5 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,  # Altere para True se precisar de um console
+    console=False,  # Altere para True se precisar de um console
 )

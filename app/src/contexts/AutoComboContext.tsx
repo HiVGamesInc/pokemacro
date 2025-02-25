@@ -31,7 +31,9 @@ const Provider = ({ children }: PropsWithChildren) => {
       setIsLoadingConfig(true);
       async function getComboConfig() {
         const config = await loadConfig("autocombo.json");
-        return config?.length ? config : await loadConfig("defaultCombo.json");
+        return config?.length
+          ? config
+          : await loadConfig("configs/defaultCombo.json");
       }
 
       const finalConfig = await getComboConfig();

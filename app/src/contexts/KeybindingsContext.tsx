@@ -30,7 +30,7 @@ const Provider = ({ children }: PropsWithChildren) => {
         const config = await loadConfig("keybindings.json");
         return config && Object.keys(config).length
           ? config
-          : await loadConfig("defaultKeybindings.json");
+          : await loadConfig("configs/defaultKeybindings.json");
       }
       const finalConfig = await getKeybindingsConfig();
       setKeybindings(finalConfig);

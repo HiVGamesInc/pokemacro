@@ -9,7 +9,7 @@ def start_flask():
     app.run(port=port)
 
 if __name__ == '__main__':
-    window = webview.create_window('Pokemacro', f'http://localhost:{port}')
+    window = webview.create_window('Pokemacro', f'http://127.0.0.1:{port}')
 
     flask_thread = threading.Thread(target=start_flask)
     flask_thread.daemon = True
