@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Default Combo",
+    "triggerKey": [
+      {
+        "keyName": "End",
+        "keyNumber": 64
+      }
+    ],
+    "moveList": [
+      {
+        "delay": "1000"
+      },
+      {
+        "skillName": "Move 1"
+      },
+      {
+        "skillName": "Pokestop"
+      },
+      {
+        "skillName": "Medicine"
+      },
+      {
+        "delay": "2000"
+      },
+      {
+        "skillName": "Auto Loot"
+      },
+      {
+        "skillName": "Revive"
+      }
+    ]
+  }
+]

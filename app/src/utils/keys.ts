@@ -28,16 +28,16 @@ export const KeyboardKeys = {
   ScrollLock: { keyName: "ScrollLock", keyNumber: 26 },
   Pause: { keyName: "Pause", keyNumber: 27 },
   Grave: { keyName: "Grave", keyNumber: 28 },
-  Num1: { keyName: "Num1", keyNumber: 29 },
-  Num2: { keyName: "Num2", keyNumber: 30 },
-  Num3: { keyName: "Num3", keyNumber: 31 },
-  Num4: { keyName: "Num4", keyNumber: 32 },
-  Num5: { keyName: "Num5", keyNumber: 33 },
-  Num6: { keyName: "Num6", keyNumber: 34 },
-  Num7: { keyName: "Num7", keyNumber: 35 },
-  Num8: { keyName: "Num8", keyNumber: 36 },
-  Num9: { keyName: "Num9", keyNumber: 37 },
-  Num0: { keyName: "Num0", keyNumber: 38 },
+  "1": { keyName: "1", keyNumber: 29 },
+  "2": { keyName: "2", keyNumber: 30 },
+  "3": { keyName: "3", keyNumber: 31 },
+  "4": { keyName: "4", keyNumber: 32 },
+  "5": { keyName: "5", keyNumber: 33 },
+  "6": { keyName: "6", keyNumber: 34 },
+  "7": { keyName: "7", keyNumber: 35 },
+  "8": { keyName: "8", keyNumber: 36 },
+  "9": { keyName: "9", keyNumber: 37 },
+  "0": { keyName: "0", keyNumber: 38 },
   Minus: { keyName: "Minus", keyNumber: 39 },
   Equal: { keyName: "Equal", keyNumber: 40 },
   Backspace: { keyName: "Backspace", keyNumber: 41 },
@@ -137,12 +137,80 @@ export const KeyboardKeys = {
 
 export type Key = (typeof KeyboardKeys)[keyof typeof KeyboardKeys];
 
+export const BrowserKeyMapping: Record<string, string> = {
+  // For Escape key: some browsers use "Esc"
+  Esc: "Escape",
+  // The key above Tab is usually called Backquote in browsers
+  Dead: "Grave",
+  // Top row number keys (if unmodified) might appear as the digit itself.
+  "1": "1",
+  "2": "2",
+  "3": "3",
+  "4": "4",
+  "5": "5",
+  "6": "6",
+  "7": "7",
+  "8": "8",
+  "9": "9",
+  "0": "0",
+  // The minus and equal keys might be sent as '-' and '='
+  "-": "Minus",
+  "=": "Equal",
+  // Brackets and backslash:
+  "[": "LeftBracket",
+  "]": "RightBracket",
+  "\\": "Backslash",
+  // Semicolon and quote
+  ";": "Semicolon",
+  "'": "Quote",
+  // For shift, default to LeftShift (could be refined using event.location)
+  Shift: "LeftShift",
+  // Arrow keys
+  ArrowUp: "Up",
+  ArrowDown: "Down",
+  ArrowLeft: "Left",
+  ArrowRight: "Right",
+  // Control, Alt, Meta
+  Control: "LeftControl",
+  Alt: "LeftAlt",
+  Meta: "LeftWin",
+  // Space may be sent as " " (a space character)
+  " ": "Space",
+  // Print Screen might come as "PrintScreen"
+  PrintScreen: "Print",
+  // Numeric keypad: browsers typically return "Numpad1", etc.
+  Numpad1: "NumPad1",
+  Numpad2: "NumPad2",
+  Numpad3: "NumPad3",
+  Numpad4: "NumPad4",
+  Numpad5: "NumPad5",
+  Numpad6: "NumPad6",
+  Numpad7: "NumPad7",
+  Numpad8: "NumPad8",
+  Numpad9: "NumPad9",
+  Numpad0: "NumPad0",
+  NumpadDecimal: "Decimal",
+};
+
 type FindKey = (
   keyName: Key["keyName"] | false,
   keyNumber?: Key["keyNumber"]
 ) => Key;
 
-export const findKey: FindKey = (keyName, keyNumber) =>
-  Object.values(KeyboardKeys).find((k) =>
-    keyName ? k.keyName === keyName : k.keyNumber === keyNumber
-  ) || ({} as Key);
+export const findKey: FindKey = (keyName, keyNumber) => {
+  let normalizedKeyName = keyName;
+
+  if (keyName) {
+    // Normalize using BrowserKeyMapping if available.
+    normalizedKeyName = BrowserKeyMapping[keyName] || keyName;
+  }
+
+  return (
+    Object.values(KeyboardKeys).find((k) =>
+      keyName
+        ? k.keyName.toLowerCase() ===
+          (normalizedKeyName as string).toLowerCase()
+        : k.keyNumber === keyNumber
+    ) || ({} as Key)
+  );
+};

@@ -3,22 +3,18 @@ import Card from "../components/Card/Card";
 import { Combo, ComboMove } from "../types/types";
 import { useContext, useEffect, useState } from "react";
 import Input from "../components/Input/Input";
-import { findKey } from "../utils/keys";
-import KeyboardKeysSelect from "../components/Select/KeyboardKeysSelect";
 import Button from "../components/Button/Button";
 import Select from "../components/Select/Select";
 import { actions } from "./AutoCombo.data";
 import * as AutoComboContext from "../contexts/AutoComboContext";
+import * as KeybindingsContext from "../contexts/KeybindingsContext";
 import ActionsList, {
   typeLabels,
   Types,
 } from "../components/ActionsList/ActionsList";
 import ComboList from "../components/ComboList/ComboList";
-
-type AutoComboEditProps = {
-  data: Combo;
-  updateCombo: (combo: Combo | {}) => void;
-};
+import KeybindingPicker from "../components/KeybindingPicker";
+import { comboWithHotkeys } from "../utils/combo";
 
 const defaultNewCombo: Combo = {
   name: "New Combo",
@@ -33,23 +29,24 @@ const defaultNewCombo: Combo = {
 
 const defaultNewMove: ComboMove = {
   skillName: "Move 1",
-  hotkey: [
-    {
-      keyName: "F1",
-      keyNumber: 1,
-    },
-  ],
   delay: "500",
 };
 
-const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
+const AutoComboEdit = ({
+  data,
+  updateCombo,
+}: {
+  data: Combo;
+  updateCombo: (combo: Combo | {}) => void;
+}) => {
   const [combo, setCombo] = useState(
     data || { name: "", triggerKey: [], moveList: [] }
   );
-  const [isAdding, setIsAdding] = useState<Types | null>();
+  const [isAdding, setIsAdding] = useState<Types | null>(null);
   const [newMove, setNewMove] = useState<ComboMove>(defaultNewMove);
 
   const { setCurrentCombo } = useContext(AutoComboContext.Context);
+  const { keybindings } = useContext(KeybindingsContext.Context);
 
   const removeSkill = (index: number) => {
     setCombo({
@@ -58,18 +55,15 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
     });
   };
 
-  // This callback will receive the new sorted moveList from ComboList (via dnd-kit)
   const handleReorder = (newMoveList: any[]) => {
     setCombo({ ...combo, moveList: newMoveList });
   };
 
   const handleNewMove = (value: string) => {
-    const [key, label] = value.split("+");
-    const keyObj = findKey(key);
+    const [, label] = value.split("+");
 
     setNewMove({
       skillName: label,
-      hotkey: [keyObj],
     });
   };
 
@@ -87,7 +81,10 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
       case "autoloot":
         handleNewMove("Space+Auto Loot");
         break;
+      default:
+        break;
     }
+    // eslint-disable-next-line
   }, [isAdding]);
 
   return (
@@ -102,6 +99,7 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
         </h2>
         <div className="flex gap-4 mb-8">
           <Input
+            name="combo-name"
             wrapperClassName="flex-1"
             label="Combo Name"
             value={combo.name || defaultNewCombo.name}
@@ -109,17 +107,16 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
               setCombo({ ...combo, name: e.target.value })
             }
           />
-          <KeyboardKeysSelect
-            wrapperClassName="flex-1"
-            title="Trigger Key"
-            value={
-              combo.triggerKey?.[0]?.keyNumber?.toString() ||
-              defaultNewCombo.triggerKey?.[0]?.keyNumber?.toString()
+          <KeybindingPicker
+            name="trigger-key"
+            label="Trigger Key"
+            currentKey={
+              combo.triggerKey?.[0]?.keyName ||
+              defaultNewCombo.triggerKey?.[0]?.keyName
             }
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              const key = findKey(false, Number(e.target.value));
-              setCombo({ ...combo, triggerKey: [key] });
-            }}
+            onKeySelected={(selectedKey) =>
+              setCombo({ ...combo, triggerKey: [selectedKey] })
+            }
           />
         </div>
         <h2 className="text-md font-medium my-4">Skills</h2>
@@ -140,7 +137,12 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
                   className="bg-black text-slate-50 border border-slate-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5"
                   value={
                     newMove
-                      ? `${newMove.hotkey?.[0]?.keyName}+${newMove.skillName}`
+                      ? `${
+                          newMove.skillName
+                            ? keybindings[newMove.skillName]?.keyName ||
+                              newMove.skillName
+                            : ""
+                        }`
                       : ""
                   }
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
@@ -154,11 +156,12 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
               )}
               {isAdding === "delay" && (
                 <Input
+                  name="delay"
                   wrapperClassName="flex-1 !mt-0"
                   value={newMove.delay || ""}
                   placeholder="Delay in milliseconds"
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setNewMove({ delay: e.target.value })
+                    setNewMove({ ...newMove, delay: e.target.value })
                   }
                 />
               )}
@@ -171,16 +174,23 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
               <Button
                 className="bg-blue-00 p-4 rounded-lg text-green-400 h-[42px] hover:bg-green-900 hover:text-white"
                 onClick={() => {
-                  const { delay, ...rest } = newMove;
-
-                  setCombo({
-                    ...combo,
-                    moveList: [
-                      ...combo.moveList,
-                      isAdding === "delay" ? { delay } : rest,
-                    ],
-                  });
-                  setNewMove(newMove);
+                  if (isAdding === "delay") {
+                    setCombo({
+                      ...combo,
+                      moveList: [...combo.moveList, { delay: newMove.delay }],
+                    });
+                  } else {
+                    setCombo({
+                      ...combo,
+                      moveList: [
+                        ...combo.moveList,
+                        {
+                          skillName: newMove.skillName,
+                        },
+                      ],
+                    });
+                  }
+                  setNewMove(defaultNewMove);
                   setIsAdding(null);
                 }}
               >
@@ -208,16 +218,15 @@ const AutoComboEdit = ({ data, updateCombo }: AutoComboEditProps) => {
           <Button
             className="p-4 bg-slate-950 border-blue-900 rounded-lg min-w-[160px]"
             onClick={() => {
+              const comboToSend = comboWithHotkeys(combo.moveList, keybindings);
+
               updateCombo({
                 name: combo.name || defaultNewCombo.name,
                 triggerKey:
                   combo.triggerKey.length > 0
                     ? combo.triggerKey
                     : defaultNewCombo.triggerKey,
-                moveList:
-                  combo.moveList.length > 0
-                    ? combo.moveList
-                    : defaultNewCombo.moveList,
+                moveList: comboToSend,
               });
               setCurrentCombo(combo);
             }}

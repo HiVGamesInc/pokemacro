@@ -1,9 +1,10 @@
+import React, { useContext } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Card from "../Card/Card";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import colors from "tailwindcss/colors";
-import React from "react";
+import * as KeybindingsContext from "../../contexts/KeybindingsContext";
 
 type SortableItemProps = {
   id: string;
@@ -14,6 +15,9 @@ type SortableItemProps = {
 const SortableItem: React.FC<SortableItemProps> = ({ id, item, onRemove }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
+
+  const { keybindings } = useContext(KeybindingsContext.Context);
+  const key = keybindings[item.skillName];
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -32,11 +36,10 @@ const SortableItem: React.FC<SortableItemProps> = ({ id, item, onRemove }) => {
         <div className="flex justify-between items-center">
           <div>
             <div className="text-md font-medium">{displayName}</div>
-            {item.hotkey && item.hotkey.length > 0 && (
+            {key?.keyName && (
               <div className="flex gap-4">
                 <div className="text-sm text-slate-300">
-                  <span className="font-medium">Hotkey:</span>{" "}
-                  {item.hotkey.map((k: any) => k.keyName).join("+")}
+                  <span className="font-medium">Hotkey:</span> {key.keyName}
                 </div>
               </div>
             )}

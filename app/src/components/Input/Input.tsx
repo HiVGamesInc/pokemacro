@@ -1,12 +1,14 @@
 import React, { PropsWithChildren } from "react";
 
 type InputProps = {
+  name: string;
   label?: string;
   defaultValue?: string;
   value: string;
   wrapperClassName?: string;
   className?: string;
   placeholder?: string;
+  readOnly?: boolean;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
 };
 

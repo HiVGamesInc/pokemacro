@@ -1,12 +1,12 @@
 import { useContext } from "react";
 import {
   FireIcon,
-  // Cog6ToothIcon,
+  Cog6ToothIcon,
   // BoltIcon,
 } from "@heroicons/react/24/outline";
 import {
   FireIcon as FireIconActive,
-  // Cog6ToothIcon as Cog6ToothIconActive,
+  Cog6ToothIcon as Cog6ToothIconActive,
   // BoltIcon as BoltIconActive,
 } from "@heroicons/react/24/solid";
 
@@ -58,7 +58,7 @@ const Navbar = () => {
           />
         </button>
       </li>
-      {/* <li>
+      <li>
         <button>
           <IconButton
             active={router.currentRoute === RouterContext.Routes.MOVE_BINDINGS}
@@ -69,7 +69,7 @@ const Navbar = () => {
             }
           />
         </button>
-      </li> */}
+      </li>
     </ul>
   );
 };

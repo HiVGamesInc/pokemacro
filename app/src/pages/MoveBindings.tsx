@@ -1,57 +1,73 @@
-import React, { useState } from "react";
-import Input from "../components/Input/Input";
-import { HotkeyObject } from "../types/types";
-import { KeyboardKeys } from "../utils/keys";
-import Button from "../components/Button/Button";
+import { useContext } from "react";
+import * as KeybindingsContext from "../contexts/KeybindingsContext";
+import KeybindingPicker from "../components/KeybindingPicker";
 
-type Form = {
-  [key: string]: HotkeyObject;
-};
+// Define the desired order of actions. Adjust these strings to match your intended names.
+const KEYBINDINGS_ORDER = [
+  "Move 1",
+  "Move 2",
+  "Move 3",
+  "Move 4",
+  "Move 5",
+  "Move 6",
+  "Move 7",
+  "Move 8",
+  "Move 9",
+  "Move 10",
+  "Move 11",
+  "Move 12",
+  "Pokestop",
+  "Revive",
+  "Medicine",
+  "Auto Loot",
+];
 
 const MoveBindings = () => {
-  const [movesFormData, setMovesFormData] = useState<Form>({
-    M1: KeyboardKeys.F1,
-    M2: KeyboardKeys.F2,
-    M3: KeyboardKeys.F3,
-    M4: KeyboardKeys.F4,
-    M5: KeyboardKeys.F5,
-    M6: KeyboardKeys.F6,
-    M7: KeyboardKeys.F7,
-    M8: KeyboardKeys.F8,
-    M9: KeyboardKeys.F9,
-    M10: KeyboardKeys.F10,
-    M11: KeyboardKeys.F11,
-    M12: KeyboardKeys.F12,
-  });
+  const { keybindings, setKeybindings } = useContext(
+    KeybindingsContext.Context
+  );
 
-  const handleSave = () => {
-    // window.electron.ipcRenderer.sendMessage('unbindAll');
-    // Object.values(movesFormData).forEach(m => window.electron.ipcRenderer.sendMessage('pressKey', m));
-  };
+  if (!keybindings || Object.keys(keybindings).length === 0) {
+    return <div>Loading keybindings...</div>;
+  }
 
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Configuration</h2>
-      <div className="flex gap-2 flex-wrap justify-between">
-        {Object.entries(movesFormData).map(([key, value]) => (
-          <Input
-            key={key}
-            label={key}
-            value={value.keyName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              const filteredKey: any = Object.values(KeyboardKeys).find(
-                (k) => k.keyName === e.target.value
-              );
+      <div className="overflow-x-auto">
+        <table className="min-w-full">
+          <thead>
+            <tr className="bg-gray-800 border border-gray-800">
+              <th className="px-4 py-2 text-white">Action</th>
+              <th className="px-4 py-2 text-white">Key Binding</th>
+            </tr>
+          </thead>
+          <tbody>
+            {KEYBINDINGS_ORDER.map((action) => {
+              const keyObj = keybindings[action];
 
-              setMovesFormData({
-                ...movesFormData,
-                [key]: filteredKey,
-              });
-            }}
-          />
-        ))}
+              return (
+                <tr key={action} className="border border-gray-800">
+                  <td className="px-4 py-2 font-medium">{action}</td>
+                  <td className="px-4 py-2">
+                    <KeybindingPicker
+                      name={action}
+                      currentKey={keyObj?.keyName}
+                      onKeySelected={(selectedKey) => {
+                        setKeybindings((prev) => {
+                          const newBindings = { ...prev };
+                          newBindings[action] = selectedKey;
+                          return newBindings;
+                        });
+                      }}
+                    />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-      <Button onClick={handleSave}>Save</Button>
     </div>
   );
 };

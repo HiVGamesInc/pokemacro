@@ -29,12 +29,14 @@ const Provider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     (async () => {
       setIsLoadingConfig(true);
-      const config = await loadConfig("autocombo.json");
-
-      if (config && config.length) {
-        setCombos(config);
-        setCurrentCombo(config[0]);
+      async function getComboConfig() {
+        const config = await loadConfig("autocombo.json");
+        return config?.length ? config : await loadConfig("defaultCombo.json");
       }
+
+      const finalConfig = await getComboConfig();
+      setCombos(finalConfig);
+      setCurrentCombo(finalConfig[0]);
     })();
     // eslint-disable-next-line
   }, []);

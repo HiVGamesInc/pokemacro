@@ -6,11 +6,14 @@ import { ArrowLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { updateAutoCombo } from "../utils/actions";
 import AddItemButton from "../components/Button/AddItemButton";
 import * as AutoComboContext from "../contexts/AutoComboContext";
+import * as KeybindingsContext from "../contexts/KeybindingsContext";
 
 const AutoComboTab = () => {
   const { combos, setCombos, currentCombo, setCurrentCombo } = useContext(
     AutoComboContext.Context
   );
+
+  const { keybindings } = useContext(KeybindingsContext.Context);
 
   const activeComboIndex = useMemo(
     () => combos.findIndex((c) => c.name === currentCombo?.name) ?? 0,
@@ -83,33 +86,37 @@ const AutoComboTab = () => {
                   </div>
                   <div className="mt-4 flex items-center flex-wrap gap-2">
                     {combo.moveList &&
-                      combo.moveList.map((item, index) => (
-                        <>
+                      combo.moveList.map((item, index) => {
+                        return (
                           <div
                             key={(item.skillName || "") + index}
-                            className="text-xs font-medium"
+                            className="flex items-center gap-2"
                           >
-                            {item.delay ? (
-                              <span>
-                                Delay -{" "}
-                                <span className="text-green-300">
-                                  {Number(item.delay) / 1000} seg
+                            <div className="text-xs font-medium">
+                              {item.delay ? (
+                                <span>
+                                  Delay -{" "}
+                                  <span className="text-green-300">
+                                    {Number(item.delay) / 1000} seg
+                                  </span>
                                 </span>
-                              </span>
-                            ) : (
-                              <span>
-                                {item.skillName} -{" "}
-                                <span className="text-green-300">
-                                  {item.hotkey?.map((k) => k.keyName).join("+")}
+                              ) : (
+                                <span>
+                                  {item.skillName} -{" "}
+                                  <span className="text-green-300">
+                                    {item.skillName
+                                      ? keybindings[item.skillName]?.keyName
+                                      : null}
+                                  </span>
                                 </span>
-                              </span>
+                              )}
+                            </div>
+                            {index !== combo.moveList.length - 1 && (
+                              <ChevronRightIcon className="size-3" />
                             )}
                           </div>
-                          {index !== combo.moveList.length - 1 && (
-                            <ChevronRightIcon className="size-3" />
-                          )}
-                        </>
-                      ))}
+                        );
+                      })}
                   </div>
                 </Card>
               ))}

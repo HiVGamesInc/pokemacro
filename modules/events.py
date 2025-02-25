@@ -18,7 +18,8 @@ def execute_move(move_list):
             delay_sec = float(move['delay']) / 1000.0
             print(f"Waiting for {delay_sec} seconds")
             time.sleep(delay_sec)
-        for hotkey in move.get('hotkey', []):
+        if move.get('hotkey'):
+            hotkey = move.get('hotkey')
             if execute_key_action(combo_event, hotkey['keyName']):
                 print(f"Executing action {hotkey['keyName']}")
 
