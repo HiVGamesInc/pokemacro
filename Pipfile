@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 pywebview = "*"
-webview = "*"
 flask = "*"
 pyinstaller = "*"
 pythonnet = "*"
@@ -18,8 +17,6 @@ nuitka = "*"
 livereload = "*"
 pyautogui = "*"
 keyboard = "*"
-threading = "*"
-time = "*"
 
 [dev-packages]
 
