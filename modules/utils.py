@@ -2,14 +2,30 @@ import json
 import os
 import sys
 
+import os
+import sys
+
 def resource_path(relative_path):
     """
-    Get the absolute path to a resource, works for both development and
-    when running from a PyInstaller bundle.
+    Returns the absolute path to a resource.
+    
+    - In a bundled (PyInstaller one‑file) application, if the relative_path starts with "configs/",
+      the file is expected to be bundled and extracted to sys._MEIPASS.
+    - Otherwise, it is assumed to be external and located in the same directory as the executable.
+    - In development, files are loaded from the project root.
     """
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), relative_path)
+    if hasattr(sys, "_MEIPASS"):
+        # Running from a bundled executable.
+        if relative_path.startswith("configs/"):
+            # Files in the configs folder are bundled into the temp folder.
+            return os.path.join(sys._MEIPASS, relative_path)
+        else:
+            # Other files are expected to be external (next to the .exe).
+            return os.path.join(os.path.dirname(sys.executable), relative_path)
+    else:
+        # In development, assume files are in the project root.
+        return os.path.join(os.path.abspath("."), relative_path)
+
 
 def save_to_file(combo, filename='config.json'):
     path = resource_path(filename)
