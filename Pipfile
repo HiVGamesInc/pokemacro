@@ -16,6 +16,9 @@ cx-freeze = "*"
 nuitka = "*"
 livereload = "*"
 pyautogui = "*"
+keyboard = "*"
+threading = "*"
+time = "*"
 
 [dev-packages]
 
