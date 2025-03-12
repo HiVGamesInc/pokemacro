@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import * as AlertContext from "../contexts/AlertContext";
 import Button from "../components/Button/Button";
-import { XMarkIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import Input from "../components/Input/Input";
 
 // Define the desired order of actions. Adjust these strings to match your intended names.
