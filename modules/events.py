@@ -2,10 +2,11 @@ import threading
 import time
 import pyautogui
 import keyboard
-from modules.utils import save_to_file, load_from_file
+from modules.utils import save_to_file, load_from_file, capture_screen, extract_text, play_alert_sound
 
 auto_combo_enabled = False
 anti_logout_enabled = False
+alert_enabled = False
 combo_event = threading.Event()
 combo_running = False
 
@@ -37,6 +38,60 @@ def toggle_anti_logout():
 
     threading.Thread(target=run, daemon=True).start()
     return f"Keyboard events {'enabled' if anti_logout_enabled else 'disabled'}"
+
+def toggle_alert():
+    global alert_enabled
+    alert_enabled = not alert_enabled
+
+    def run():
+        # try:
+        iteration = 0
+        
+        while alert_enabled:
+            alert_config = load_from_file('alertConfig.json')
+            offset_x = int(alert_config['fields']['offset_x']['value'])
+            offset_y = int(alert_config['fields']['offset_y']['value'])
+            x_length = int(alert_config['fields']['x_length']['value'])
+            y_length = int(alert_config['fields']['y_length']['value'])
+
+            battle_box = (offset_x, offset_y, x_length, y_length)
+            # Capture the battle box region
+            screenshot = capture_screen(bbox=battle_box)
+
+            iteration += 1
+
+            # Extract text from the screenshot
+            text = extract_text(screenshot)
+
+            # Split the text into lines and check for matches
+            should_play_sound = False
+            line_to_print = ''
+            for line in text.splitlines():
+                line_stripped = line.strip()
+                if line_stripped:
+                    line_has_any_target = False
+                    for target in alert_config['hunt']['list']:
+                        if target in line_stripped:
+                            line_has_any_target = True
+                    if line_has_any_target == False:
+                        line_to_print = line_stripped
+                        should_play_sound = True
+                
+            if should_play_sound:
+                play_alert_sound()
+            
+            del screenshot
+            del text
+
+            time.sleep(0.5)
+        # except Exception as e:
+        #     print(f"Error running alert: {str(e)}")
+
+    threading.Thread(target=run, daemon=True).start()
+    return {
+        "alert_enabled": alert_enabled,
+        "message": f"Alert {'enabled' if alert_enabled else 'disabled'}"
+    }
 
 def toggle_auto_combo(trigger_key, current_combo, stop_key='home'):
     global auto_combo_enabled, current_combo_hook, stop_hook

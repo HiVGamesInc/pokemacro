@@ -87,6 +87,7 @@ const AutoComboEdit = ({
     });
   };
 
+
   return (
     <div className="flex gap-8">
       <div>
@@ -179,6 +180,8 @@ const AutoComboEdit = ({
               <Button
                 className="bg-blue-00 p-4 rounded-lg text-green-400 h-[42px] hover:bg-green-900 hover:text-white"
                 onClick={() => {
+                  console.log(combo);
+
                   if (isAdding === "delay") {
                     setCombo({
                       ...combo,
@@ -198,6 +201,7 @@ const AutoComboEdit = ({
                       ],
                     });
                   }
+
                   setNewMove(defaultNewMove);
                   setIsAdding(null);
                 }}

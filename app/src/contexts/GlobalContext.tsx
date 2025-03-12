@@ -11,6 +11,8 @@ type ContextType = {
   setAntiLogout: Dispatch<SetStateAction<boolean>>;
   autoCombo: boolean;
   setAutoCombo: Dispatch<SetStateAction<boolean>>;
+  alertStatus: boolean;
+  setAlertStatus: Dispatch<SetStateAction<boolean>>;
 };
 
 const Context = createContext<ContextType>({} as ContextType);
@@ -18,10 +20,12 @@ const Context = createContext<ContextType>({} as ContextType);
 const Provider = ({ children }: PropsWithChildren) => {
   const [antiLogout, setAntiLogout] = useState(false);
   const [autoCombo, setAutoCombo] = useState(false);
+  const [alertStatus, setAlertStatus] = useState(false);
+
 
   return (
     <Context.Provider
-      value={{ antiLogout, setAntiLogout, autoCombo, setAutoCombo }}
+      value={{ antiLogout, setAntiLogout, autoCombo, setAutoCombo, alertStatus, setAlertStatus }}
     >
       {children}
     </Context.Provider>

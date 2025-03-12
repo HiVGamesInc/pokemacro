@@ -10,6 +10,7 @@ export enum Routes {
   HOME = "home",
   AUTO_COMBO = "auto-combo",
   MOVE_BINDINGS = "move-bindings",
+  ALERT = "alert",
 }
 
 type ContextType = {
