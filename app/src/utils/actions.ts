@@ -6,6 +6,12 @@ export const handleAntiLogout = async () => {
   return data;
 };
 
+export const handleAlert = async () => {
+  const response = await fetch("/alert", { method: "POST" });
+  const data = await response.json();
+  return data;
+};
+
 export const handleAutoCombo = async (combo: Combo) => {
   const response = await fetch("/auto-combo", {
     method: "POST",

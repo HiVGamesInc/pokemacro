@@ -1,9 +1,10 @@
 import json
 import os
 import sys
+import pytesseract
+from PIL import ImageGrab
+import winsound
 
-import os
-import sys
 
 def resource_path(relative_path):
     """
@@ -49,3 +50,23 @@ def load_from_file(filename='config.json'):
     except Exception as e:
         print(f"Failed to load file: {str(e)}")
         return {}
+
+def capture_screen(bbox=None):
+    """Capture a specific region of the screen and return it as an image."""
+    return ImageGrab.grab(bbox=bbox)
+
+def extract_text(image):
+    pytesseract.pytesseract.tesseract_cmd = 'tesseract-ocr\\tesseract.exe'
+    return pytesseract.image_to_string(image)
+
+def save_debug_image(image, iteration):
+    """Save the captured image for debugging purposes."""
+    debug_image_path = os.path.join(DEBUG_IMAGE_DIR, f"debug_{iteration}.png")
+    image.save(debug_image_path)
+    print(f"Debug image saved: {debug_image_path}")
+
+def play_alert_sound():
+    """Play a sound alert."""
+    frequency = 500  # Hz
+    duration = 500  # milliseconds
+    winsound.Beep(frequency, duration)

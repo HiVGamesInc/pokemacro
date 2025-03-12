@@ -2,12 +2,13 @@ import { useContext } from "react";
 import {
   FireIcon,
   Cog6ToothIcon,
+  BellAlertIcon,
   // BoltIcon,
 } from "@heroicons/react/24/outline";
 import {
   FireIcon as FireIconActive,
   Cog6ToothIcon as Cog6ToothIconActive,
-  // BoltIcon as BoltIconActive,
+  BellAlertIcon as BellAlertIconActive
 } from "@heroicons/react/24/solid";
 
 import { IconType } from "../types/types";
@@ -61,6 +62,18 @@ const Navbar = () => {
       <li>
         <button>
           <IconButton
+            active={router.currentRoute === RouterContext.Routes.ALERT}
+            icon={BellAlertIcon}
+            activeIcon={BellAlertIconActive}
+            onClick={() =>
+              router.setCurrentRoute(RouterContext.Routes.ALERT)
+            }
+          />
+        </button>
+      </li>
+      <li>
+        <button>
+          <IconButton
             active={router.currentRoute === RouterContext.Routes.MOVE_BINDINGS}
             icon={Cog6ToothIcon}
             activeIcon={Cog6ToothIconActive}
@@ -70,6 +83,7 @@ const Navbar = () => {
           />
         </button>
       </li>
+      
     </ul>
   );
 };
