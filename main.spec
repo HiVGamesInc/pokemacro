@@ -10,6 +10,7 @@ a = Analysis(
         ('app/build', 'app/build'),
         ('modules', 'modules'),
         ('configs', 'configs'),
+        ('tesseract-ocr', 'tesseract-ocr'),
     ],
     hiddenimports=['keyboard', 'pkg_resources.extern', 'webview'],  # Adicione imports ocultos se necessário
     hookspath=[],                # Adicione caminhos para hooks customizados se necessário
