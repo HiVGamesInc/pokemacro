@@ -15,6 +15,8 @@ type ContextType = {
   setAlertStatus: Dispatch<SetStateAction<boolean>>;
   autoCatch: boolean;
   setAutoCatch: Dispatch<SetStateAction<boolean>>; 
+  healing: boolean;
+  setHealing: Dispatch<SetStateAction<boolean>>;
 };
 
 const Context = createContext<ContextType>({} as ContextType);
@@ -24,6 +26,7 @@ const Provider = ({ children }: PropsWithChildren) => {
   const [autoCombo, setAutoCombo] = useState(false);
   const [alertStatus, setAlertStatus] = useState(false);
   const [autoCatch, setAutoCatch] = useState(false);
+  const [healing, setHealing] = useState(false);
   return (
     <Context.Provider
       value={{
@@ -35,6 +38,8 @@ const Provider = ({ children }: PropsWithChildren) => {
         setAlertStatus,
         autoCatch, 
         setAutoCatch,
+        healing, 
+        setHealing
       }}
     >
       {children}

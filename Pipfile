@@ -20,11 +20,13 @@ keyboard = "*"
 pytesseract = "*"
 Pillow = "*"
 opencv-python = "*"
+easyocr = "*"
+numpy = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.12"
+python_version = "3.11"
 
 [scripts]
 dev = "set DEBUG_MODE=True && set FLASK_APP=modules:app && set FLASK_ENV=development && npx concurrently \"flask --debug run\" \"npm run start --prefix app\""

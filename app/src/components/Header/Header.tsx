@@ -1,11 +1,16 @@
 import { useContext } from "react";
-import { handleAntiLogout, handleAutoCombo, handleAlert, handleAutoCatch } from "../../utils/actions";
+import { handleAntiLogout, handleAutoCombo, handleAlert, handleHealing, handleAutoCatch } from "../../utils/actions";
 import Button from "../Button/Button";
 import * as GlobalContext from "../../contexts/GlobalContext";
 import * as AutoComboContext from "../../contexts/AutoComboContext";
 
 const Header = () => {
-  const { antiLogout, setAntiLogout, autoCombo, setAutoCombo, alertStatus, setAlertStatus, autoCatch, setAutoCatch } = useContext(GlobalContext.Context); // Access autoCatch from context
+  const { antiLogout, setAntiLogout, autoCombo, setAutoCombo, alertStatus, setAlertStatus, autoCatch, setAutoCatch, healing, setHealing } = useContext(GlobalContext.Context); // Access autoCatch from context
+  // const { antiLogout, setAntiLogout } = useContext(GlobalContext.Context);
+  // const { autoCombo, setAutoCombo } = useContext(GlobalContext.Context);
+  // const { alertStatus, setAlertStatus } = useContext(GlobalContext.Context);
+  // const { healing, setHealing } = useContext(GlobalContext.Context);
+
 
   const { currentCombo } = useContext(AutoComboContext.Context);
 
@@ -18,6 +23,13 @@ const Header = () => {
     const result = await handleAlert();
     if(result.data){
       setAlertStatus(result.data.alert_enabled);
+    }
+  };
+
+  const toggleHealing = async () => {
+    const result = await handleHealing();
+    if(result.data){
+      setHealing(result.data.healing_enabled);
     }
   };
 
@@ -49,6 +61,9 @@ const Header = () => {
           </Button>
           <Button active={alertStatus} onClick={toggleAlert}>
             Alert
+          </Button>
+          <Button active={healing} onClick={toggleHealing}>
+            Healing
           </Button>
           <Button active={autoCombo} onClick={toggleAutoCombo}>
             Auto Combo

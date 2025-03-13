@@ -1,7 +1,7 @@
 import os
 from flask import request, jsonify, send_from_directory
 from modules import app
-from modules.events import execute_crop_area, toggle_auto_catch, toggle_auto_combo, toggle_anti_logout, toggle_alert, update_current_combo, save_config, load_config
+from modules.events import toggle_auto_combo, toggle_anti_logout, toggle_alert, toggle_healing, update_current_combo, save_config, load_config, execute_crop_area, toggle_auto_catch
 
 @app.route('/anti-logout', methods=['POST'])
 def anti_logout():
@@ -11,6 +11,11 @@ def anti_logout():
 @app.route('/alert', methods=['POST'])
 def alert():
     data = toggle_alert()
+    return jsonify({"data": data})
+
+@app.route('/healing', methods=['POST'])
+def healing():
+    data = toggle_healing()
     return jsonify({"data": data})
 
 @app.route('/auto-combo', methods=['POST'])

@@ -20,7 +20,8 @@ const KEYBINDINGS_ORDER = [
   "Revive",
   "Medicine",
   "Auto Loot",
-  "Pokeball"
+  "Pokeball",
+  "Poke Heal"
 ];
 
 const MoveBindings = () => {
