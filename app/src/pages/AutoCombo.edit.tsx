@@ -94,7 +94,7 @@ const AutoComboEdit = ({
         <h2 className="text-lg font-medium mb-[43px]">Actions</h2>
         <ActionsList
           onClick={(type) => {
-            if (["pokestop", "medicine", "revive", "autoloot"].includes(type)) {
+            if (["pokestop", "medicine", "revive", "autoloot", "autocatch"].includes(type)) {
               setCombo({
                 ...combo,
                 moveList: [
@@ -102,13 +102,12 @@ const AutoComboEdit = ({
                   ...(!combo.moveList[combo.moveList.length - 1]?.delay
                     ? [{ delay: TYPE_DELAYS[type] }]
                     : []),
-                  {
-                    skillName: TYPE_LABELS[type],
-                  },
+                    type === "autocatch"
+                    ? { skillName: TYPE_LABELS[type], autoCatch: true }
+                    : { skillName: TYPE_LABELS[type] },
                 ],
               });
             } else {
-              // opens accept/cancel ui
               setIsAdding(type);
             }
           }}
@@ -142,7 +141,6 @@ const AutoComboEdit = ({
         </div>
         <h2 className="text-md font-medium my-4">Skills</h2>
 
-        {/* ComboList now uses dnd-kit internally. */}
         <ComboList
           combo={combo}
           onRemove={removeSkill}

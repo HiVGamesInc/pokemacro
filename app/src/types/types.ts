@@ -14,6 +14,7 @@ export interface ComboMove {
   skillName?: string;
   hotkey?: HotkeyObject;
   delay?: string;
+  autoCatch? : boolean;
 }
 
 export type IconType = React.ForwardRefExoticComponent<
