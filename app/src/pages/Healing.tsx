@@ -1,7 +1,5 @@
 import { useContext } from "react";
 import * as HealingContext from "../contexts/HealingContext";
-import Button from "../components/Button/Button";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import Input from "../components/Input/Input";
 
 // Define the desired order of actions. Adjust these strings to match your intended names.
