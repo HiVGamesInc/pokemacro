@@ -3,10 +3,13 @@ import time
 import pyautogui
 import keyboard
 from modules.utils import save_to_file, load_from_file, capture_screen, extract_text, play_alert_sound
+import easyocr
+import numpy as np
 
 auto_combo_enabled = False
 anti_logout_enabled = False
 alert_enabled = False
+healing_enabled = False
 combo_event = threading.Event()
 combo_running = False
 
@@ -91,6 +94,54 @@ def toggle_alert():
     return {
         "alert_enabled": alert_enabled,
         "message": f"Alert {'enabled' if alert_enabled else 'disabled'}"
+    }
+
+def toggle_healing():
+    global healing_enabled
+    healing_enabled = not healing_enabled
+
+    def run():
+        reader = easyocr.Reader(['en'])
+        iteration = 0
+        while healing_enabled:
+            heal_config = load_from_file('healConfig.json')
+            keybindings = load_from_file('keybindings.json')
+
+            ph_x_start = int(heal_config['fields']['poke_heal_x_start']['value'])
+            ph_x_end = int(heal_config['fields']['poke_heal_x_end']['value'])
+            ph_y_start = int(heal_config['fields']['poke_heal_y_start']['value'])
+            ph_y_end = int(heal_config['fields']['poke_heal_y_end']['value'])
+
+            pokemon_life_box = (ph_x_start, ph_y_start, ph_x_end, ph_y_end)
+            ph_hotkey = keybindings['Poke Heal']['keyName']
+            ph_cooldown = int(heal_config['fields']['poke_heal_cooldown']['value'])
+            ph_percent_limit = int(heal_config['fields']['poke_heal_percent_limit']['value']) / 100
+
+
+            screenshot = capture_screen(bbox=pokemon_life_box)
+
+            # save_debug_image(screenshot, iteration)
+            iteration += 1
+
+            text_array = reader.readtext(np.array(screenshot), detail=0)
+        
+            if len(text_array) == 2:
+                health = int(text_array[0])
+                total_health = int(text_array[1])
+                if health / total_health <= ph_percent_limit:
+                    keyboard.press_and_release(ph_hotkey)
+                    time.sleep(ph_cooldown)
+                
+            del screenshot
+            
+            # Wait for a short time before capturing the screen again
+            time.sleep(0.5)
+        del reader
+
+    threading.Thread(target=run, daemon=True).start()
+    return {
+        "healing_enabled": healing_enabled,
+        "message": f"Healing {'enabled' if healing_enabled else 'disabled'}"
     }
 
 def toggle_auto_combo(trigger_key, current_combo, stop_key='home'):

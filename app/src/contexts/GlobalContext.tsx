@@ -13,6 +13,8 @@ type ContextType = {
   setAutoCombo: Dispatch<SetStateAction<boolean>>;
   alertStatus: boolean;
   setAlertStatus: Dispatch<SetStateAction<boolean>>;
+  healing: boolean;
+  setHealing: Dispatch<SetStateAction<boolean>>;
 };
 
 const Context = createContext<ContextType>({} as ContextType);
@@ -21,11 +23,12 @@ const Provider = ({ children }: PropsWithChildren) => {
   const [antiLogout, setAntiLogout] = useState(false);
   const [autoCombo, setAutoCombo] = useState(false);
   const [alertStatus, setAlertStatus] = useState(false);
+  const [healing, setHealing] = useState(false);
 
 
   return (
     <Context.Provider
-      value={{ antiLogout, setAntiLogout, autoCombo, setAutoCombo, alertStatus, setAlertStatus }}
+      value={{ antiLogout, setAntiLogout, autoCombo, setAutoCombo, alertStatus, setAlertStatus, healing, setHealing }}
     >
       {children}
     </Context.Provider>

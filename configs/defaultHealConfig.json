@@ -1,0 +1,29 @@
+{
+    "fields": {
+        "poke_heal_cooldown": {
+            "label": "Cooldown to Poke Heal",
+            "value": 10
+        },
+        "poke_heal_percent_limit": {
+            "label": "Life % to Poke Heal",
+            "value": 50
+        },
+        "poke_heal_x_start": {
+            "label": "Pokemon Healthbar: X Start",
+            "value": 1780
+        },
+        "poke_heal_x_end": {
+            "label": "Pokemon Healthbar: X End",
+            "value": 1900
+        },
+        "poke_heal_y_start": {
+            "label": "Pokemon Healthbar: Y Start",
+            "value": 55
+        },
+        "poke_heal_y_end": {
+            "label": "Pokemon Healthbar: Y End",
+            "value": 80
+        }
+    }
+  }
+  

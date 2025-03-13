@@ -62,5 +62,9 @@
   "Revive": {
     "keyName": "R",
     "keyNumber": 53
+  },
+  "Poke Heal": {
+    "keyName": "O",
+    "keyNumber": 79
   }
 }

@@ -19,6 +19,8 @@ pyautogui = "*"
 keyboard = "*"
 pytesseract = "*"
 Pillow = "*"
+easyocr = "*"
+numpy = "*"
 
 [dev-packages]
 

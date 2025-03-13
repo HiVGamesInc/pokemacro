@@ -12,6 +12,13 @@ export const handleAlert = async () => {
   return data;
 };
 
+
+export const handleHealing = async () => {
+  const response = await fetch("/healing", { method: "POST" });
+  const data = await response.json();
+  return data;
+};
+
 export const handleAutoCombo = async (combo: Combo) => {
   const response = await fetch("/auto-combo", {
     method: "POST",

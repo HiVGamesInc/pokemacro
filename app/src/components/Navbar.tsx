@@ -3,12 +3,14 @@ import {
   FireIcon,
   Cog6ToothIcon,
   BellAlertIcon,
+  HeartIcon
   // BoltIcon,
 } from "@heroicons/react/24/outline";
 import {
   FireIcon as FireIconActive,
   Cog6ToothIcon as Cog6ToothIconActive,
-  BellAlertIcon as BellAlertIconActive
+  BellAlertIcon as BellAlertIconActive,
+  HeartIcon as HeartIconActive
 } from "@heroicons/react/24/solid";
 
 import { IconType } from "../types/types";
@@ -67,6 +69,18 @@ const Navbar = () => {
             activeIcon={BellAlertIconActive}
             onClick={() =>
               router.setCurrentRoute(RouterContext.Routes.ALERT)
+            }
+          />
+        </button>
+      </li>
+      <li>
+        <button>
+          <IconButton
+            active={router.currentRoute === RouterContext.Routes.HEALING}
+            icon={HeartIcon}
+            activeIcon={HeartIconActive}
+            onClick={() =>
+              router.setCurrentRoute(RouterContext.Routes.HEALING)
             }
           />
         </button>
