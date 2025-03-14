@@ -285,7 +285,7 @@ def toggle_auto_catch():
         "message": f"Auto Catch {'enabled' if auto_catch_enabled else 'disabled'}"
     }
 
-def locate_image_opencv(template_path, threshold=0.8):
+def locate_image_opencv(template_path, threshold=0.9):
     screenshot = pyautogui.screenshot()
     screenshot_cv = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
     
@@ -317,7 +317,7 @@ def process_image(image_path, control_lock, stop_time, trigger_key):
 
     while time.time() - start_time < stop_time:
         try:
-            matches = locate_image_opencv(image_path, threshold=0.8)
+            matches = locate_image_opencv(image_path, threshold=0.9)
         except Exception as e:
             time.sleep(delay)
             continue
@@ -334,14 +334,14 @@ def process_image(image_path, control_lock, stop_time, trigger_key):
                 cv2.normalize(region_hist, region_hist, 0, 1, cv2.NORM_MINMAX)
                 
                 correlation = cv2.compareHist(template_hist, region_hist, cv2.HISTCMP_CORREL)
-                if correlation >= 0.9:
+                if correlation >= 0.95:
                     with control_lock:
                         center_x = x + w // 2
                         center_y = y + h // 2
                         pyautogui.moveTo(center_x, center_y)
                         keyboard.press(trigger_key)
-                        pyautogui.click(center_x, center_y)
                         keyboard.release(trigger_key)
+                        pyautogui.click(center_x, center_y)
                     break
 
         time.sleep(delay)
