@@ -51,7 +51,7 @@ const AutoCatchProvider = ({ children }: PropsWithChildren) => {
       }
       setInitialized(true);
     })();
-  }, []); 
+  }, [loadConfig]); 
 
   useEffect(() => {
     if (initialized) {
@@ -64,7 +64,7 @@ const AutoCatchProvider = ({ children }: PropsWithChildren) => {
           console.error("Error saving AutoCatch config:", error);
         });
     }
-  }, [autoCatchConfig, initialized]);
+  }, [autoCatchConfig, initialized, saveConfig]);
 
   return (
     <AutoCatchContext.Provider value={{ autoCatchConfig, setAutoCatchConfig }}>
