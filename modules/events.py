@@ -1,12 +1,14 @@
 import os
 import threading
 import time
+import cv2
 import pyautogui
 import keyboard
 from modules.snipper import get_crop_area
 from modules.utils import save_to_file, load_from_file, capture_screen, extract_text, play_alert_sound
 import easyocr
 import numpy as np
+
 
 auto_combo_enabled = False
 anti_logout_enabled = False
@@ -283,27 +285,69 @@ def toggle_auto_catch():
         "message": f"Auto Catch {'enabled' if auto_catch_enabled else 'disabled'}"
     }
 
+def locate_image_opencv(template_path, threshold=0.8):
+    screenshot = pyautogui.screenshot()
+    screenshot_cv = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+    
+    template = cv2.imread(template_path, cv2.IMREAD_COLOR)
+    if template is None:
+        raise ValueError(f"Não foi possível carregar o template: {template_path}")
+    h, w, _ = template.shape
+
+    # Executa o match template
+    res = cv2.matchTemplate(screenshot_cv, template, cv2.TM_CCOEFF_NORMED)
+    loc = np.where(res >= threshold)
+
+    # Armazena todos os matches encontrados
+    matches = []
+    for pt in zip(*loc[::-1]):
+        matches.append((pt[0], pt[1], w, h))
+    return matches
+
 def process_image(image_path, control_lock, stop_time, trigger_key):
+    shiny_template = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    if shiny_template is None:
+        return
+    template_hsv = cv2.cvtColor(shiny_template, cv2.COLOR_BGR2HSV)
+    template_hist = cv2.calcHist([template_hsv], [0], None, [180], [0, 180])
+    cv2.normalize(template_hist, template_hist, 0, 1, cv2.NORM_MINMAX)
+
     start_time = time.time()
     delay = 0.05  
 
     while time.time() - start_time < stop_time:
         try:
-            region = pyautogui.locateOnScreen(image_path, confidence=0.9)
+            matches = locate_image_opencv(image_path, threshold=0.8)
         except Exception as e:
-            print(f"Erro ao procurar a imagem {image_path}: {e}")
             time.sleep(delay)
             continue
 
-        if region:
-            with control_lock:
-                pyautogui.moveTo(region)
-                keyboard.press(trigger_key)
-                pyautogui.click(region)
-                keyboard.release(trigger_key)
+        if matches:
+            for (x, y, w, h) in matches:
+                x, y, w, h = int(x), int(y), int(w), int(h)
+                
+                screenshot = pyautogui.screenshot(region=(x, y, w, h))
+                region_cv = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+                
+                region_hsv = cv2.cvtColor(region_cv, cv2.COLOR_BGR2HSV)
+                region_hist = cv2.calcHist([region_hsv], [0], None, [180], [0, 180])
+                cv2.normalize(region_hist, region_hist, 0, 1, cv2.NORM_MINMAX)
+                
+                correlation = cv2.compareHist(template_hist, region_hist, cv2.HISTCMP_CORREL)
+                if correlation >= 0.9:
+                    with control_lock:
+                        center_x = x + w // 2
+                        center_y = y + h // 2
+                        pyautogui.moveTo(center_x, center_y)
+                        keyboard.press(trigger_key)
+                        pyautogui.click(center_x, center_y)
+                        keyboard.release(trigger_key)
+                    break
+
         time.sleep(delay)
 
     print(f"Busca pela imagem {os.path.basename(image_path)} encerrada após {stop_time} segundos.")
+
 
 def locate_and_interact_with_images():
     global cached_auto_catch_config, pokeball_trigger_key
@@ -312,15 +356,14 @@ def locate_and_interact_with_images():
         print("No selected images configured in autocatch.json.")
         return
 
-    selected_images = cached_auto_catch_config["selectedImages"]  # List of dicts containing filename and label
+    selected_images = cached_auto_catch_config["selectedImages"] 
     images_path = os.path.join(os.getcwd(), "images")
     if not os.path.exists(images_path):
         print("Images folder does not exist.")
         return
 
     control_lock = threading.Lock()
-    threads = []
-    stop_time = 5  # Run each image search for 5 seconds
+    stop_time = 5 
 
     for img in selected_images:
         filename = img.get("filename")
@@ -331,14 +374,12 @@ def locate_and_interact_with_images():
             print(f"File {filename} does not exist at the specified path.")
             continue
 
-        # Start a thread for each selected image.
-        t = threading.Thread(target=process_image, args=(long_image_path, control_lock, stop_time, pokeball_trigger_key), daemon=True)
+        t = threading.Thread(
+            target=process_image, 
+            args=(long_image_path, control_lock, stop_time, pokeball_trigger_key), 
+            daemon=True
+        )
         t.start()
-        threads.append(t)
         print(f"Started task for {filename} (will stop after {stop_time} seconds)")
 
-    # Wait for all threads to finish
-    for t in threads:
-        t.join()
-
-    print("All image searches stopped.")
+    print("All image search tasks started in parallel.")
