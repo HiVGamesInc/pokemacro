@@ -94,7 +94,7 @@ const AutoComboEdit = ({
         <h2 className="text-lg font-medium mb-[43px]">Actions</h2>
         <ActionsList
           onClick={(type) => {
-            if (["pokestop", "medicine", "revive", "autoloot", "autocatch"].includes(type)) {
+            if (["pokestop", "medicine", "revive", "autoloot"].includes(type)) {
               setCombo({
                 ...combo,
                 moveList: [
@@ -102,9 +102,15 @@ const AutoComboEdit = ({
                   ...(!combo.moveList[combo.moveList.length - 1]?.delay
                     ? [{ delay: TYPE_DELAYS[type] }]
                     : []),
-                    type === "autocatch"
-                    ? { skillName: TYPE_LABELS[type], autoCatch: true }
-                    : { skillName: TYPE_LABELS[type] },
+                  { skillName: TYPE_LABELS[type] },
+                ],
+              });
+            } else if (type === "autocatch") {
+              setCombo({
+                ...combo,
+                moveList: [
+                  ...combo.moveList,
+                  { skillName: TYPE_LABELS[type], autoCatch: true },
                 ],
               });
             } else {

@@ -85,38 +85,41 @@ const AutoComboTab = () => {
                     </div>
                   </div>
                   <div className="mt-4 flex items-center flex-wrap gap-2">
-                    {combo.moveList &&
-                      combo.moveList.map((item, index) => {
-                        return (
-                          <div
-                            key={(item.skillName || "") + index}
-                            className="flex items-center gap-2"
-                          >
-                            <div className="text-xs font-medium">
-                              {item.delay ? (
-                                <span>
-                                  Delay -{" "}
-                                  <span className="text-green-300">
-                                    {Number(item.delay) / 1000} seg
-                                  </span>
+                  {combo.moveList &&
+                    combo.moveList.map((item, index) => {
+                      return (
+                        <div
+                          key={(item.skillName || "") + index}
+                          className="flex items-center gap-2"
+                        >
+                          <div className="text-xs font-medium">
+                            {item.delay ? (
+                              <span>
+                                Delay -{" "}
+                                <span className="text-green-300">
+                                  {Number(item.delay) / 1000} seg
                                 </span>
-                              ) : (
-                                <span>
-                                  {item.skillName} -{" "}
-                                  <span className="text-green-300">
-                                    {item.skillName
-                                      ? keybindings[item.skillName]?.keyName
-                                      : null}
-                                  </span>
-                                </span>
-                              )}
-                            </div>
-                            {index !== combo.moveList.length - 1 && (
-                              <ChevronRightIcon className="size-3" />
+                              </span>
+                            ) : (
+                              <span>
+                                {item.skillName}
+                                {!item.autoCatch && item.skillName && (
+                                  <>
+                                    {" - "}
+                                    <span className="text-green-300">
+                                      {keybindings[item.skillName]?.keyName}
+                                    </span>
+                                  </>
+                                )}
+                              </span>
                             )}
                           </div>
-                        );
-                      })}
+                          {index !== combo.moveList.length - 1 && (
+                            <ChevronRightIcon className="size-3" />
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </Card>
               ))}
