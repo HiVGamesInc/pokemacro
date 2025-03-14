@@ -5,13 +5,7 @@ import * as GlobalContext from "../../contexts/GlobalContext";
 import * as AutoComboContext from "../../contexts/AutoComboContext";
 
 const Header = () => {
-  const { antiLogout, setAntiLogout, autoCombo, setAutoCombo, alertStatus, setAlertStatus, autoCatch, setAutoCatch, healing, setHealing } = useContext(GlobalContext.Context); // Access autoCatch from context
-  // const { antiLogout, setAntiLogout } = useContext(GlobalContext.Context);
-  // const { autoCombo, setAutoCombo } = useContext(GlobalContext.Context);
-  // const { alertStatus, setAlertStatus } = useContext(GlobalContext.Context);
-  // const { healing, setHealing } = useContext(GlobalContext.Context);
-
-
+  const { antiLogout, setAntiLogout, autoCombo, setAutoCombo, alertStatus, setAlertStatus, autoCatch, setAutoCatch, healing, setHealing } = useContext(GlobalContext.Context); 
   const { currentCombo } = useContext(AutoComboContext.Context);
 
   const toggleAntiLogout = () => {
@@ -38,12 +32,9 @@ const Header = () => {
     handleAutoCombo(currentCombo);
   };
 
-  // Function to toggle AutoCatch
   const toggleAutoCatch = () => {
     setAutoCatch(!autoCatch);
-    handleAutoCatch() // Toggle autoCatch state
-    console.log("Auto Catch", autoCatch ? "Enabled" : "Disabled"); // Optionally log the status
-    // You can add additional logic here, like interacting with an API or handling specific actions when AutoCatch is toggled
+    handleAutoCatch() 
   };
 
   return (
