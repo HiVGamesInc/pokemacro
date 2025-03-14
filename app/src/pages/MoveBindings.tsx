@@ -20,6 +20,7 @@ const KEYBINDINGS_ORDER = [
   "Revive",
   "Medicine",
   "Auto Loot",
+  "Pokeball",
   "Poke Heal"
 ];
 

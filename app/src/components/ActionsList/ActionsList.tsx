@@ -1,7 +1,7 @@
 import Card from "../Card/Card";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-const types = ["move", "delay", "pokestop", "medicine", "revive", "autoloot"];
+const types = ["move", "delay", "pokestop", "medicine", "revive", "autoloot", "autocatch"];
 
 export type Types = (typeof types)[number];
 
@@ -12,6 +12,7 @@ export const TYPE_LABELS: { [key: Types]: string } = {
   medicine: "Medicine",
   revive: "Revive",
   autoloot: "Auto Loot",
+  autocatch: "Auto Catch",
 };
 
 export const TYPE_DELAYS: Record<string, string> = {

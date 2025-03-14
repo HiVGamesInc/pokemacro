@@ -1,16 +1,11 @@
 import { useContext } from "react";
-import { handleAntiLogout, handleAutoCombo, handleAlert, handleHealing } from "../../utils/actions";
+import { handleAntiLogout, handleAutoCombo, handleAlert, handleHealing, handleAutoCatch } from "../../utils/actions";
 import Button from "../Button/Button";
 import * as GlobalContext from "../../contexts/GlobalContext";
 import * as AutoComboContext from "../../contexts/AutoComboContext";
 
 const Header = () => {
-  const { antiLogout, setAntiLogout } = useContext(GlobalContext.Context);
-  const { autoCombo, setAutoCombo } = useContext(GlobalContext.Context);
-  const { alertStatus, setAlertStatus } = useContext(GlobalContext.Context);
-  const { healing, setHealing } = useContext(GlobalContext.Context);
-
-
+  const { antiLogout, setAntiLogout, autoCombo, setAutoCombo, alertStatus, setAlertStatus, autoCatch, setAutoCatch, healing, setHealing } = useContext(GlobalContext.Context); 
   const { currentCombo } = useContext(AutoComboContext.Context);
 
   const toggleAntiLogout = () => {
@@ -37,6 +32,11 @@ const Header = () => {
     handleAutoCombo(currentCombo);
   };
 
+  const toggleAutoCatch = () => {
+    setAutoCatch(!autoCatch);
+    handleAutoCatch() 
+  };
+
   return (
     <div className="p-4 bg-slate-950 border-b border-slate-700">
       <div className="flex gap-4 justify-between items-center">
@@ -58,6 +58,9 @@ const Header = () => {
           </Button>
           <Button active={autoCombo} onClick={toggleAutoCombo}>
             Auto Combo
+          </Button>
+          <Button active={autoCatch} onClick={toggleAutoCatch}>
+            Auto Catch
           </Button>
         </div>
       </div>

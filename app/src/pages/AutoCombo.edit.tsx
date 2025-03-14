@@ -102,13 +102,18 @@ const AutoComboEdit = ({
                   ...(!combo.moveList[combo.moveList.length - 1]?.delay
                     ? [{ delay: TYPE_DELAYS[type] }]
                     : []),
-                  {
-                    skillName: TYPE_LABELS[type],
-                  },
+                  { skillName: TYPE_LABELS[type] },
+                ],
+              });
+            } else if (type === "autocatch") {
+              setCombo({
+                ...combo,
+                moveList: [
+                  ...combo.moveList,
+                  { skillName: TYPE_LABELS[type], autoCatch: true },
                 ],
               });
             } else {
-              // opens accept/cancel ui
               setIsAdding(type);
             }
           }}
@@ -142,7 +147,6 @@ const AutoComboEdit = ({
         </div>
         <h2 className="text-md font-medium my-4">Skills</h2>
 
-        {/* ComboList now uses dnd-kit internally. */}
         <ComboList
           combo={combo}
           onRemove={removeSkill}

@@ -66,3 +66,41 @@ export const loadConfig = async (filename?: string) => {
   const data = await response.json();
   return data;
 };
+
+export const handleAutoCatch = async () => {
+  console.log('toggle')
+  const response = await fetch("/auto-catch", { method: "POST" });
+  const data = await response.json();
+  console.log(data)
+  return data;
+};
+
+export const handleCropImage = async () => {
+  const response = await fetch("/crop-image", { method: "POST" });
+  const data = await response.json();
+  return data;
+};
+
+export const getImages = async () => {
+  const response = await fetch("/list-images", { method: "GET" });
+  const data = await response.json();
+  return data;
+};
+
+export const deleteImage = async (filename: string) => {
+  const response = await fetch(`/delete-image/${filename}`, { method: "DELETE" });
+  const data = await response.json();
+  return data;
+};
+
+export const renameImage = async (oldFilename: string, newFilename: string) => {
+  const response = await fetch("/rename-image", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ oldFilename, newFilename }),
+  });
+  const data = await response.json();
+  return data;
+};

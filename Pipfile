@@ -19,6 +19,7 @@ pyautogui = "*"
 keyboard = "*"
 pytesseract = "*"
 Pillow = "*"
+opencv-python = "*"
 easyocr = "*"
 numpy = "*"
 

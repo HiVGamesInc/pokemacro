@@ -3,6 +3,7 @@ import {
   FireIcon,
   Cog6ToothIcon,
   BellAlertIcon,
+  BugAntIcon,
   HeartIcon
   // BoltIcon,
 } from "@heroicons/react/24/outline";
@@ -10,6 +11,7 @@ import {
   FireIcon as FireIconActive,
   Cog6ToothIcon as Cog6ToothIconActive,
   BellAlertIcon as BellAlertIconActive,
+  BugAntIcon as BugAntIconActive,
   HeartIcon as HeartIconActive
 } from "@heroicons/react/24/solid";
 
@@ -72,6 +74,16 @@ const Navbar = () => {
             }
           />
         </button>
+      </li>
+      <li>
+        <IconButton
+              active={router.currentRoute === RouterContext.Routes.AUTO_CATCH}
+              icon={BugAntIcon}
+              activeIcon={BugAntIconActive}
+              onClick={() =>
+                router.setCurrentRoute(RouterContext.Routes.AUTO_CATCH)
+              }
+        />
       </li>
       <li>
         <button>

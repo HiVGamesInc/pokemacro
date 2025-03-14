@@ -49,16 +49,16 @@ const SortableItem: React.FC<SortableItemProps> = ({
       >
         <div className="flex justify-between items-center">
           <div>
-            {!item.delay && (
-              <div className="text-md font-medium">{displayName}</div>
-            )}
-            {key?.keyName && (
-              <div className="flex gap-4">
-                <div className="text-sm text-slate-300">
-                  <span className="font-medium">Hotkey:</span> {key.keyName}
-                </div>
+          {!item.delay && (
+            <div className="text-md font-medium">{displayName}</div>
+          )}
+          {!item.autoCatch && key?.keyName && (
+            <div className="flex gap-4">
+              <div className="text-sm text-slate-300">
+                <span className="font-medium">Hotkey:</span> {key.keyName}
               </div>
-            )}
+            </div>
+          )}
             {item.delay && (
               <div className="flex gap-4">
                 <div className="text-xs text-slate-300">

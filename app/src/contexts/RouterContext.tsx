@@ -11,6 +11,7 @@ export enum Routes {
   AUTO_COMBO = "auto-combo",
   MOVE_BINDINGS = "move-bindings",
   ALERT = "alert",
+  AUTO_CATCH = "auto-catch",
   HEALING = 'healing'
 }
 
