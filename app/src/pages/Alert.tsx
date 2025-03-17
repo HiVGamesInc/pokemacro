@@ -1,8 +1,9 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import * as AlertContext from "../contexts/AlertContext";
 import Button from "../components/Button/Button";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Input from "../components/Input/Input";
+import ScreenBoxPicker, { ScreenBoxValue } from "../components/ScreenBoxPicker/ScreenBoxPicker";
 
 // Define the desired order of actions. Adjust these strings to match your intended names.
 
@@ -16,72 +17,64 @@ const Alert = () => {
     return <div>Loading alert config...</div>;
   }
 
-  const fields = Object.entries(alertConfig.fields);
+  // Function to update a specific index in the hunt list
+  const handleChangeHunt = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+      setAlertConfig((prevAlertConfig) => {
+          if(prevAlertConfig){
+              const newList = [...prevAlertConfig.hunt.list];
+              if (index >= 0 && index < newList.length) {
+                  newList[index] = e.target.value; 
+              }
+              return {
+                  ...prevAlertConfig,
+                  hunt: {
+                      ...prevAlertConfig.hunt,
+                      list: newList, 
+                  },
+              };
+          }   
+      });
+  };
 
-  const handleChangeField = (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
-    setAlertConfig({
-        ...alertConfig,
-        fields: {
-            ...alertConfig.fields,
-            [id]: {
-                ...alertConfig.fields[id],
-                value: e.target.value
-            }
-        }
-    })
+  const handleAddHunt = () => {
+      setAlertConfig({
+          ...alertConfig,
+          hunt: {
+              ...alertConfig.hunt,
+              list: [
+                  ...alertConfig.hunt.list,
+                  ''
+              ]
+          }
+      });
   }
 
-    // Function to update a specific index in the hunt list
-    const handleChangeHunt = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-        setAlertConfig((prevAlertConfig) => {
-            if(prevAlertConfig){
-                const newList = [...prevAlertConfig.hunt.list];
-                if (index >= 0 && index < newList.length) {
-                    newList[index] = e.target.value; 
-                }
-                return {
-                    ...prevAlertConfig,
-                    hunt: {
-                        ...prevAlertConfig.hunt,
-                        list: newList, 
-                    },
-                };
-            }   
-        });
-    };
+  const handleRemoveHunt = (index: number) => {
+      setAlertConfig((prevAlertConfig) => {
+          if(prevAlertConfig){
+              console.log(prevAlertConfig.hunt.list)
 
-    const handleAddHunt = () => {
-        setAlertConfig({
-            ...alertConfig,
-            hunt: {
-                ...alertConfig.hunt,
-                list: [
-                    ...alertConfig.hunt.list,
-                    ''
-                ]
-            }
-        });
-    }
+              const newList = [...prevAlertConfig.hunt.list]
+              newList.splice(index, 1);
+              console.log(newList)
 
-    const handleRemoveHunt = (index: number) => {
-        setAlertConfig((prevAlertConfig) => {
-            if(prevAlertConfig){
-                console.log(prevAlertConfig.hunt.list)
+              return {
+                  ...prevAlertConfig,
+                  hunt: {
+                      ...prevAlertConfig.hunt,
+                      list: newList, 
+                  },
+              };
+          }   
+      });
+  }
 
-                const newList = [...prevAlertConfig.hunt.list]
-                newList.splice(index, 1);
-                console.log(newList)
-
-                return {
-                    ...prevAlertConfig,
-                    hunt: {
-                        ...prevAlertConfig.hunt,
-                        list: newList, 
-                    },
-                };
-            }   
-        });
-    }
+  const handleChangePicker = (value: ScreenBoxValue) => {
+    setAlertConfig({
+      ...alertConfig,
+      battleBox: value
+    })
+  }
 
   return (
     <div>
@@ -95,22 +88,12 @@ const Alert = () => {
             </tr>
           </thead>
           <tbody>
-            {fields.map(([id, field]) => {
-              return (
-                <tr key={id} className="border border-gray-800">
-                  <td className="px-4 py-2 font-medium">{field.label}</td>
-                  <td className="px-4 py-2">
-                    <Input
-                        name="delay"
-                        wrapperClassName="flex-1 !mt-0"
-                        value={field.value}
-                        placeholder="Value"
-                        onChange={(e) => handleChangeField(e, id)}
-                    />
-                  </td>
-                </tr>
-              );
-            })}
+            <tr className="border border-gray-800">
+              <td className="px-4 py-2 font-medium">Battle Box Area</td>
+              <td className="px-4 py-2">
+                <ScreenBoxPicker value={alertConfig.battleBox} onChange={handleChangePicker}></ScreenBoxPicker>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>

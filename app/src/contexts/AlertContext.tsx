@@ -7,14 +7,10 @@ import {
     useState,
   } from "react";
   import useConfig from "../hooks/useConfig";
-  
-  interface AlertConfigField {
-    label: string,
-    value: string
-  }
+import type { ScreenBoxValue } from "../components/ScreenBoxPicker/ScreenBoxPicker";
 
   export interface AlertConfigInterface {
-    fields: Record<string, AlertConfigField>,
+    battleBox: ScreenBoxValue,
     hunt: {
         label: string,
         list: string[]

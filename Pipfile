@@ -17,10 +17,11 @@ nuitka = "*"
 livereload = "*"
 pyautogui = "*"
 keyboard = "*"
-pytesseract = "*"
 Pillow = "*"
 easyocr = "*"
 numpy = "*"
+PyQt5 = "*"
+requests = "*"
 
 [dev-packages]
 

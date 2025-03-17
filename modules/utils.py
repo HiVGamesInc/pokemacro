@@ -1,9 +1,12 @@
+import sys
 import json
 import os
 import sys
 import pytesseract
 from PIL import ImageGrab
 import winsound
+from PyQt5.QtWidgets import QApplication
+from modules.screen_picker import ScreenBoxPicker
 
 
 def resource_path(relative_path):
@@ -54,10 +57,6 @@ def load_from_file(filename='config.json'):
 def capture_screen(bbox=None):
     """Capture a specific region of the screen and return it as an image."""
     return ImageGrab.grab(bbox=bbox)
-
-def extract_text(image):
-    pytesseract.pytesseract.tesseract_cmd = 'tesseract-ocr\\tesseract.exe'
-    return pytesseract.image_to_string(image)
 
 def save_debug_image(image, iteration):
     """Save the captured image for debugging purposes."""

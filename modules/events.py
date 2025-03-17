@@ -2,7 +2,7 @@ import threading
 import time
 import pyautogui
 import keyboard
-from modules.utils import save_to_file, load_from_file, capture_screen, extract_text, play_alert_sound
+from modules.utils import save_to_file, load_from_file, capture_screen, play_alert_sound
 import easyocr
 import numpy as np
 
@@ -48,14 +48,15 @@ def toggle_alert():
 
     def run():
         # try:
+        reader = easyocr.Reader(['en'])
         iteration = 0
         
         while alert_enabled:
             alert_config = load_from_file('alertConfig.json')
-            offset_x = int(alert_config['fields']['offset_x']['value'])
-            offset_y = int(alert_config['fields']['offset_y']['value'])
-            x_length = int(alert_config['fields']['x_length']['value'])
-            y_length = int(alert_config['fields']['y_length']['value'])
+            offset_x = int(alert_config['battle_box']['x_start'])
+            offset_y = int(alert_config['battle_box']['y_start'])
+            x_length = int(alert_config['battle_box']['x_end'])
+            y_length = int(alert_config['battle_box']['y_end'])
 
             battle_box = (offset_x, offset_y, x_length, y_length)
             # Capture the battle box region
@@ -64,12 +65,13 @@ def toggle_alert():
             iteration += 1
 
             # Extract text from the screenshot
-            text = extract_text(screenshot)
+            text = reader.readtext(np.array(screenshot), detail=0)
 
             # Split the text into lines and check for matches
+            
             should_play_sound = False
             line_to_print = ''
-            for line in text.splitlines():
+            for line in text:
                 line_stripped = line.strip()
                 if line_stripped:
                     line_has_any_target = False

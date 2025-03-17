@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from modules import app
 from modules.events import toggle_auto_combo, toggle_anti_logout, toggle_alert, toggle_healing, update_current_combo, save_config, load_config
+import subprocess
 
 @app.route('/anti-logout', methods=['POST'])
 def anti_logout():
@@ -60,3 +61,28 @@ def load_config_file():
     message = load_config(filename)
 
     return jsonify(message)
+
+selection_data = None  # Store selection data globally
+
+@app.route("/start-selection", methods=["POST"])
+def start_selection():
+    global selection_data
+    selection_data = None
+    """Start the selection tool as a separate process"""
+    subprocess.Popen(["python", "modules/screen_picker.py"], creationflags=subprocess.CREATE_NO_WINDOW)
+    return jsonify({"message": "Selection started"})
+
+@app.route("/selection", methods=["POST"])
+def receive_selection():
+    """Receive selection coordinates from PyQt"""
+    global selection_data
+    selection_data = request.json
+    print("Received selection:", selection_data)
+    return jsonify({"message": "Selection received"})
+
+@app.route("/get-selection", methods=["GET"])
+def get_selection():
+    """Return the last selection coordinates"""
+    if selection_data:
+        return jsonify({ "selection": selection_data })
+    return jsonify({"message": "No selection made yet"})
