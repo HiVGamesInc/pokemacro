@@ -4,15 +4,16 @@ import {
   Cog6ToothIcon,
   BellAlertIcon,
   BugAntIcon,
-  HeartIcon
-  // BoltIcon,
+  HeartIcon,
+  SparklesIcon  // Import icon for Auto Revive
 } from "@heroicons/react/24/outline";
 import {
   FireIcon as FireIconActive,
   Cog6ToothIcon as Cog6ToothIconActive,
   BellAlertIcon as BellAlertIconActive,
   BugAntIcon as BugAntIconActive,
-  HeartIcon as HeartIconActive
+  HeartIcon as HeartIconActive,
+  SparklesIcon as SparklesIconActive  // Import active icon for Auto Revive
 } from "@heroicons/react/24/solid";
 
 import { IconType } from "../types/types";
@@ -109,7 +110,16 @@ const Navbar = () => {
           />
         </button>
       </li>
-      
+      <li>
+        <IconButton
+          active={router.currentRoute === RouterContext.Routes.AUTO_REVIVE}
+          icon={SparklesIcon}
+          activeIcon={SparklesIconActive}
+          onClick={() =>
+            router.setCurrentRoute(RouterContext.Routes.AUTO_REVIVE)
+          }
+        />
+      </li>
     </ul>
   );
 };

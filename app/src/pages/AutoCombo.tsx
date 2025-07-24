@@ -85,41 +85,53 @@ const AutoComboTab = () => {
                     </div>
                   </div>
                   <div className="mt-4 flex items-center flex-wrap gap-2">
-                  {combo.moveList &&
-                    combo.moveList.map((item, index) => {
-                      return (
-                        <div
-                          key={(item.skillName || "") + index}
-                          className="flex items-center gap-2"
-                        >
-                          <div className="text-xs font-medium">
-                            {item.delay ? (
-                              <span>
-                                Delay -{" "}
-                                <span className="text-green-300">
-                                  {Number(item.delay) / 1000} seg
+                    {combo.moveList &&
+                      combo.moveList.map((item, index) => {
+                        return (
+                          <div
+                            key={(item.skillName || "") + index}
+                            className="flex items-center gap-2"
+                          >
+                            <div className="text-xs font-medium">
+                              {item.mouseClick ? (
+                                <span>
+                                  Mouse Click - {item.mouseClick.button} (
+                                  {item.mouseClick.x}, {item.mouseClick.y})
                                 </span>
-                              </span>
-                            ) : (
-                              <span>
-                                {item.skillName}
-                                {!item.autoCatch && item.skillName && (
-                                  <>
-                                    {" - "}
-                                    <span className="text-green-300">
-                                      {keybindings[item.skillName]?.keyName}
-                                    </span>
-                                  </>
-                                )}
-                              </span>
+                              ) : item.delay ? (
+                                <span>
+                                  Delay -{" "}
+                                  <span className="text-green-300">
+                                    {Number(item.delay) / 1000} seg
+                                  </span>
+                                </span>
+                              ) : item.hotkey ? (
+                                <span>
+                                  Hotkey -{" "}
+                                  <span className="text-green-300">
+                                    {item.hotkey.keyName}
+                                  </span>
+                                </span>
+                              ) : (
+                                <span>
+                                  {item.skillName}
+                                  {!item.autoCatch && item.skillName && (
+                                    <>
+                                      {" - "}
+                                      <span className="text-green-300">
+                                        {keybindings[item.skillName]?.keyName}
+                                      </span>
+                                    </>
+                                  )}
+                                </span>
+                              )}
+                            </div>
+                            {index !== combo.moveList.length - 1 && (
+                              <ChevronRightIcon className="size-3" />
                             )}
                           </div>
-                          {index !== combo.moveList.length - 1 && (
-                            <ChevronRightIcon className="size-3" />
-                          )}
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
                   </div>
                 </Card>
               ))}

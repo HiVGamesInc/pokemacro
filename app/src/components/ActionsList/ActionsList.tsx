@@ -1,11 +1,21 @@
 import Card from "../Card/Card";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-const types = ["move", "delay", "pokestop", "medicine", "revive", "autoloot", "autocatch"];
+const types = [
+  "move",
+  "delay",
+  "pokestop",
+  "medicine",
+  "revive",
+  "autoloot",
+  "autocatch",
+  "mouseclick",
+  "hotkey", 
+];
 
 export type Types = (typeof types)[number];
 
-export const TYPE_LABELS: { [key: Types]: string } = {
+export const TYPE_LABELS: { [key: string]: string } = {
   delay: "Delay",
   move: "Move",
   pokestop: "Pokestop",
@@ -13,14 +23,20 @@ export const TYPE_LABELS: { [key: Types]: string } = {
   revive: "Revive",
   autoloot: "Auto Loot",
   autocatch: "Auto Catch",
+  mouseclick: "Mouse Click",
+  hotkey: "Hotkey",
 };
 
 export const TYPE_DELAYS: Record<string, string> = {
   move: "350",
-  pokestop: "100",
-  medicine: "100",
-  revive: "100",
-  autoloot: "100",
+  delay: "500",
+  pokestop: "1500",
+  medicine: "1000",
+  revive: "1000",
+  autoloot: "500",
+  autocatch: "500",
+  mouseclick: "300",
+  hotkey: "350", // Add delay for new type
 };
 
 const Action = ({ type, onClick }: { type: Types; onClick: () => void }) => {

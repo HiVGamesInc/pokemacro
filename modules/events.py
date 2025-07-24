@@ -24,19 +24,75 @@ auto_catch_enabled = False
 pokeball_trigger_key = None
 auto_catch_enabled = False
 
+# Global variables to control the coordinate tracking
+mouse_tracking_enabled = False
+mouse_coords = {'x': 0, 'y': 0}
+mouse_tracking_thread = None
+
+# Add these globals at the top of the file
+auto_revive_enabled = False
+auto_revive_hook = None
+
 def execute_move(move_list):
+    print(move_list)
     for move in move_list:
         if move.get('delay'):
-            delay_sec = float(move['delay']) / 1000.0
-            print(f"Waiting for {delay_sec} seconds")
-            time.sleep(delay_sec)
-        if move.get('autoCatch'):
-            locate_and_interact_with_images()
-            continue
-        if move.get('hotkey'):
+            # Handle delay
+            delay = float(move.get('delay')) / 1000.0
+            time.sleep(delay)
+            
+        elif move.get('autoCatch'):
+            # Handle autoCatch
+            pass
+            
+        elif move.get('mouseClick'):
+            # Handle mouse click
+            mouse_click = move.get('mouseClick')
+            button = mouse_click.get('button', 'left')
+            x = mouse_click.get('x', 0)
+            y = mouse_click.get('y', 0)
+            
+            pyautogui.moveTo(x, y)
+            if button == 'left':
+                pyautogui.click()
+            else:
+                pyautogui.rightClick()
+            
+        elif move.get('hotkey'):
+            # Handle hotkey press
             hotkey = move.get('hotkey')
-            if execute_key_action(combo_event, hotkey['keyName']):
-                print(f"Executing action {hotkey['keyName']}")
+            key_name = hotkey.get('keyName')
+            if key_name:
+                print(f"Pressing hotkey: {key_name}")
+                keyboard.press_and_release(key_name)
+                time.sleep(0.1)  # Small delay after key press
+            
+        elif move.get('skillName') and not move.get('hotkey'):
+            # Handle skillName without hotkey
+            skill_name = move.get('skillName')
+            print(f"Processing skill without hotkey: {skill_name}")
+            
+            try:
+                keybindings = load_from_file('keybindings.json')
+                if keybindings and skill_name in keybindings:
+                    key_data = keybindings[skill_name]
+                    key_name = key_data.get('keyName')
+                    key_number = key_data.get('keyNumber')
+                    if key_name and key_number is not None:
+                        print(f"Found keybinding for {skill_name}: {key_name} ({key_number})")
+                        keyboard.press_and_release(key_name)
+                        time.sleep(0.1)
+                    else:
+                        print(f"Invalid keybinding format for skill: {skill_name}")
+                else:
+                    print(f"No keybinding found for skill: {skill_name}")
+            except Exception as e:
+                print(f"Error loading keybindings for skill {skill_name}: {str(e)}")
+        
+        # Skip malformed entries
+        elif move.get('id') and not any([move.get('hotkey'), move.get('skillName'), move.get('delay'), move.get('mouseClick'), move.get('autoCatch')]):
+            print(f"Skipping malformed entry with id: {move.get('id')}")
+            continue
 
 def toggle_anti_logout():
     global anti_logout_enabled
@@ -182,6 +238,15 @@ def update_current_combo(trigger_key, current_combo):
     if current_combo_hook is not None:
         keyboard.unhook(current_combo_hook)
         current_combo_hook = None
+
+    # Ensure the moveList structure is preserved
+    current_combo['moveList'] = [
+        {
+            **move,
+            'hotkey': move.get('hotkey', None)  # Preserve hotkey structure
+        }
+        for move in current_combo.get('moveList', [])
+    ]
 
     current_combo_hook = keyboard.on_press_key(trigger_key, lambda event: run_combo(current_combo))
     return current_combo
@@ -383,3 +448,137 @@ def locate_and_interact_with_images():
         print(f"Started task for {filename} (will stop after {stop_time} seconds)")
 
     print("All image search tasks started in parallel.")
+
+def toggle_mouse_tracking():
+    """Toggle the mouse coordinate tracking on/off"""
+    global mouse_tracking_enabled, mouse_tracking_thread
+    
+    mouse_tracking_enabled = not mouse_tracking_enabled
+    
+    if mouse_tracking_enabled:
+        # Start a new thread to monitor mouse clicks
+        if mouse_tracking_thread is None or not mouse_tracking_thread.is_alive():
+            mouse_tracking_thread = threading.Thread(target=monitor_mouse, daemon=True)
+            mouse_tracking_thread.start()
+            
+    return {
+        "tracking_enabled": mouse_tracking_enabled,
+        "message": f"Mouse tracking {'enabled' if mouse_tracking_enabled else 'disabled'}"
+    }
+
+def monitor_mouse():
+    """Monitor mouse clicks and Enter key presses"""
+    global mouse_tracking_enabled, mouse_coords
+    
+    # Variables to help detect actual clicks
+    last_click_time = 0
+    click_detected = False
+    
+    while mouse_tracking_enabled and not click_detected:
+        try:
+            # Get current mouse position
+            current_pos = pyautogui.position()
+            
+            # Check for Enter key press
+            if keyboard.is_pressed('enter'):
+                mouse_coords['x'] = current_pos[0]
+                mouse_coords['y'] = current_pos[1]
+                print(f"Captured mouse position via Enter key: {mouse_coords}")
+                mouse_tracking_enabled = False
+                break
+            
+            # Use win32api to detect mouse clicks more reliably
+            try:
+                import win32api
+                left_button_state = win32api.GetAsyncKeyState(0x01)  # Left mouse button
+                
+                # Button is pressed (state < 0) and not too soon after last detection
+                current_time = time.time()
+                if left_button_state < 0 and current_time - last_click_time > 0.5:
+                    mouse_coords['x'] = current_pos[0]
+                    mouse_coords['y'] = current_pos[1]
+                    print(f"Captured mouse position via click: {mouse_coords}")
+                    last_click_time = current_time
+                    mouse_tracking_enabled = False
+                    break
+                    
+            except ImportError:
+                # Fallback if win32api is not available
+                pass
+            
+            time.sleep(0.05)  # Small delay to reduce CPU usage
+            
+        except Exception as e:
+            print(f"Error in mouse tracking: {str(e)}")
+            time.sleep(0.1)
+
+def get_mouse_coords():
+    """Return the current tracked mouse coordinates"""
+    return mouse_coords
+
+def toggle_auto_revive():
+    """Toggle the auto revive functionality on/off"""
+    global auto_revive_enabled, auto_revive_hook
+    
+    # Always unhook the existing hook if one exists
+    if auto_revive_hook is not None:
+        keyboard.unhook(auto_revive_hook)
+        auto_revive_hook = None
+    
+    # Toggle the enabled state
+    auto_revive_enabled = not auto_revive_enabled
+    
+    # Load the latest config
+    config = load_from_file("autorevive.json")
+    if not config or not config.get("keybind"):
+        print("No hotkey set for Auto Revive.")
+        return {
+            "auto_revive_enabled": auto_revive_enabled,
+            "message": "No hotkey set for Auto Revive."
+        }
+    
+    # Set up a new hook if enabled
+    if auto_revive_enabled:
+        trigger_key = config.get("keybind")
+        auto_revive_hook = keyboard.on_press_key(trigger_key, lambda event: perform_auto_revive(config))
+        print(f"Auto Revive enabled. Press '{trigger_key.upper()}' to revive.")
+    
+    return {
+        "auto_revive_enabled": auto_revive_enabled,
+        "message": f"Auto Revive {'enabled' if auto_revive_enabled else 'disabled'}"
+    }
+
+def perform_auto_revive(config):
+    """Perform the auto revive action"""
+    try:
+        # Get the stored revive position
+        revive_x = config["position"]["x"]
+        revive_y = config["position"]["y"]
+        
+        # Get the hotkey from config
+        revive_key = config["keybind"]
+        
+        # Get the current mouse position
+        current_x, current_y = pyautogui.position()
+        
+        # Move to the revive position
+        pyautogui.moveTo(revive_x, revive_y)
+        time.sleep(0.3)  # Wait for the mouse movement to complete
+        pyautogui.click()
+        # Press the revive hotkey
+        keyboard.press_and_release("R")
+        time.sleep(0.2)  # Wait for the key press to register
+        
+        # Perform click action
+        pyautogui.click()
+        time.sleep(0.2)  # Wait for the click to register
+        pyautogui.click()
+        
+        # Move back to the original position
+        pyautogui.moveTo(current_x, current_y)
+        
+        print(f"Auto revive performed at position ({revive_x}, {revive_y}) using key '{revive_key}'")
+        return True
+    except Exception as e:
+        print(f"Error performing auto revive: {str(e)}")
+        return False

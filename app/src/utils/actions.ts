@@ -12,7 +12,6 @@ export const handleAlert = async () => {
   return data;
 };
 
-
 export const handleHealing = async () => {
   const response = await fetch("/healing", { method: "POST" });
   const data = await response.json();
@@ -37,7 +36,16 @@ export const updateAutoCombo = async (combo: Combo) => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ key: combo?.triggerKey?.[0], combo }),
+    body: JSON.stringify({
+      key: combo?.triggerKey?.[0],
+      combo: {
+        ...combo,
+        moveList: combo.moveList.map((move) => ({
+          ...move,
+          hotkey: move.hotkey || undefined, // Preserve hotkey structure
+        })),
+      },
+    }),
   });
   const data = await response.json();
   return data;
@@ -101,6 +109,24 @@ export const renameImage = async (oldFilename: string, newFilename: string) => {
     },
     body: JSON.stringify({ oldFilename, newFilename }),
   });
+  const data = await response.json();
+  return data;
+};
+
+export const toggleMouseTracking = async () => {
+  const response = await fetch("/toggle-mouse-tracking", { method: "POST" });
+  const data = await response.json();
+  return data;
+};
+
+export const getMouseCoordinates = async () => {
+  const response = await fetch("/get-mouse-coords", { method: "GET" });
+  const data = await response.json();
+  return data;
+};
+
+export const handleAutoRevive = async () => {
+  const response = await fetch("/auto-revive", { method: "POST" });
   const data = await response.json();
   return data;
 };

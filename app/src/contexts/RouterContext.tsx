@@ -12,7 +12,8 @@ export enum Routes {
   MOVE_BINDINGS = "move-bindings",
   ALERT = "alert",
   AUTO_CATCH = "auto-catch",
-  HEALING = 'healing'
+  HEALING = 'healing',
+  AUTO_REVIVE = 'auto-revive'  // Add this new route
 }
 
 type ContextType = {

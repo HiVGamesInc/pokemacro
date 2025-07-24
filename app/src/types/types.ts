@@ -14,7 +14,12 @@ export interface ComboMove {
   skillName?: string;
   hotkey?: HotkeyObject;
   delay?: string;
-  autoCatch? : boolean;
+  autoCatch?: boolean;
+  mouseClick?: {
+    button: "left" | "right";
+    x: number;
+    y: number;
+  };
 }
 
 export type IconType = React.ForwardRefExoticComponent<

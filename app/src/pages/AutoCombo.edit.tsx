@@ -1,7 +1,7 @@
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Card from "../components/Card/Card";
 import { Combo, ComboMove, HotkeyObject } from "../types/types";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import Input from "../components/Input/Input";
 import Button from "../components/Button/Button";
 import Select from "../components/Select/Select";
@@ -16,6 +16,8 @@ import ActionsList, {
 import ComboList from "../components/ComboList/ComboList";
 import KeybindingPicker from "../components/KeybindingPicker";
 import { comboWithHotkeys } from "../utils/combo";
+import { toggleMouseTracking, getMouseCoordinates } from "../utils/actions";
+import { KeyboardKeys } from "../utils/keys";
 
 const getMoveDelay = (moveName?: string) => {
   if (!moveName) return;
@@ -52,6 +54,7 @@ const defaultNewCombo: Combo = {
 const defaultNewMove: ComboMove = {
   skillName: "Move 1",
   delay: "350",
+  hotkey: undefined, // Add this to ensure hotkey is properly reset
 };
 
 const AutoComboEdit = ({
@@ -66,9 +69,49 @@ const AutoComboEdit = ({
   );
   const [isAdding, setIsAdding] = useState<Types | null>(null);
   const [newMove, setNewMove] = useState<ComboMove>(defaultNewMove);
+  const [isTracking, setIsTracking] = useState(false);
+  const [mouseButton, setMouseButton] = useState<"left" | "right">("left");
+  const [mouseCoordinates, setMouseCoordinates] = useState({ x: 0, y: 0 });
 
   const { setCurrentCombo } = useContext(AutoComboContext.Context);
   const { keybindings } = useContext(KeybindingsContext.Context);
+
+  // Poll for coordinates when tracking is active
+  useEffect(() => {
+    if (!isTracking) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const coords = await getMouseCoordinates();
+        
+        // Check if we have new coordinates
+        if (coords && (coords.x !== 0 || coords.y !== 0) && 
+            (coords.x !== mouseCoordinates.x || coords.y !== mouseCoordinates.y)) {
+          // Update coordinates in state
+          setMouseCoordinates(coords);
+          
+          // Stop tracking immediately once we get coordinates
+          setIsTracking(false);
+          
+          // Log for debugging
+          console.log("Captured coordinates:", coords);
+        }
+      } catch (error) {
+        console.error("Error getting mouse coordinates:", error);
+      }
+    }, 200);  // Poll more frequently (200ms)
+
+    return () => clearInterval(interval);
+  }, [isTracking, mouseCoordinates.x, mouseCoordinates.y]);
+
+  const handleStartTracking = async () => {
+    try {
+      const result = await toggleMouseTracking();
+      setIsTracking(result.tracking_enabled);
+    } catch (error) {
+      console.error("Error toggling mouse tracking:", error);
+    }
+  };
 
   const removeSkill = (index: number) => {
     setCombo({
@@ -87,6 +130,22 @@ const AutoComboEdit = ({
     });
   };
 
+  // Add a new handler function for hotkey selection
+  const handleNewHotkey = (keyName: string) => {
+    console.log("Selected key:", keyName);
+    const key = Object.values(KeyboardKeys).find(k => k.keyName === keyName);
+    if (key) {
+      setNewMove({
+        ...newMove,
+        hotkey: {
+          keyName: key.keyName,
+          keyNumber: key.keyNumber,
+        },
+      });
+    } else {
+      console.error(`Key not found for: ${keyName}`);
+    }
+  };
 
   return (
     <div className="flex gap-8">
@@ -113,6 +172,11 @@ const AutoComboEdit = ({
                   { skillName: TYPE_LABELS[type], autoCatch: true },
                 ],
               });
+            } else if (type === "mouseclick") {
+              // Initialize the mouseclick action with default values
+              setIsAdding(type);
+              setMouseButton("left");
+              setMouseCoordinates({ x: 0, y: 0 });
             } else {
               setIsAdding(type);
             }
@@ -153,6 +217,17 @@ const AutoComboEdit = ({
           onReorder={handleReorder}
         />
 
+        {isTracking && (
+          <div className="mb-4 p-4 bg-blue-900 rounded-lg">
+            <p className="text-white font-bold">
+              Waiting for your next click...
+            </p>
+            <p className="text-white">
+              Click anywhere on screen (or press Enter) to capture the position.
+            </p>
+          </div>
+        )}
+
         {isAdding && (
           <Card as="div" active={false} className="bg-slate-800 w-full mb-8">
             <div className="flex gap-2 items-center">
@@ -181,15 +256,109 @@ const AutoComboEdit = ({
                   }
                 />
               )}
+              {isAdding === "mouseclick" && (
+                <>
+                  <div className="flex flex-col gap-2 w-full">
+                    <div className="flex gap-2">
+                      <Select
+                        wrapperClassName="flex-1 !mt-0"
+                        className="bg-black text-slate-50 border border-slate-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5"
+                        value={mouseButton}
+                        onChange={(e) => setMouseButton(e.target.value as "left" | "right")}
+                        options={[
+                          { value: "left", label: "Left Click" },
+                          { value: "right", label: "Right Click" },
+                        ]}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        name="mouseX"
+                        wrapperClassName="flex-1 !mt-0"
+                        value={mouseCoordinates.x.toString()} // Convert number to string
+                        placeholder="X coordinate"
+                        onChange={(e) => setMouseCoordinates({...mouseCoordinates, x: Number(e.target.value)})}
+                      />
+                      <Input
+                        name="mouseY"
+                        wrapperClassName="flex-1 !mt-0"
+                        value={mouseCoordinates.y.toString()} // Convert number to string
+                        placeholder="Y coordinate"
+                        onChange={(e) => setMouseCoordinates({...mouseCoordinates, y: Number(e.target.value)})}
+                      />
+                      <Button 
+                        className={`${isTracking ? "bg-red-600" : "bg-blue-600"} p-2 rounded-lg`}
+                        onClick={handleStartTracking}
+                      >
+                        {isTracking ? "Cancel" : "Track"}
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              )}
+              {isAdding === "hotkey" && (
+                <Select
+                  wrapperClassName="flex-1 !mt-0"
+                  className="bg-black text-slate-50 border border-slate-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5"
+                  value={newMove?.hotkey?.keyName || ""} // This should show the selected key
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                    console.log("Select onChange:", e.target.value); // Debug log
+                    handleNewHotkey(e.target.value);
+                  }}
+                  options={Object.values(KeyboardKeys).map((key) => ({
+                    value: key.keyName,
+                    label: key.keyName,
+                  }))}
+                />
+              )}
               <Button
                 className="bg-blue-00 p-4 rounded-lg text-green-400 h-[42px] hover:bg-green-900 hover:text-white"
                 onClick={() => {
-                  console.log(combo);
-
                   if (isAdding === "delay") {
                     setCombo({
                       ...combo,
                       moveList: [...combo.moveList, { delay: newMove.delay }],
+                    });
+                  } else if (isAdding === "mouseclick") {
+                    setCombo({
+                      ...combo,
+                      moveList: [
+                        ...combo.moveList,
+                        ...(!combo.moveList[combo.moveList.length - 1]?.delay
+                          ? [{ delay: TYPE_DELAYS[isAdding] }]
+                          : []),
+                        {
+                          skillName: TYPE_LABELS[isAdding],
+                          mouseClick: {
+                            button: mouseButton,
+                            x: mouseCoordinates.x,
+                            y: mouseCoordinates.y
+                          }
+                        },
+                      ],
+                    });
+                  } else if (isAdding === "hotkey") {
+                    console.log("Adding hotkey - newMove:", newMove); // Debug log
+                    console.log("Adding hotkey - newMove.hotkey:", newMove.hotkey); // Debug log
+                    
+                    // Verificar se o hotkey foi selecionado
+                    if (!newMove.hotkey || !newMove.hotkey.keyName) {
+                      alert("Please select a hotkey first");
+                      return;
+                    }
+                    
+                    setCombo({
+                      ...combo,
+                      moveList: [
+                        ...combo.moveList,
+                        ...(!combo.moveList[combo.moveList.length - 1]?.delay
+                          ? [{ delay: TYPE_DELAYS[isAdding] }]
+                          : []),
+                        {
+                          hotkey: newMove.hotkey,
+                          skillName: newMove.hotkey.keyName // Use the actual key name
+                        },
+                      ],
                     });
                   } else {
                     setCombo({
@@ -206,8 +375,13 @@ const AutoComboEdit = ({
                     });
                   }
 
-                  setNewMove(defaultNewMove);
+                  // After all the setCombo calls, make sure to reset properly:
+                  setNewMove({
+                    ...defaultNewMove,
+                    hotkey: undefined // Explicitly reset hotkey
+                  });
                   setIsAdding(null);
+                  setIsTracking(false);
                 }}
               >
                 <CheckIcon className="size-4" />
@@ -217,6 +391,7 @@ const AutoComboEdit = ({
                 onClick={() => {
                   setNewMove(defaultNewMove);
                   setIsAdding(null);
+                  setIsTracking(false);
                 }}
               >
                 <XMarkIcon className="size-4" />
@@ -234,10 +409,11 @@ const AutoComboEdit = ({
           <Button
             className="p-4 bg-slate-950 border-blue-900 rounded-lg min-w-[160px]"
             onClick={() => {
-              const moveListToSend = comboWithHotkeys(
-                combo.moveList,
-                keybindings
-              );
+              const moveListToSend = combo.moveList.map((move) => ({
+                ...move,
+                hotkey: move.hotkey || undefined, // Preserve hotkey structure
+              }));
+
               const newCombo = {
                 name: combo.name || defaultNewCombo.name,
                 triggerKey:

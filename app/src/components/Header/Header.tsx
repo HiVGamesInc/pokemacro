@@ -1,11 +1,18 @@
 import { useContext } from "react";
-import { handleAntiLogout, handleAutoCombo, handleAlert, handleHealing, handleAutoCatch } from "../../utils/actions";
+import { handleAntiLogout, handleAutoCombo, handleAlert, handleHealing, handleAutoCatch, handleAutoRevive } from "../../utils/actions";
 import Button from "../Button/Button";
 import * as GlobalContext from "../../contexts/GlobalContext";
 import * as AutoComboContext from "../../contexts/AutoComboContext";
 
 const Header = () => {
-  const { antiLogout, setAntiLogout, autoCombo, setAutoCombo, alertStatus, setAlertStatus, autoCatch, setAutoCatch, healing, setHealing } = useContext(GlobalContext.Context); 
+  const { 
+    antiLogout, setAntiLogout, 
+    autoCombo, setAutoCombo, 
+    alertStatus, setAlertStatus, 
+    autoCatch, setAutoCatch, 
+    healing, setHealing,
+    autoRevive, setAutoRevive 
+  } = useContext(GlobalContext.Context); 
   const { currentCombo } = useContext(AutoComboContext.Context);
 
   const toggleAntiLogout = () => {
@@ -37,6 +44,13 @@ const Header = () => {
     handleAutoCatch() 
   };
 
+  const toggleAutoRevive = async () => {
+    const result = await handleAutoRevive();
+    if(result.data){
+      setAutoRevive(result.data.auto_revive_enabled);
+    }
+  };
+
   return (
     <div className="p-4 bg-slate-950 border-b border-slate-700">
       <div className="flex gap-4 justify-between items-center">
@@ -61,6 +75,9 @@ const Header = () => {
           </Button>
           <Button active={autoCatch} onClick={toggleAutoCatch}>
             Auto Catch
+          </Button>
+          <Button active={autoRevive} onClick={toggleAutoRevive}>
+            Auto Revive
           </Button>
         </div>
       </div>

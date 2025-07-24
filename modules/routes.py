@@ -1,7 +1,7 @@
 import os
 from flask import request, jsonify, send_from_directory
 from modules import app
-from modules.events import toggle_auto_combo, toggle_anti_logout, toggle_alert, toggle_healing, update_current_combo, save_config, load_config, execute_crop_area, toggle_auto_catch
+from modules.events import toggle_auto_combo, toggle_anti_logout, toggle_alert, toggle_healing, update_current_combo, save_config, load_config, execute_crop_area, toggle_auto_catch, toggle_mouse_tracking, get_mouse_coords, toggle_auto_revive
 
 @app.route('/anti-logout', methods=['POST'])
 def anti_logout():
@@ -36,6 +36,15 @@ def update_combo():
 
     key = data.get('key')
     combo = data.get('combo')
+
+    # Ensure moveList structure is correct
+    combo['moveList'] = [
+        {
+            **move,
+            'hotkey': move.get('hotkey', None)  # Preserve hotkey structure
+        }
+        for move in combo.get('moveList', [])
+    ]
 
     message = update_current_combo(key['keyName'], combo)
 
@@ -120,3 +129,18 @@ def rename_image():
         return jsonify({"message": "File renamed successfully", "newFilename": new_filename})
     except Exception as e:
         return jsonify({"message": f"Error renaming file: {str(e)}"}), 500
+
+@app.route('/toggle-mouse-tracking', methods=['POST'])
+def mouse_tracking():
+    result = toggle_mouse_tracking()
+    return jsonify(result)
+
+@app.route('/get-mouse-coords', methods=['GET'])
+def mouse_coordinates():
+    coords = get_mouse_coords()
+    return jsonify(coords)
+
+@app.route('/auto-revive', methods=['POST'])
+def auto_revive():
+    data = toggle_auto_revive()
+    return jsonify({"data": data})
