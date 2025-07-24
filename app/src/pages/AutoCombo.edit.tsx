@@ -15,7 +15,6 @@ import ActionsList, {
 } from "../components/ActionsList/ActionsList";
 import ComboList from "../components/ComboList/ComboList";
 import KeybindingPicker from "../components/KeybindingPicker";
-import { comboWithHotkeys } from "../utils/combo";
 import { toggleMouseTracking, getMouseCoordinates } from "../utils/actions";
 import { KeyboardKeys } from "../utils/keys";
 
@@ -74,7 +73,6 @@ const AutoComboEdit = ({
   const [mouseCoordinates, setMouseCoordinates] = useState({ x: 0, y: 0 });
 
   const { setCurrentCombo } = useContext(AutoComboContext.Context);
-  const { keybindings } = useContext(KeybindingsContext.Context);
 
   // Poll for coordinates when tracking is active
   useEffect(() => {

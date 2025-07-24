@@ -566,7 +566,19 @@ def perform_auto_revive(config):
         time.sleep(0.3)  # Wait for the mouse movement to complete
         pyautogui.click()
         # Press the revive hotkey
-        keyboard.press_and_release("R")
+                
+        keybindings = load_from_file("keybindings.json")
+        if not keybindings or "Revive" not in keybindings:
+            print("Revive keybinding not found in keybindings.json")
+            return
+
+        # Get the keyName for Revive
+        revive_key = keybindings["Revive"].get("keyName")
+        if not revive_key:
+            print("Revive keyName is missing in keybindings.json")
+            return
+
+        keyboard.press_and_release(revive_key)
         time.sleep(0.2)  # Wait for the key press to register
         
         # Perform click action
