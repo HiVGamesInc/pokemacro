@@ -8,6 +8,7 @@ from modules.snipper import get_crop_area
 from modules.utils import save_to_file, load_from_file, capture_screen, extract_text, play_alert_sound
 import easyocr
 import numpy as np
+from datetime import datetime, time as dt_time
 
 
 auto_combo_enabled = False
@@ -594,3 +595,456 @@ def perform_auto_revive(config):
     except Exception as e:
         print(f"Error performing auto revive: {str(e)}")
         return False
+
+
+def reset_all_todos():
+    """Reset all todos to uncompleted state"""
+    try:
+        todo_config = load_from_file('todoConfig.json')
+        
+        def reset_todos_recursive(todos):
+            for todo in todos:
+                todo["completed"] = False
+                if todo.get("children"):
+                    reset_todos_recursive(todo["children"])
+        
+        reset_todos_recursive(todo_config["todos"])
+        
+        # Update the last reset timestamp
+        todo_config["lastReset"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        save_to_file(todo_config, 'todoConfig.json')
+        print("All todos have been reset")
+        return {"success": True, "message": "All todos reset successfully"}
+        
+    except Exception as e:
+        print(f"Error resetting todos: {str(e)}")
+        return {"success": False, "message": f"Error resetting todos: {str(e)}"}
+
+
+def get_todo_stats():
+    """Get statistics about todos including last reset time"""
+    try:
+        todo_config = load_from_file('todoConfig.json')
+        
+        def count_todos(todos):
+            total = 0
+            completed = 0
+            for todo in todos:
+                total += 1
+                if todo["completed"]:
+                    completed += 1
+                if todo.get("children"):
+                    child_total, child_completed = count_todos(todo["children"])
+                    total += child_total
+                    completed += child_completed
+            return total, completed
+        
+        total_count, completed_count = count_todos(todo_config["todos"])
+        last_reset = todo_config.get("lastReset", "Never")
+        
+        return {
+            "success": True,
+            "stats": {
+                "total": total_count,
+                "completed": completed_count,
+                "lastReset": last_reset
+            }
+        }
+        
+    except Exception as e:
+        print(f"Error getting todo stats: {str(e)}")
+        return {"success": False, "message": f"Error getting todo stats: {str(e)}"}
+
+
+def add_todo_item(text, parent_id=None):
+    """Add a new todo item to the list"""
+    import uuid
+    try:
+        todo_config = load_from_file('todoConfig.json')
+        
+        # Generate a unique ID
+        new_id = str(uuid.uuid4())
+        
+        new_todo = {
+            "id": new_id,
+            "text": text,
+            "completed": False,
+            "children": []
+        }
+        
+        if parent_id:
+            # Add as a child to the specified parent
+            def add_to_parent(todos):
+                for todo in todos:
+                    if todo["id"] == parent_id:
+                        todo["children"].append(new_todo)
+                        return True
+                    elif todo.get("children"):
+                        if add_to_parent(todo["children"]):
+                            return True
+                return False
+            
+            if add_to_parent(todo_config["todos"]):
+                save_to_file(todo_config, 'todoConfig.json')
+                return {"success": True, "message": "Child todo added successfully", "todo": new_todo}
+            else:
+                return {"success": False, "message": "Parent todo not found"}
+        else:
+            # Add as a root level todo
+            todo_config["todos"].append(new_todo)
+            save_to_file(todo_config, 'todoConfig.json')
+            return {"success": True, "message": "Todo added successfully", "todo": new_todo}
+            
+    except Exception as e:
+        print(f"Error adding todo: {str(e)}")
+        return {"success": False, "message": f"Error adding todo: {str(e)}"}
+
+
+def toggle_todo_item(todo_id):
+    """Toggle the completed status of a todo item and handle parent/child logic"""
+    try:
+        todo_config = load_from_file('todoConfig.json')
+        
+        def find_and_toggle(todos, target_id):
+            for todo in todos:
+                if todo["id"] == target_id:
+                    # Toggle the todo
+                    todo["completed"] = not todo["completed"]
+                    
+                    # If completing this todo, check all children
+                    if todo["completed"] and todo.get("children"):
+                        for child in todo["children"]:
+                            child["completed"] = True
+                            # Recursively mark children's children as completed
+                            if child.get("children"):
+                                mark_children_completed(child["children"])
+                    
+                    # If uncompleting this todo, uncheck all children
+                    elif not todo["completed"] and todo.get("children"):
+                        for child in todo["children"]:
+                            child["completed"] = False
+                            # Recursively mark children's children as uncompleted
+                            if child.get("children"):
+                                mark_children_uncompleted(child["children"])
+                    
+                    return todo
+                elif todo.get("children"):
+                    result = find_and_toggle(todo["children"], target_id)
+                    if result:
+                        # Check if all children are completed to auto-complete parent
+                        if all(child["completed"] for child in todo["children"]):
+                            todo["completed"] = True
+                        else:
+                            todo["completed"] = False
+                        return result
+            return None
+        
+        def mark_children_completed(children):
+            for child in children:
+                child["completed"] = True
+                if child.get("children"):
+                    mark_children_completed(child["children"])
+        
+        def mark_children_uncompleted(children):
+            for child in children:
+                child["completed"] = False
+                if child.get("children"):
+                    mark_children_uncompleted(child["children"])
+        
+        toggled_todo = find_and_toggle(todo_config["todos"], todo_id)
+        
+        if toggled_todo:
+            save_to_file(todo_config, 'todoConfig.json')
+            return {"success": True, "message": "Todo toggled successfully", "todo": toggled_todo}
+        else:
+            return {"success": False, "message": "Todo not found"}
+            
+    except Exception as e:
+        print(f"Error toggling todo: {str(e)}")
+        return {"success": False, "message": f"Error toggling todo: {str(e)}"}
+
+
+def delete_todo_item(todo_id):
+    """Delete a todo item from the list"""
+    try:
+        todo_config = load_from_file('todoConfig.json')
+        
+        def delete_from_todos(todos, target_id):
+            for i, todo in enumerate(todos):
+                if todo["id"] == target_id:
+                    deleted_todo = todos.pop(i)
+                    return deleted_todo
+                elif todo.get("children"):
+                    result = delete_from_todos(todo["children"], target_id)
+                    if result:
+                        return result
+            return None
+        
+        deleted_todo = delete_from_todos(todo_config["todos"], todo_id)
+        
+        if deleted_todo:
+            save_to_file(todo_config, 'todoConfig.json')
+            return {"success": True, "message": "Todo deleted successfully", "todo": deleted_todo}
+        else:
+            return {"success": False, "message": "Todo not found"}
+            
+    except Exception as e:
+        print(f"Error deleting todo: {str(e)}")
+        return {"success": False, "message": f"Error deleting todo: {str(e)}"}
+
+
+def update_todo_item(todo_id, new_text):
+    """Update the text of a todo item"""
+    try:
+        todo_config = load_from_file('todoConfig.json')
+        
+        def find_and_update(todos, target_id, text):
+            for todo in todos:
+                if todo["id"] == target_id:
+                    todo["text"] = text
+                    return todo
+                elif todo.get("children"):
+                    result = find_and_update(todo["children"], target_id, text)
+                    if result:
+                        return result
+            return None
+        
+        updated_todo = find_and_update(todo_config["todos"], todo_id, new_text)
+        
+        if updated_todo:
+            save_to_file(todo_config, 'todoConfig.json')
+            return {"success": True, "message": "Todo updated successfully", "todo": updated_todo}
+        else:
+            return {"success": False, "message": "Todo not found"}
+            
+    except Exception as e:
+        print(f"Error updating todo: {str(e)}")
+        return {"success": False, "message": f"Error updating todo: {str(e)}"}
+
+
+# Weekly Todo Functions
+def add_weekly_todo_item(text, parent_id=None):
+    """Add a new weekly todo item to the list"""
+    import uuid
+    try:
+        todo_config = load_from_file('weeklyTodoConfig.json')
+        
+        # Generate a unique ID
+        new_id = str(uuid.uuid4())
+        
+        new_todo = {
+            "id": new_id,
+            "text": text,
+            "completed": False,
+            "children": []
+        }
+        
+        if parent_id:
+            # Add as a child to the specified parent
+            def add_to_parent(todos):
+                for todo in todos:
+                    if todo["id"] == parent_id:
+                        todo["children"].append(new_todo)
+                        return True
+                    elif todo.get("children"):
+                        if add_to_parent(todo["children"]):
+                            return True
+                return False
+            
+            if add_to_parent(todo_config["todos"]):
+                save_to_file(todo_config, 'weeklyTodoConfig.json')
+                return {"success": True, "message": "Child weekly todo added successfully", "todo": new_todo}
+            else:
+                return {"success": False, "message": "Parent weekly todo not found"}
+        else:
+            # Add as a root level todo
+            todo_config["todos"].append(new_todo)
+            save_to_file(todo_config, 'weeklyTodoConfig.json')
+            return {"success": True, "message": "Weekly todo added successfully", "todo": new_todo}
+            
+    except Exception as e:
+        print(f"Error adding weekly todo: {str(e)}")
+        return {"success": False, "message": f"Error adding weekly todo: {str(e)}"}
+
+
+def toggle_weekly_todo_item(todo_id):
+    """Toggle the completed status of a weekly todo item and handle parent/child logic"""
+    try:
+        todo_config = load_from_file('weeklyTodoConfig.json')
+        
+        def find_and_toggle(todos, target_id):
+            for todo in todos:
+                if todo["id"] == target_id:
+                    # Toggle the todo
+                    todo["completed"] = not todo["completed"]
+                    
+                    # If completing this todo, check all children
+                    if todo["completed"] and todo.get("children"):
+                        for child in todo["children"]:
+                            child["completed"] = True
+                            # Recursively mark children's children as completed
+                            if child.get("children"):
+                                mark_children_completed(child["children"])
+                    
+                    # If uncompleting this todo, uncheck all children
+                    elif not todo["completed"] and todo.get("children"):
+                        for child in todo["children"]:
+                            child["completed"] = False
+                            # Recursively mark children's children as uncompleted
+                            if child.get("children"):
+                                mark_children_uncompleted(child["children"])
+                    
+                    return todo
+                elif todo.get("children"):
+                    result = find_and_toggle(todo["children"], target_id)
+                    if result:
+                        # Check if all children are completed to auto-complete parent
+                        if all(child["completed"] for child in todo["children"]):
+                            todo["completed"] = True
+                        else:
+                            todo["completed"] = False
+                        return result
+            return None
+        
+        def mark_children_completed(children):
+            for child in children:
+                child["completed"] = True
+                if child.get("children"):
+                    mark_children_completed(child["children"])
+        
+        def mark_children_uncompleted(children):
+            for child in children:
+                child["completed"] = False
+                if child.get("children"):
+                    mark_children_uncompleted(child["children"])
+        
+        toggled_todo = find_and_toggle(todo_config["todos"], todo_id)
+        
+        if toggled_todo:
+            save_to_file(todo_config, 'weeklyTodoConfig.json')
+            return {"success": True, "message": "Weekly todo toggled successfully", "todo": toggled_todo}
+        else:
+            return {"success": False, "message": "Weekly todo not found"}
+            
+    except Exception as e:
+        print(f"Error toggling weekly todo: {str(e)}")
+        return {"success": False, "message": f"Error toggling weekly todo: {str(e)}"}
+
+
+def delete_weekly_todo_item(todo_id):
+    """Delete a weekly todo item from the list"""
+    try:
+        todo_config = load_from_file('weeklyTodoConfig.json')
+        
+        def delete_from_todos(todos, target_id):
+            for i, todo in enumerate(todos):
+                if todo["id"] == target_id:
+                    deleted_todo = todos.pop(i)
+                    return deleted_todo
+                elif todo.get("children"):
+                    result = delete_from_todos(todo["children"], target_id)
+                    if result:
+                        return result
+            return None
+        
+        deleted_todo = delete_from_todos(todo_config["todos"], todo_id)
+        
+        if deleted_todo:
+            save_to_file(todo_config, 'weeklyTodoConfig.json')
+            return {"success": True, "message": "Weekly todo deleted successfully", "todo": deleted_todo}
+        else:
+            return {"success": False, "message": "Weekly todo not found"}
+            
+    except Exception as e:
+        print(f"Error deleting weekly todo: {str(e)}")
+        return {"success": False, "message": f"Error deleting weekly todo: {str(e)}"}
+
+
+def update_weekly_todo_item(todo_id, new_text):
+    """Update the text of a weekly todo item"""
+    try:
+        todo_config = load_from_file('weeklyTodoConfig.json')
+        
+        def find_and_update(todos, target_id, text):
+            for todo in todos:
+                if todo["id"] == target_id:
+                    todo["text"] = text
+                    return todo
+                elif todo.get("children"):
+                    result = find_and_update(todo["children"], target_id, text)
+                    if result:
+                        return result
+            return None
+        
+        updated_todo = find_and_update(todo_config["todos"], todo_id, new_text)
+        
+        if updated_todo:
+            save_to_file(todo_config, 'weeklyTodoConfig.json')
+            return {"success": True, "message": "Weekly todo updated successfully", "todo": updated_todo}
+        else:
+            return {"success": False, "message": "Weekly todo not found"}
+            
+    except Exception as e:
+        print(f"Error updating weekly todo: {str(e)}")
+        return {"success": False, "message": f"Error updating weekly todo: {str(e)}"}
+
+
+def reset_all_weekly_todos():
+    """Reset all weekly todos to uncompleted state"""
+    try:
+        todo_config = load_from_file('weeklyTodoConfig.json')
+        
+        def reset_todos_recursive(todos):
+            for todo in todos:
+                todo["completed"] = False
+                if todo.get("children"):
+                    reset_todos_recursive(todo["children"])
+        
+        reset_todos_recursive(todo_config["todos"])
+        
+        # Update the last reset timestamp
+        todo_config["lastReset"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        save_to_file(todo_config, 'weeklyTodoConfig.json')
+        print("All weekly todos have been reset")
+        return {"success": True, "message": "All weekly todos reset successfully"}
+        
+    except Exception as e:
+        print(f"Error resetting weekly todos: {str(e)}")
+        return {"success": False, "message": f"Error resetting weekly todos: {str(e)}"}
+
+
+def get_weekly_todo_stats():
+    """Get statistics about weekly todos including last reset time"""
+    try:
+        todo_config = load_from_file('weeklyTodoConfig.json')
+        
+        def count_todos(todos):
+            total = 0
+            completed = 0
+            for todo in todos:
+                total += 1
+                if todo["completed"]:
+                    completed += 1
+                if todo.get("children"):
+                    child_total, child_completed = count_todos(todo["children"])
+                    total += child_total
+                    completed += child_completed
+            return total, completed
+        
+        total_count, completed_count = count_todos(todo_config["todos"])
+        last_reset = todo_config.get("lastReset", "Never")
+        
+        return {
+            "success": True,
+            "stats": {
+                "total": total_count,
+                "completed": completed_count,
+                "lastReset": last_reset
+            }
+        }
+        
+    except Exception as e:
+        print(f"Error getting weekly todo stats: {str(e)}")
+        return {"success": False, "message": f"Error getting weekly todo stats: {str(e)}"}

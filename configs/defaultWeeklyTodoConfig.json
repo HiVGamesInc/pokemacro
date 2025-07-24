@@ -1,0 +1,28 @@
+{
+  "lastReset": null,
+  "todos": [
+    {
+      "id": "w1",
+      "text": "Weekly Boss Example",
+      "completed": false,
+      "children": [
+        {
+          "id": "w1-1",
+          "text": "Defeat Boss A",
+          "completed": false
+        },
+        {
+          "id": "w1-2",
+          "text": "Defeat Boss B",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "text": "Weekly Event",
+      "completed": false,
+      "children": []
+    }
+  ]
+}

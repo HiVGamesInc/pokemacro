@@ -1,0 +1,28 @@
+{
+  "lastReset": null,
+  "todos": [
+    {
+      "id": "1",
+      "text": "Daily Quest Example",
+      "completed": false,
+      "children": [
+        {
+          "id": "1-1",
+          "text": "Sub-task 1",
+          "completed": false
+        },
+        {
+          "id": "1-2",
+          "text": "Sub-task 2",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "text": "Weekly Boss Fight",
+      "completed": false,
+      "children": []
+    }
+  ]
+}

@@ -5,7 +5,8 @@ import {
   BellAlertIcon,
   BugAntIcon,
   HeartIcon,
-  SparklesIcon  // Import icon for Auto Revive
+  SparklesIcon, // Import icon for Auto Revive
+  ClipboardDocumentListIcon, // Import icon for Todo
 } from "@heroicons/react/24/outline";
 import {
   FireIcon as FireIconActive,
@@ -13,7 +14,8 @@ import {
   BellAlertIcon as BellAlertIconActive,
   BugAntIcon as BugAntIconActive,
   HeartIcon as HeartIconActive,
-  SparklesIcon as SparklesIconActive  // Import active icon for Auto Revive
+  SparklesIcon as SparklesIconActive, // Import active icon for Auto Revive
+  ClipboardDocumentListIcon as ClipboardDocumentListIconActive, // Import active icon for Todo
 } from "@heroicons/react/24/solid";
 
 import { IconType } from "../types/types";
@@ -70,20 +72,18 @@ const Navbar = () => {
             active={router.currentRoute === RouterContext.Routes.ALERT}
             icon={BellAlertIcon}
             activeIcon={BellAlertIconActive}
-            onClick={() =>
-              router.setCurrentRoute(RouterContext.Routes.ALERT)
-            }
+            onClick={() => router.setCurrentRoute(RouterContext.Routes.ALERT)}
           />
         </button>
       </li>
       <li>
         <IconButton
-              active={router.currentRoute === RouterContext.Routes.AUTO_CATCH}
-              icon={BugAntIcon}
-              activeIcon={BugAntIconActive}
-              onClick={() =>
-                router.setCurrentRoute(RouterContext.Routes.AUTO_CATCH)
-              }
+          active={router.currentRoute === RouterContext.Routes.AUTO_CATCH}
+          icon={BugAntIcon}
+          activeIcon={BugAntIconActive}
+          onClick={() =>
+            router.setCurrentRoute(RouterContext.Routes.AUTO_CATCH)
+          }
         />
       </li>
       <li>
@@ -92,9 +92,7 @@ const Navbar = () => {
             active={router.currentRoute === RouterContext.Routes.HEALING}
             icon={HeartIcon}
             activeIcon={HeartIconActive}
-            onClick={() =>
-              router.setCurrentRoute(RouterContext.Routes.HEALING)
-            }
+            onClick={() => router.setCurrentRoute(RouterContext.Routes.HEALING)}
           />
         </button>
       </li>
@@ -118,6 +116,14 @@ const Navbar = () => {
           onClick={() =>
             router.setCurrentRoute(RouterContext.Routes.AUTO_REVIVE)
           }
+        />
+      </li>
+      <li>
+        <IconButton
+          active={router.currentRoute === RouterContext.Routes.TODO}
+          icon={ClipboardDocumentListIcon}
+          activeIcon={ClipboardDocumentListIconActive}
+          onClick={() => router.setCurrentRoute(RouterContext.Routes.TODO)}
         />
       </li>
     </ul>

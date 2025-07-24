@@ -1,7 +1,7 @@
 import os
 from flask import request, jsonify, send_from_directory
 from modules import app
-from modules.events import toggle_auto_combo, toggle_anti_logout, toggle_alert, toggle_healing, update_current_combo, save_config, load_config, execute_crop_area, toggle_auto_catch, toggle_mouse_tracking, get_mouse_coords, toggle_auto_revive
+from modules.events import toggle_auto_combo, toggle_anti_logout, toggle_alert, toggle_healing, update_current_combo, save_config, load_config, execute_crop_area, toggle_auto_catch, toggle_mouse_tracking, get_mouse_coords, toggle_auto_revive, add_todo_item, toggle_todo_item, delete_todo_item, update_todo_item, reset_all_todos, get_todo_stats, add_weekly_todo_item, toggle_weekly_todo_item, delete_weekly_todo_item, update_weekly_todo_item, reset_all_weekly_todos, get_weekly_todo_stats
 
 @app.route('/anti-logout', methods=['POST'])
 def anti_logout():
@@ -144,3 +144,93 @@ def mouse_coordinates():
 def auto_revive():
     data = toggle_auto_revive()
     return jsonify({"data": data})
+
+# Todo routes
+@app.route('/todo/add', methods=['POST'])
+def add_todo():
+    data = request.get_json()
+    todo_text = data.get('text')
+    parent_id = data.get('parentId')
+    
+    message = add_todo_item(todo_text, parent_id)
+    return jsonify(message)
+
+@app.route('/todo/toggle', methods=['POST'])
+def toggle_todo():
+    data = request.get_json()
+    todo_id = data.get('id')
+    
+    message = toggle_todo_item(todo_id)
+    return jsonify(message)
+
+@app.route('/todo/delete', methods=['POST'])
+def delete_todo():
+    data = request.get_json()
+    todo_id = data.get('id')
+    
+    message = delete_todo_item(todo_id)
+    return jsonify(message)
+
+@app.route('/todo/update', methods=['POST'])
+def update_todo():
+    data = request.get_json()
+    todo_id = data.get('id')
+    new_text = data.get('text')
+    
+    message = update_todo_item(todo_id, new_text)
+    return jsonify(message)
+
+@app.route('/todo/reset', methods=['POST'])
+def reset_todos():
+    message = reset_all_todos()
+    return jsonify(message)
+
+@app.route('/todo/stats', methods=['GET'])
+def todo_stats():
+    message = get_todo_stats()
+    return jsonify(message)
+
+# Weekly Todo routes
+@app.route('/weekly-todo/add', methods=['POST'])
+def add_weekly_todo():
+    data = request.get_json()
+    todo_text = data.get('text')
+    parent_id = data.get('parentId')
+    
+    message = add_weekly_todo_item(todo_text, parent_id)
+    return jsonify(message)
+
+@app.route('/weekly-todo/toggle', methods=['POST'])
+def toggle_weekly_todo():
+    data = request.get_json()
+    todo_id = data.get('id')
+    
+    message = toggle_weekly_todo_item(todo_id)
+    return jsonify(message)
+
+@app.route('/weekly-todo/delete', methods=['POST'])
+def delete_weekly_todo():
+    data = request.get_json()
+    todo_id = data.get('id')
+    
+    message = delete_weekly_todo_item(todo_id)
+    return jsonify(message)
+
+@app.route('/weekly-todo/update', methods=['POST'])
+def update_weekly_todo():
+    data = request.get_json()
+    todo_id = data.get('id')
+    new_text = data.get('text')
+    
+    message = update_weekly_todo_item(todo_id, new_text)
+    return jsonify(message)
+
+@app.route('/weekly-todo/reset', methods=['POST'])
+def reset_weekly_todos():
+    message = reset_all_weekly_todos()
+    return jsonify(message)
+
+@app.route('/weekly-todo/stats', methods=['GET'])
+def weekly_todo_stats():
+    message = get_weekly_todo_stats()
+    return jsonify(message)

@@ -1,7 +1,7 @@
 import React, { PropsWithChildren } from "react";
 
 type InputProps = {
-  name: string;
+  name?: string;
   label?: string;
   defaultValue?: string;
   value: string;
@@ -9,7 +9,9 @@ type InputProps = {
   className?: string;
   placeholder?: string;
   readOnly?: boolean;
+  autoFocus?: boolean;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 };
 
 const Input = ({
