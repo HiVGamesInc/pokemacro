@@ -7,7 +7,6 @@ import Button from "../components/Button/Button";
 import Select from "../components/Select/Select";
 import { actions } from "./AutoCombo.data";
 import * as AutoComboContext from "../contexts/AutoComboContext";
-import * as KeybindingsContext from "../contexts/KeybindingsContext";
 import ActionsList, {
   TYPE_DELAYS,
   TYPE_LABELS,
