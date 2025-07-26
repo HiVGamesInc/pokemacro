@@ -17,24 +17,24 @@
         },
         {
           "children": [],
-          "completed": false,
+          "completed": true,
           "id": "286bdd07-92b9-43b9-b311-88eb166490cf",
           "text": "No 2"
         }
       ],
-      "completed": false,
+      "completed": true,
       "id": "52fe24b1-53f8-4606-9361-717fcda2e3eb",
       "text": "Daily Catch"
     },
     {
       "children": [],
-      "completed": false,
+      "completed": true,
       "id": "cc3231ce-4f12-4085-8d1e-fb75418abed1",
       "text": "Daily Kill - Swampert"
     },
     {
       "children": [],
-      "completed": false,
+      "completed": true,
       "id": "bcc6f8b5-868d-4b69-ab0a-f4aa0ef2569f",
       "text": "Unown Dg"
     },
