@@ -2,6 +2,7 @@ import os
 from flask import request, jsonify, send_from_directory
 from modules import app
 from modules.events import toggle_auto_combo, toggle_anti_logout, toggle_alert, toggle_healing, update_current_combo, save_config, load_config, execute_crop_area, toggle_auto_catch, toggle_mouse_tracking, get_mouse_coords, toggle_auto_revive, add_todo_item, toggle_todo_item, delete_todo_item, update_todo_item, reset_all_todos, get_todo_stats, add_weekly_todo_item, toggle_weekly_todo_item, delete_weekly_todo_item, update_weekly_todo_item, reset_all_weekly_todos, get_weekly_todo_stats
+from modules.key_mapper import convert_key_name
 
 @app.route('/anti-logout', methods=['POST'])
 def anti_logout():
@@ -25,7 +26,9 @@ def auto_combo():
     key = data.get('key')
     combo = data.get('combo')
 
-    message = toggle_auto_combo(key['keyName'], combo)
+    # Convert frontend key name to Python keyboard library format
+    python_key_name = convert_key_name(key['keyName'])
+    message = toggle_auto_combo(python_key_name, combo)
 
     return jsonify(message)
 
@@ -46,7 +49,9 @@ def update_combo():
         for move in combo.get('moveList', [])
     ]
 
-    message = update_current_combo(key['keyName'], combo)
+    # Convert frontend key name to Python keyboard library format
+    python_key_name = convert_key_name(key['keyName'])
+    message = update_current_combo(python_key_name, combo)
 
     return jsonify(message)
 

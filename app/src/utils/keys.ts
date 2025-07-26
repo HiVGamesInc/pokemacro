@@ -142,6 +142,7 @@ export const BrowserKeyMapping: Record<string, string> = {
   Esc: "Escape",
   // The key above Tab is usually called Backquote in browsers
   Dead: "Grave",
+  Quote: "'",
   // Top row number keys (if unmodified) might appear as the digit itself.
   "1": "1",
   "2": "2",
@@ -153,9 +154,11 @@ export const BrowserKeyMapping: Record<string, string> = {
   "8": "8",
   "9": "9",
   "0": "0",
-  // The minus and equal keys might be sent as '-' and '='
   "-": "Minus",
   "=": "Equal",
+  "+": "Add",
+  "*": "Multiply",
+  "/": "Slash",
   // Brackets and backslash:
   "[": "LeftBracket",
   "]": "RightBracket",
@@ -165,6 +168,8 @@ export const BrowserKeyMapping: Record<string, string> = {
   "'": "Quote",
   // For shift, default to LeftShift (could be refined using event.location)
   Shift: "LeftShift",
+  ShiftLeft: "LeftShift",
+  ShiftRight: "RightShift",
   // Arrow keys
   ArrowUp: "Up",
   ArrowDown: "Down",
@@ -172,8 +177,15 @@ export const BrowserKeyMapping: Record<string, string> = {
   ArrowRight: "Right",
   // Control, Alt, Meta
   Control: "LeftControl",
+  ControlLeft: "LeftControl",
+  ControlRight: "RightControl",
   Alt: "LeftAlt",
+  AltLeft: "LeftAlt",
+  AltRight: "RightAlt",
   Meta: "LeftWin",
+  MetaLeft: "LeftWin",
+  MetaRight: "RightWin",
+  OS: "LeftWin",
   // Space may be sent as " " (a space character)
   " ": "Space",
   // Print Screen might come as "PrintScreen"
@@ -190,6 +202,19 @@ export const BrowserKeyMapping: Record<string, string> = {
   Numpad9: "NumPad9",
   Numpad0: "NumPad0",
   NumpadDecimal: "Decimal",
+  NumpadAdd: "Add",
+  NumpadSubtract: "Subtract",
+  NumpadMultiply: "Multiply",
+  NumpadDivide: "Divide",
+  // Common aliases and additional mappings
+  Del: "Delete",
+  Backquote: "Grave",
+  Comma: "Comma",
+  Period: "Period",
+  Slash: "Slash",
+  // Enter variants
+  Enter: "Enter",
+  Return: "Return",
 };
 
 type FindKey = (

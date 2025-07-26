@@ -6,6 +6,7 @@ import pyautogui
 import keyboard
 from modules.snipper import get_crop_area
 from modules.utils import save_to_file, load_from_file, capture_screen, extract_text, play_alert_sound
+from modules.key_mapper import convert_key_name
 import easyocr
 import numpy as np
 from datetime import datetime, time as dt_time
@@ -64,9 +65,20 @@ def execute_move(move_list):
             hotkey = move.get('hotkey')
             key_name = hotkey.get('keyName')
             if key_name:
-                print(f"Pressing hotkey: {key_name}")
-                keyboard.press_and_release(key_name)
-                time.sleep(0.1)  # Small delay after key press
+                # Convert frontend key name to Python keyboard library format
+                python_key_name = convert_key_name(key_name)
+                print(f"Pressing hotkey: {key_name} -> {python_key_name}")
+                try:
+                    keyboard.press_and_release(python_key_name)
+                    time.sleep(0.1)  # Small delay after key press
+                except Exception as e:
+                    print(f"Error pressing key '{python_key_name}': {str(e)}")
+                    # Try the original key name as fallback
+                    try:
+                        keyboard.press_and_release(key_name)
+                        print(f"Fallback successful with original key name: {key_name}")
+                    except Exception as e2:
+                        print(f"Both key formats failed: {str(e2)}")
             
         elif move.get('skillName') and not move.get('hotkey'):
             # Handle skillName without hotkey
@@ -81,8 +93,20 @@ def execute_move(move_list):
                     key_number = key_data.get('keyNumber')
                     if key_name and key_number is not None:
                         print(f"Found keybinding for {skill_name}: {key_name} ({key_number})")
-                        keyboard.press_and_release(key_name)
-                        time.sleep(0.1)
+                        # Convert frontend key name to Python keyboard library format
+                        python_key_name = convert_key_name(key_name)
+                        print(f"Converting key: {key_name} -> {python_key_name}")
+                        try:
+                            keyboard.press_and_release(python_key_name)
+                            time.sleep(0.1)
+                        except Exception as e:
+                            print(f"Error pressing key '{python_key_name}': {str(e)}")
+                            # Try the original key name as fallback
+                            try:
+                                keyboard.press_and_release(key_name)
+                                print(f"Fallback successful with original key name: {key_name}")
+                            except Exception as e2:
+                                print(f"Both key formats failed: {str(e2)}")
                     else:
                         print(f"Invalid keybinding format for skill: {skill_name}")
                 else:
@@ -197,7 +221,18 @@ def toggle_healing():
                 health = int(text_array[0])
                 total_health = int(text_array[1])
                 if health / total_health <= ph_percent_limit:
-                    keyboard.press_and_release(ph_hotkey)
+                    # Convert frontend key name to Python keyboard library format
+                    python_key_name = convert_key_name(ph_hotkey)
+                    print(f"Healing: pressing {ph_hotkey} -> {python_key_name}")
+                    try:
+                        keyboard.press_and_release(python_key_name)
+                    except Exception as e:
+                        print(f"Error pressing healing key '{python_key_name}': {str(e)}")
+                        # Try the original key name as fallback
+                        try:
+                            keyboard.press_and_release(ph_hotkey)
+                        except Exception as e2:
+                            print(f"Both healing key formats failed: {str(e2)}")
                     time.sleep(ph_cooldown)
                 
             del screenshot
@@ -215,6 +250,9 @@ def toggle_healing():
 def toggle_auto_combo(trigger_key, current_combo, stop_key='home'):
     global auto_combo_enabled, current_combo_hook, stop_hook
     auto_combo_enabled = not auto_combo_enabled
+    
+    # Convert stop_key in case it's a frontend key name
+    python_stop_key = convert_key_name(stop_key)
 
     if auto_combo_enabled:
         if current_combo_hook is not None:
@@ -223,7 +261,7 @@ def toggle_auto_combo(trigger_key, current_combo, stop_key='home'):
         
         if stop_hook is not None:
             keyboard.unhook(stop_hook)
-        stop_hook = keyboard.on_press_key(stop_key, lambda event: stop_function(combo_event))
+        stop_hook = keyboard.on_press_key(python_stop_key, lambda event: stop_function(combo_event))
     else:
         if current_combo_hook is not None:
             keyboard.unhook(current_combo_hook)
@@ -276,7 +314,17 @@ def stop_function(event):
 def execute_key_action(event, key):
     if event.is_set():
         return False
-    keyboard.press_and_release(key)
+    # Convert frontend key name to Python keyboard library format
+    python_key_name = convert_key_name(key)
+    try:
+        keyboard.press_and_release(python_key_name)
+    except Exception as e:
+        print(f"Error pressing key '{python_key_name}': {str(e)}")
+        # Try the original key name as fallback
+        try:
+            keyboard.press_and_release(key)
+        except Exception as e2:
+            print(f"Both key formats failed for '{key}': {str(e2)}")
     return True
 
 def save_config(config, filename):
@@ -332,13 +380,18 @@ def toggle_auto_catch():
 
     # Use the hotkey from autocatch config for toggling
     trigger_key = config.get("hotkey")
+    
+    # Convert frontend key names to Python keyboard library format
+    python_trigger_key = convert_key_name(trigger_key)
+    # Store the converted pokeball key globally for use in locate_and_interact_with_images
+    pokeball_trigger_key = convert_key_name(pokeball_trigger_key)
 
     auto_catch_enabled = not auto_catch_enabled
 
     if auto_catch_enabled:
         if auto_catch_hook is not None:
             keyboard.unhook(auto_catch_hook)
-        auto_catch_hook = keyboard.on_press_key(trigger_key, lambda event: locate_and_interact_with_images())
+        auto_catch_hook = keyboard.on_press_key(python_trigger_key, lambda event: locate_and_interact_with_images())
         print(f"Auto Catch enabled. Press '{trigger_key.upper()}' to start searching for images.")
     else:
         if auto_catch_hook is not None:
@@ -541,7 +594,9 @@ def toggle_auto_revive():
     # Set up a new hook if enabled
     if auto_revive_enabled:
         trigger_key = config.get("keybind")
-        auto_revive_hook = keyboard.on_press_key(trigger_key, lambda event: perform_auto_revive(config))
+        # Convert frontend key name to Python keyboard library format
+        python_trigger_key = convert_key_name(trigger_key)
+        auto_revive_hook = keyboard.on_press_key(python_trigger_key, lambda event: perform_auto_revive(config))
         print(f"Auto Revive enabled. Press '{trigger_key.upper()}' to revive.")
     
     return {
@@ -579,7 +634,19 @@ def perform_auto_revive(config):
             print("Revive keyName is missing in keybindings.json")
             return
 
-        keyboard.press_and_release(revive_key)
+        # Convert frontend key name to Python keyboard library format
+        python_revive_key = convert_key_name(revive_key)
+        print(f"Revive: pressing {revive_key} -> {python_revive_key}")
+        try:
+            keyboard.press_and_release(python_revive_key)
+        except Exception as e:
+            print(f"Error pressing revive key '{python_revive_key}': {str(e)}")
+            # Try the original key name as fallback
+            try:
+                keyboard.press_and_release(revive_key)
+                print(f"Fallback successful with original revive key: {revive_key}")
+            except Exception as e2:
+                print(f"Both revive key formats failed: {str(e2)}")
         time.sleep(0.2)  # Wait for the key press to register
         
         # Perform click action
