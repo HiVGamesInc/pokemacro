@@ -43,8 +43,10 @@ jobs:
         run: |
           echo "Contents of dist folder:"
           dir dist
+          echo "Contents of pokemacro folder:"
+          dir dist/pokemacro
           echo "Size of executable:"
-          powershell "Get-ChildItem dist/pokemacro.exe | Select-Object Name, Length"
+          powershell "Get-ChildItem dist/pokemacro/pokemacro.exe | Select-Object Name, Length"
 
       - name: Create Release Archive
         run: |
