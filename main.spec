@@ -11,6 +11,7 @@ a = Analysis(
         ('modules', 'modules'),
         ('configs', 'configs'),
         ('tesseract-ocr', 'tesseract-ocr'),
+        ('version.json', '.'),
     ],
     hiddenimports=[
         'keyboard', 
@@ -24,7 +25,10 @@ a = Analysis(
         'modules.events',
         'modules.utils',
         'modules.key_mapper',
-        'modules.snipper'
+        'modules.snipper',
+        'modules.updater',
+        'requests',
+        'packaging.version'
     ],
     hookspath=[],
     runtime_hooks=[],

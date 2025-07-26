@@ -1,0 +1,10 @@
+{
+  "version": "4.0.0",
+  "app_name": "Pokemacro",
+  "description": "Pokemon automation tool",
+  "authors": "Nekou & Birolho",
+  "github_repo": "HiVGamesInc/pokemacro",
+  "auto_update_enabled": true,
+  "update_check_interval": 3600,
+  "release_notes_url": "https://github.com/HiVGamesInc/pokemacro/releases"
+}

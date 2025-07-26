@@ -24,6 +24,8 @@ easyocr = "*"
 numpy = "*"
 pywin32 = "*"
 pefile = "*"
+requests = "*"
+packaging = "*"
 
 [dev-packages]
 

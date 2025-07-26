@@ -1,4 +1,9 @@
+import json
 from cx_Freeze import setup, Executable
+
+# Load version info
+with open('version.json', 'r') as f:
+    version_info = json.load(f)
 
 # Define build options
 build_exe_options = {
@@ -6,6 +11,7 @@ build_exe_options = {
     "include_files": [
         ("app/build", "app/build"),
         ("modules", "modules"),
+        ("version.json", "version.json"),
     ]
 }
 
@@ -13,9 +19,9 @@ build_exe_options = {
 executables = [Executable("main.py", base=None, target_name="pokemacro.exe")]
 
 setup(
-    name="Pokemacro",
-    version="0.1",
-    description="Your application description",
+    name=version_info["app_name"],
+    version=version_info["version"],
+    description=version_info["description"],
     options={"build_exe": build_exe_options},
     executables=executables
 )
