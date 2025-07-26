@@ -14,12 +14,12 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.12.4"
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "18"
 
       - name: Install Node dependencies
         working-directory: app
@@ -31,17 +31,30 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install pipenv && pipenv install --dev
-          pip install pywin32 pefile pyinstaller
+          pip install pipenv
+          pipenv install --dev
 
       - name: Build .exe with PyInstaller
-        run: pipenv run build
+        run: |
+          pipenv run build
+          dir dist
+
+      - name: List build artifacts
+        run: |
+          echo "Contents of dist folder:"
+          dir dist
+          echo "Size of executable:"
+          powershell "Get-ChildItem dist/pokemacro.exe | Select-Object Name, Length"
+
+      - name: Create Release Archive
+        run: |
+          powershell "Compress-Archive -Path 'dist/pokemacro/*' -DestinationPath 'pokemacro-release.zip'"
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
-          files: dist/pokemacro.exe
+          files: pokemacro-release.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

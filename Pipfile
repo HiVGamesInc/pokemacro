@@ -22,6 +22,8 @@ Pillow = "*"
 opencv-python = "*"
 easyocr = "*"
 numpy = "*"
+pywin32 = "*"
+pefile = "*"
 
 [dev-packages]
 

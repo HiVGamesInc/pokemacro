@@ -1,9 +1,9 @@
 {
-  "lastReset": "2025-07-24 13:59:30",
+  "lastReset": "2025-07-26 11:44:29",
   "todos": [
     {
       "children": [],
-      "completed": true,
+      "completed": false,
       "id": "e912bb9d-3334-44b8-9cab-918c62cf9bb6",
       "text": "Shiny Bellsprout"
     },
@@ -17,36 +17,36 @@
         },
         {
           "children": [],
-          "completed": true,
+          "completed": false,
           "id": "286bdd07-92b9-43b9-b311-88eb166490cf",
           "text": "No 2"
         }
       ],
-      "completed": true,
+      "completed": false,
       "id": "52fe24b1-53f8-4606-9361-717fcda2e3eb",
       "text": "Daily Catch"
     },
     {
       "children": [],
-      "completed": true,
+      "completed": false,
       "id": "cc3231ce-4f12-4085-8d1e-fb75418abed1",
-      "text": "Daily Kill"
+      "text": "Daily Kill - Swampert"
     },
     {
       "children": [],
-      "completed": true,
+      "completed": false,
       "id": "bcc6f8b5-868d-4b69-ab0a-f4aa0ef2569f",
       "text": "Unown Dg"
     },
     {
       "children": [],
-      "completed": true,
+      "completed": false,
       "id": "f8dd7a6e-4707-4ae9-bed5-1a29a5c6eace",
       "text": "Unown Legion"
     },
     {
       "children": [],
-      "completed": true,
+      "completed": false,
       "id": "9cd5e77c-9d4b-4db3-b6ea-84e1a22f74bf",
       "text": "DZ - DImensional Zones"
     }
