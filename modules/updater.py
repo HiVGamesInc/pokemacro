@@ -200,6 +200,7 @@ class AutoUpdater:
             current_dir = os.path.dirname(current_exe_path)
             
             print(f"Current exe path: {current_exe_path}")
+            print(f"Current directory: {current_dir}")
             print(f"Temp file path: {temp_file_path}")
             
             if temp_file_path.endswith('.zip'):
@@ -209,43 +210,31 @@ class AutoUpdater:
                 with zipfile.ZipFile(temp_file_path, 'r') as zip_ref:
                     zip_ref.extractall(extract_dir)
                 
-                # Find the executable in the extracted files
-                new_exe_path = None
-                print("Looking for executable files...")
+                # Find the pokemacro folder in the extracted files
+                update_source_dir = None
+                print("Looking for pokemacro directory...")
                 for root, dirs, files in os.walk(extract_dir):
-                    for file in files:
-                        if file.endswith('.exe'):
-                            print(f"Found exe: {file}")
-                            if 'pokemacro' in file.lower() or 'main' in file.lower():
-                                new_exe_path = os.path.join(root, file)
-                                print(f"Selected exe: {new_exe_path}")
+                    for dir_name in dirs:
+                        if 'pokemacro' in dir_name.lower():
+                            potential_dir = os.path.join(root, dir_name)
+                            # Check if this directory contains pokemacro.exe
+                            if os.path.exists(os.path.join(potential_dir, 'pokemacro.exe')):
+                                update_source_dir = potential_dir
+                                print(f"Found pokemacro directory: {update_source_dir}")
                                 break
-                    if new_exe_path:
+                    if update_source_dir:
                         break
                 
-                if not new_exe_path:
-                    # If we can't find pokemacro.exe, look for any .exe file
-                    for root, dirs, files in os.walk(extract_dir):
-                        for file in files:
-                            if file.endswith('.exe'):
-                                new_exe_path = os.path.join(root, file)
-                                print(f"Fallback exe: {new_exe_path}")
-                                break
-                        if new_exe_path:
-                            break
+                if not update_source_dir:
+                    return {"error": True, "message": "Could not find pokemacro directory in update package"}
                 
-                if not new_exe_path:
-                    return {"error": True, "message": "Could not find executable in update package"}
-                
-            elif temp_file_path.endswith('.exe'):
-                new_exe_path = temp_file_path
             else:
-                return {"error": True, "message": "Unsupported update file format"}
+                return {"error": True, "message": "Update package must be a zip file"}
             
-            print(f"Using new exe: {new_exe_path}")
+            print(f"Update source directory: {update_source_dir}")
             
-            # Create update script
-            update_script = self._create_update_script(current_exe_path, new_exe_path, current_dir)
+            # Create update script to replace entire directory
+            update_script = self._create_directory_update_script(current_dir, update_source_dir)
             print(f"Created update script: {update_script}")
             
             # Execute update script and exit current application
@@ -259,9 +248,77 @@ class AutoUpdater:
         except Exception as e:
             return {"error": True, "message": f"Failed to install update: {str(e)}"}
     
+    def _create_directory_update_script(self, current_app_dir: str, new_app_dir: str) -> str:
+        """
+        Create a batch script to handle the complete directory update process
+        """
+        current_exe_name = "pokemacro.exe"
+        log_file = os.path.join(current_app_dir, "update_log.txt")
+        backup_dir = os.path.join(os.path.dirname(current_app_dir), "pokemacro_backup")
+        
+        script_content = f'''@echo off
+echo Updating Pokemacro (Full Directory)... > "{log_file}"
+echo Current app dir: {current_app_dir} >> "{log_file}"
+echo New app dir: {new_app_dir} >> "{log_file}"
+echo Backup dir: {backup_dir} >> "{log_file}"
+echo Current time: %date% %time% >> "{log_file}"
+
+REM Wait for the application to close
+echo Waiting for app to close... >> "{log_file}"
+timeout /t 3 /nobreak > nul
+
+REM Kill any running instances of the application
+echo Killing running instances... >> "{log_file}"
+taskkill /F /IM "{current_exe_name}" >> "{log_file}" 2>&1
+
+REM Wait a bit more
+timeout /t 2 /nobreak > nul
+
+REM Create backup of current installation
+echo Creating backup... >> "{log_file}"
+if exist "{backup_dir}" (
+    rmdir /S /Q "{backup_dir}" >> "{log_file}" 2>&1
+)
+move "{current_app_dir}" "{backup_dir}" >> "{log_file}" 2>&1
+
+REM Copy new version to the current location
+echo Copying new version... >> "{log_file}"
+xcopy "{new_app_dir}" "{current_app_dir}" /E /I /H /Y >> "{log_file}" 2>&1
+
+REM Verify the update worked
+if exist "{current_app_dir}\\{current_exe_name}" (
+    echo Update successful! >> "{log_file}"
+    echo Starting updated application... >> "{log_file}"
+    start "" "{current_app_dir}\\{current_exe_name}"
+    
+    REM Clean up backup after successful update
+    timeout /t 5 /nobreak > nul
+    rmdir /S /Q "{backup_dir}" >> "{log_file}" 2>&1
+) else (
+    echo Update failed! Restoring backup... >> "{log_file}"
+    if exist "{backup_dir}" (
+        rmdir /S /Q "{current_app_dir}" >> "{log_file}" 2>&1
+        move "{backup_dir}" "{current_app_dir}" >> "{log_file}" 2>&1
+        start "" "{current_app_dir}\\{current_exe_name}"
+    )
+)
+
+REM Clean up temp files
+rmdir /S /Q "{os.path.dirname(new_app_dir)}" >> "{log_file}" 2>&1
+
+REM Clean up this script
+del "%~f0" > nul 2>&1
+'''
+        
+        script_path = os.path.join(current_app_dir, "update_pokemacro.bat")
+        with open(script_path, 'w') as f:
+            f.write(script_content)
+        
+        return script_path
+    
     def _create_update_script(self, current_exe: str, new_exe: str, install_dir: str) -> str:
         """
-        Create a batch script to handle the update process
+        Create a batch script to handle the update process (legacy method)
         """
         current_exe_name = os.path.basename(current_exe)
         log_file = os.path.join(install_dir, "update_log.txt")
