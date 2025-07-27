@@ -199,21 +199,40 @@ class AutoUpdater:
             current_exe_path = self.get_current_executable_path()
             current_dir = os.path.dirname(current_exe_path)
             
+            print(f"Current exe path: {current_exe_path}")
+            print(f"Temp file path: {temp_file_path}")
+            
             if temp_file_path.endswith('.zip'):
                 # Extract zip file
                 extract_dir = os.path.join(temp_dir, "extracted")
+                print(f"Extracting to: {extract_dir}")
                 with zipfile.ZipFile(temp_file_path, 'r') as zip_ref:
                     zip_ref.extractall(extract_dir)
                 
                 # Find the executable in the extracted files
                 new_exe_path = None
+                print("Looking for executable files...")
                 for root, dirs, files in os.walk(extract_dir):
                     for file in files:
-                        if file.endswith('.exe') and 'pokemacro' in file.lower():
-                            new_exe_path = os.path.join(root, file)
-                            break
+                        if file.endswith('.exe'):
+                            print(f"Found exe: {file}")
+                            if 'pokemacro' in file.lower() or 'main' in file.lower():
+                                new_exe_path = os.path.join(root, file)
+                                print(f"Selected exe: {new_exe_path}")
+                                break
                     if new_exe_path:
                         break
+                
+                if not new_exe_path:
+                    # If we can't find pokemacro.exe, look for any .exe file
+                    for root, dirs, files in os.walk(extract_dir):
+                        for file in files:
+                            if file.endswith('.exe'):
+                                new_exe_path = os.path.join(root, file)
+                                print(f"Fallback exe: {new_exe_path}")
+                                break
+                        if new_exe_path:
+                            break
                 
                 if not new_exe_path:
                     return {"error": True, "message": "Could not find executable in update package"}
@@ -223,8 +242,11 @@ class AutoUpdater:
             else:
                 return {"error": True, "message": "Unsupported update file format"}
             
+            print(f"Using new exe: {new_exe_path}")
+            
             # Create update script
             update_script = self._create_update_script(current_exe_path, new_exe_path, current_dir)
+            print(f"Created update script: {update_script}")
             
             # Execute update script and exit current application
             subprocess.Popen([update_script], shell=True)
@@ -242,42 +264,59 @@ class AutoUpdater:
         Create a batch script to handle the update process
         """
         current_exe_name = os.path.basename(current_exe)
+        log_file = os.path.join(install_dir, "update_log.txt")
+        
         script_content = f'''@echo off
-echo Updating Pokemacro...
+echo Updating Pokemacro... > "{log_file}"
+echo Current exe: {current_exe} >> "{log_file}"
+echo New exe: {new_exe} >> "{log_file}"
+echo Install dir: {install_dir} >> "{log_file}"
+echo Current time: %date% %time% >> "{log_file}"
 
 REM Wait a bit for the application to close
-timeout /t 2 /nobreak > nul
+echo Waiting for app to close... >> "{log_file}"
+timeout /t 3 /nobreak > nul
 
 REM Kill any running instances of the application
-taskkill /F /IM "{current_exe_name}" > nul 2>&1
+echo Killing running instances... >> "{log_file}"
+taskkill /F /IM "{current_exe_name}" >> "{log_file}" 2>&1
 
 REM Wait a bit more
-timeout /t 1 /nobreak > nul
+timeout /t 2 /nobreak > nul
 
-REM Backup current executable
+REM Check if old exe exists
 if exist "{current_exe}" (
-    move "{current_exe}" "{current_exe}.backup" > nul 2>&1
+    echo Old exe exists, backing up... >> "{log_file}"
+    move "{current_exe}" "{current_exe}.backup" >> "{log_file}" 2>&1
+) else (
+    echo Old exe not found! >> "{log_file}"
 )
 
-REM Copy new executable
-copy "{new_exe}" "{current_exe}" > nul 2>&1
+REM Check if new exe exists
+if exist "{new_exe}" (
+    echo New exe found, copying... >> "{log_file}"
+    copy "{new_exe}" "{current_exe}" >> "{log_file}" 2>&1
+) else (
+    echo ERROR: New exe not found at {new_exe}! >> "{log_file}"
+)
 
+REM Verify the copy worked
 if exist "{current_exe}" (
-    echo Update successful!
-    REM Start the updated application
+    echo Update successful! >> "{log_file}"
+    echo Starting updated application... >> "{log_file}"
     start "" "{current_exe}"
 ) else (
-    echo Update failed! Restoring backup...
+    echo Update failed! Restoring backup... >> "{log_file}"
     if exist "{current_exe}.backup" (
-        move "{current_exe}.backup" "{current_exe}" > nul 2>&1
+        move "{current_exe}.backup" "{current_exe}" >> "{log_file}" 2>&1
         start "" "{current_exe}"
     )
 )
 
-REM Clean up temp files
-rmdir /S /Q "{os.path.dirname(new_exe)}" > nul 2>&1
+REM Clean up temp files (but keep log for debugging)
+rmdir /S /Q "{os.path.dirname(new_exe)}" >> "{log_file}" 2>&1
 
-REM Clean up this script
+REM Clean up this script after 10 seconds to allow log viewing
 del "%~f0" > nul 2>&1
 '''
         

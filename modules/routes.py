@@ -303,10 +303,15 @@ def install_update():
     download_info = app.config['UPDATE_DOWNLOAD_INFO']
     updater = get_updater()
     
+    print(f"Installing update with info: {download_info}")
+    print(f"Current executable path: {updater.get_current_executable_path()}")
+    
     result = updater.install_update(
         download_info['temp_file_path'],
         download_info['temp_dir']
     )
+    
+    print(f"Install result: {result}")
     
     if result.get('error'):
         return jsonify(result), 500
@@ -327,3 +332,17 @@ def install_update():
     threading.Thread(target=shutdown_app, daemon=True).start()
     
     return jsonify(result)
+
+@app.route('/update/log', methods=['GET'])
+def get_update_log():
+    """Get the update log file contents for debugging"""
+    try:
+        log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "update_log.txt")
+        if os.path.exists(log_file_path):
+            with open(log_file_path, 'r') as f:
+                log_content = f.read()
+            return jsonify({"success": True, "log": log_content})
+        else:
+            return jsonify({"success": False, "message": "Log file not found"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)})
