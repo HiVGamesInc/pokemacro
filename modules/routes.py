@@ -268,16 +268,13 @@ def download_update():
     if not updater.update_available:
         return jsonify({"error": True, "message": "No update available"}), 400
     
-    # Start download in background
-    def download_with_progress():
-        def progress_callback(progress):
-            # In a real implementation, you might want to store this progress
-            # in a shared state or send it via WebSocket
-            pass
-        
-        return updater.download_update(progress_callback)
+    # Track progress in app config
+    app.config['DOWNLOAD_PROGRESS'] = 0
     
-    result = download_with_progress()
+    def progress_callback(progress):
+        app.config['DOWNLOAD_PROGRESS'] = progress
+    
+    result = updater.download_update(progress_callback)
     
     if result.get('error'):
         return jsonify(result), 500
@@ -290,6 +287,12 @@ def download_update():
         "message": "Update downloaded successfully",
         "ready_to_install": True
     })
+
+@app.route('/update/progress', methods=['GET'])
+def get_download_progress():
+    """Get current download progress"""
+    progress = app.config.get('DOWNLOAD_PROGRESS', 0)
+    return jsonify({"progress": progress})
 
 @app.route('/update/install', methods=['POST'])
 def install_update():
@@ -310,5 +313,17 @@ def install_update():
     
     # Clean up download info
     app.config.pop('UPDATE_DOWNLOAD_INFO', None)
+    app.config.pop('DOWNLOAD_PROGRESS', None)
+    
+    # Schedule app shutdown after response
+    import threading
+    import time
+    
+    def shutdown_app():
+        time.sleep(1)  # Give time for response to be sent
+        import os
+        os._exit(0)  # Force exit the application
+    
+    threading.Thread(target=shutdown_app, daemon=True).start()
     
     return jsonify(result)

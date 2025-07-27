@@ -86,6 +86,7 @@ export const UpdateProvider: React.FC<UpdateProviderProps> = ({ children }) => {
     setDownloadProgress(0);
 
     try {
+      // Start the download
       const response = await fetch("/update/download", {
         method: "POST",
       });
@@ -96,7 +97,20 @@ export const UpdateProvider: React.FC<UpdateProviderProps> = ({ children }) => {
         throw new Error(data.message);
       }
 
-      setDownloadProgress(100);
+      // Poll for progress
+      const progressInterval = setInterval(async () => {
+        try {
+          const progressResponse = await fetch("/update/progress");
+          const progressData = await progressResponse.json();
+          setDownloadProgress(progressData.progress);
+
+          if (progressData.progress >= 100) {
+            clearInterval(progressInterval);
+          }
+        } catch (error) {
+          console.error("Failed to get progress:", error);
+        }
+      }, 500);
 
       // Update the updateInfo to reflect that download is complete
       setUpdateInfo((prev) => ({
@@ -131,10 +145,17 @@ export const UpdateProvider: React.FC<UpdateProviderProps> = ({ children }) => {
         throw new Error(data.message);
       }
 
-      // The application will restart automatically
-      alert(
-        "Update will be installed. The application will restart automatically."
-      );
+      // Show confirmation and then let the backend handle app closure
+      setUpdateInfo((prev) => ({
+        ...prev!,
+        message:
+          "Installing update... The application will restart automatically.",
+      }));
+
+      // Give the user a moment to see the message, then the backend will close the app
+      setTimeout(() => {
+        // The backend has already started the update process and will close the app
+      }, 2000);
     } catch (error) {
       console.error("Failed to install update:", error);
       setUpdateInfo((prev) => ({
@@ -144,7 +165,6 @@ export const UpdateProvider: React.FC<UpdateProviderProps> = ({ children }) => {
           error instanceof Error ? error.message : "Unknown error"
         }`,
       }));
-    } finally {
       setIsInstalling(false);
     }
   };

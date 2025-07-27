@@ -241,25 +241,44 @@ class AutoUpdater:
         """
         Create a batch script to handle the update process
         """
+        current_exe_name = os.path.basename(current_exe)
         script_content = f'''@echo off
 echo Updating Pokemacro...
 
-REM Wait for the application to close
-timeout /t 3 /nobreak > nul
+REM Wait a bit for the application to close
+timeout /t 2 /nobreak > nul
+
+REM Kill any running instances of the application
+taskkill /F /IM "{current_exe_name}" > nul 2>&1
+
+REM Wait a bit more
+timeout /t 1 /nobreak > nul
 
 REM Backup current executable
 if exist "{current_exe}" (
-    move "{current_exe}" "{current_exe}.backup"
+    move "{current_exe}" "{current_exe}.backup" > nul 2>&1
 )
 
 REM Copy new executable
-copy "{new_exe}" "{current_exe}"
+copy "{new_exe}" "{current_exe}" > nul 2>&1
 
-REM Start the updated application
-start "" "{current_exe}"
+if exist "{current_exe}" (
+    echo Update successful!
+    REM Start the updated application
+    start "" "{current_exe}"
+) else (
+    echo Update failed! Restoring backup...
+    if exist "{current_exe}.backup" (
+        move "{current_exe}.backup" "{current_exe}" > nul 2>&1
+        start "" "{current_exe}"
+    )
+)
 
-REM Clean up
-del "%~f0"
+REM Clean up temp files
+rmdir /S /Q "{os.path.dirname(new_exe)}" > nul 2>&1
+
+REM Clean up this script
+del "%~f0" > nul 2>&1
 '''
         
         script_path = os.path.join(install_dir, "update_pokemacro.bat")
