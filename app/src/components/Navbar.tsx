@@ -7,7 +7,6 @@ import {
   HeartIcon,
   SparklesIcon, // Import icon for Auto Revive
   ClipboardDocumentListIcon, // Import icon for Todo
-  RocketLaunchIcon, // Import icon for Release Manager
 } from "@heroicons/react/24/outline";
 import {
   FireIcon as FireIconActive,
@@ -17,7 +16,6 @@ import {
   HeartIcon as HeartIconActive,
   SparklesIcon as SparklesIconActive, // Import active icon for Auto Revive
   ClipboardDocumentListIcon as ClipboardDocumentListIconActive, // Import active icon for Todo
-  RocketLaunchIcon as RocketLaunchIconActive, // Import active icon for Release Manager
 } from "@heroicons/react/24/solid";
 
 import { IconType } from "../types/types";
@@ -126,16 +124,6 @@ const Navbar = () => {
           icon={ClipboardDocumentListIcon}
           activeIcon={ClipboardDocumentListIconActive}
           onClick={() => router.setCurrentRoute(RouterContext.Routes.TODO)}
-        />
-      </li>
-      <li>
-        <IconButton
-          active={router.currentRoute === RouterContext.Routes.RELEASE_MANAGER}
-          icon={RocketLaunchIcon}
-          activeIcon={RocketLaunchIconActive}
-          onClick={() =>
-            router.setCurrentRoute(RouterContext.Routes.RELEASE_MANAGER)
-          }
         />
       </li>
     </ul>

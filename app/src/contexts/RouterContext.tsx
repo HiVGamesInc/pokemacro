@@ -15,7 +15,6 @@ export enum Routes {
   HEALING = "healing",
   AUTO_REVIVE = "auto-revive",
   TODO = "todo",
-  RELEASE_MANAGER = "release-manager",
 }
 
 type ContextType = {

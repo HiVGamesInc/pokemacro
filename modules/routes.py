@@ -1,11 +1,9 @@
 import os
-import json
-import subprocess
 from flask import request, jsonify, send_from_directory
 from modules import app
 from modules.events import toggle_auto_combo, toggle_anti_logout, toggle_alert, toggle_healing, update_current_combo, save_config, load_config, execute_crop_area, toggle_auto_catch, toggle_mouse_tracking, get_mouse_coords, toggle_auto_revive, add_todo_item, toggle_todo_item, delete_todo_item, update_todo_item, reset_all_todos, get_todo_stats, add_weekly_todo_item, toggle_weekly_todo_item, delete_weekly_todo_item, update_weekly_todo_item, reset_all_weekly_todos, get_weekly_todo_stats
 from modules.key_mapper import convert_key_name
-from modules.updater import get_updater, load_version_info
+from modules.updater import get_updater
 
 @app.route('/anti-logout', methods=['POST'])
 def anti_logout():
@@ -314,77 +312,3 @@ def install_update():
     app.config.pop('UPDATE_DOWNLOAD_INFO', None)
     
     return jsonify(result)
-
-# Release management routes
-@app.route('/api/version', methods=['GET'])
-def get_version():
-    """Get current version information"""
-    version_info = load_version_info()
-    return jsonify(version_info)
-
-@app.route('/api/create-release', methods=['POST'])
-def create_release():
-    """Create a new release by updating version files and creating a git tag"""
-    data = request.get_json()
-    version = data.get('version')
-    release_notes = data.get('releaseNotes', '')
-    
-    if not version:
-        return jsonify({"error": True, "message": "Version is required"}), 400
-    
-    try:
-        # Update version.json
-        version_info = load_version_info()
-        version_info['version'] = version
-        
-        with open('version.json', 'w') as f:
-            json.dump(version_info, f, indent=2)
-        
-        # Update app/package.json
-        package_json_path = os.path.join('app', 'package.json')
-        if os.path.exists(package_json_path):
-            with open(package_json_path, 'r') as f:
-                package_data = json.load(f)
-            
-            package_data['version'] = version
-            
-            with open(package_json_path, 'w') as f:
-                json.dump(package_data, f, indent=2)
-        
-        # Build frontend
-        build_result = subprocess.run(
-            ['npm', 'run', 'build'],
-            cwd='app',
-            capture_output=True,
-            text=True
-        )
-        
-        if build_result.returncode != 0:
-            return jsonify({
-                "error": True, 
-                "message": f"Frontend build failed: {build_result.stderr}"
-            }), 500
-        
-        # Git operations
-        subprocess.run(['git', 'add', 'version.json', 'app/package.json', 'app/build'], check=True)
-        subprocess.run(['git', 'commit', '-m', f'chore: bump version to {version}'], check=True)
-        subprocess.run(['git', 'tag', version], check=True)
-        subprocess.run(['git', 'push', 'origin', 'master'], check=True)
-        subprocess.run(['git', 'push', 'origin', version], check=True)
-        
-        return jsonify({
-            "success": True,
-            "message": f"Release {version} created successfully",
-            "version": version
-        })
-        
-    except subprocess.CalledProcessError as e:
-        return jsonify({
-            "error": True,
-            "message": f"Git operation failed: {str(e)}"
-        }), 500
-    except Exception as e:
-        return jsonify({
-            "error": True,
-            "message": f"Failed to create release: {str(e)}"
-        }), 500

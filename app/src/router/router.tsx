@@ -6,7 +6,6 @@ import Alert from "../pages/Alert";
 import AutoCatch from "../pages/AutoCatch";
 import Healing from "../pages/Healing";
 import Todo from "../pages/Todo";
-import ReleaseManager from "../pages/ReleaseManager";
 import Header from "../components/Header/Header";
 import UpdateDialog from "../components/UpdateDialog";
 import * as RouterContext from "../contexts/RouterContext";
@@ -57,9 +56,6 @@ const Router = () => {
                             </Route>
                             <Route path={RouterContext.Routes.TODO}>
                               <Todo />
-                            </Route>
-                            <Route path={RouterContext.Routes.RELEASE_MANAGER}>
-                              <ReleaseManager />
                             </Route>
                           </Layout>
                           <UpdateDialog />
