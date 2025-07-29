@@ -2,18 +2,16 @@ import { useContext, useState, useEffect, useMemo } from "react";
 import { Combo } from "../types/types";
 import Card from "../components/Card/Card";
 import AutoComboEdit from "./AutoCombo.edit";
-import { ArrowLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { updateAutoCombo } from "../utils/actions";
 import AddItemButton from "../components/Button/AddItemButton";
+import PageWrapper from "../components/PageWrapper";
 import * as AutoComboContext from "../contexts/AutoComboContext";
-import * as KeybindingsContext from "../contexts/KeybindingsContext";
 
 const AutoComboTab = () => {
   const { combos, setCombos, currentCombo, setCurrentCombo } = useContext(
     AutoComboContext.Context
   );
-
-  const { keybindings } = useContext(KeybindingsContext.Context);
 
   const activeComboIndex = useMemo(
     () => combos.findIndex((c) => c.name === currentCombo?.name) ?? 0,
@@ -36,115 +34,137 @@ const AutoComboTab = () => {
     }
   }, [currentCombo]);
 
-  return (
-    <div>
-      {isEditing !== null ? (
-        <>
-          <button onClick={() => setIsEditing(null)}>
-            <ArrowLeftIcon className="size-6 text-blue-500" />
+  if (isEditing !== null) {
+    return (
+      <PageWrapper
+        title="Edit Combo"
+        subtitle={`Editing: ${combos[isEditing]?.name}`}
+        actions={
+          <button
+            onClick={() => setIsEditing(null)}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-700 hover:bg-gray-600 rounded transition-colors"
+          >
+            <ArrowLeftIcon className="w-4 h-4" />
+            Back to List
           </button>
-          <AutoComboEdit
-            data={combos[isEditing]}
-            updateCombo={(data) => {
-              const updatedCombos = [...combos];
+        }
+      >
+        <AutoComboEdit
+          data={combos[isEditing]}
+          updateCombo={(data) => {
+            const updatedCombos = [...combos];
 
-              if (Object.keys(data).length > 0)
-                (updatedCombos[isEditing] as Combo | {}) = data;
-              else updatedCombos.splice(isEditing, 1);
+            if (Object.keys(data).length > 0)
+              (updatedCombos[isEditing] as Combo | {}) = data;
+            else updatedCombos.splice(isEditing, 1);
 
-              setCurrentCombo(updatedCombos[activeComboIndex]);
-              setCombos(updatedCombos);
-              setIsEditing(null);
-            }}
-          />
-        </>
-      ) : (
-        <>
-          <h2 className="text-xl font-bold">Auto Combo</h2>
-          <h3 className="text-lg font-bold mt-4 mb-4">Combos</h3>
+            setCurrentCombo(updatedCombos[activeComboIndex]);
+            setCombos(updatedCombos);
+            setIsEditing(null);
+          }}
+        />
+      </PageWrapper>
+    );
+  }
 
-          {combos && (
-            <div className="flex flex-col gap-4">
-              {combos.map((combo, index) => (
-                <Card
-                  key={combo.name}
-                  active={activeComboIndex === index}
-                  onClick={() => setCurrentCombo(combos[index])}
-                  onDoubleClick={() => setIsEditing(index)}
-                  className="flex flex-col items-start !m-0"
-                >
-                  <div className="flex justify-between items-center w-full">
-                    <div className="font-medium">
-                      <span className="text-sm text-slate-400">
-                        {index + ". "}
+  return (
+    <PageWrapper
+      title="Auto Combo"
+      subtitle="Manage and configure your combat combos"
+      actions={
+        <AddItemButton
+          onClick={() => {
+            const newComboIndex = combos.length;
+            const newCombo: Combo = {
+              name: `New Combo ${newComboIndex + 1}`,
+              triggerKey: [],
+              moveList: [],
+            };
+            setCombos([...combos, newCombo]);
+            setIsEditing(newComboIndex);
+          }}
+        />
+      }
+    >
+      {combos && combos.length > 0 ? (
+        <div className="grid gap-3">
+          {combos.map((combo, index) => (
+            <Card
+              key={combo.name}
+              active={activeComboIndex === index}
+              onClick={() => setCurrentCombo(combos[index])}
+              onDoubleClick={() => setIsEditing(index)}
+              className="!m-0 hover:bg-gray-800 transition-colors cursor-pointer"
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs text-gray-400 font-mono">
+                      #{index + 1}
+                    </span>
+                    <h3 className="font-medium text-gray-100">{combo.name}</h3>
+                    {activeComboIndex === index && (
+                      <span className="px-2 py-0.5 text-xs bg-blue-600 text-white rounded">
+                        Active
                       </span>
-                      <span className="text-lg">{combo.name}</span>
-                    </div>
-                    <div className="text-md font-medium text-slate-300">
-                      {combo.triggerKey[0].keyName}
-                    </div>
+                    )}
                   </div>
-                  <div className="mt-4 flex items-center flex-wrap gap-2">
-                    {combo.moveList &&
-                      combo.moveList.map((item, index) => {
-                        return (
-                          <div
-                            key={(item.skillName || "") + index}
-                            className="flex items-center gap-2"
-                          >
-                            <div className="text-xs font-medium">
-                              {item.mouseClick ? (
-                                <span>
-                                  Mouse Click - {item.mouseClick.button} (
-                                  {item.mouseClick.x}, {item.mouseClick.y})
-                                </span>
-                              ) : item.delay ? (
-                                <span>
-                                  Delay -{" "}
-                                  <span className="text-green-300">
-                                    {Number(item.delay) / 1000} seg
-                                  </span>
-                                </span>
-                              ) : item.hotkey ? (
-                                <span>
-                                  Hotkey -{" "}
-                                  <span className="text-green-300">
-                                    {item.hotkey.keyName}
-                                  </span>
-                                </span>
-                              ) : (
-                                <span>
-                                  {item.skillName}
-                                  {!item.autoCatch && item.skillName && (
-                                    <>
-                                      {" - "}
-                                      <span className="text-green-300">
-                                        {keybindings[item.skillName]?.keyName}
-                                      </span>
-                                    </>
-                                  )}
-                                </span>
-                              )}
-                            </div>
-                            {index !== combo.moveList.length - 1 && (
-                              <ChevronRightIcon className="size-3" />
-                            )}
-                          </div>
-                        );
-                      })}
+
+                  {combo.triggerKey?.[0] && (
+                    <div className="text-sm text-gray-400 mb-2">
+                      Trigger:{" "}
+                      <kbd className="px-1.5 py-0.5 text-xs bg-green-700 text-gray-100 rounded">
+                        {combo.triggerKey[0].keyName}
+                      </kbd>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-1">
+                    {combo.moveList?.slice(0, 5).map((item, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-1 text-xs bg-gray-700 text-gray-300 rounded"
+                      >
+                        {item.mouseClick
+                          ? `Click (${item.mouseClick.x}, ${item.mouseClick.y})`
+                          : item.skillName
+                          ? item.skillName
+                          : item.delay
+                          ? `${item.delay}ms`
+                          : "Unknown"}
+                      </span>
+                    ))}
+                    {combo.moveList && combo.moveList.length > 5 && (
+                      <span className="px-2 py-1 text-xs bg-blue-900 text-white rounded">
+                        +{combo.moveList.length - 5} more
+                      </span>
+                    )}
                   </div>
-                </Card>
-              ))}
-              <AddItemButton onClick={() => setIsEditing(combos.length)}>
-                <div className="flex items-center justify-center">
-                  <div className="text-md font-medium">Add Combo</div>
                 </div>
-              </AddItemButton>
-            </div>
-          )}
-        </>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditing(index);
+                  }}
+                  className="px-2 py-1 text-xs text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded transition-colors"
+                >
+                  Edit
+                </button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <div className="text-gray-400 mb-4">
+            <PlusIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
+            <p>No combos configured yet</p>
+            <p className="text-sm">Create your first combo to get started</p>
+          </div>
+        </div>
       )}
-    </div>
+    </PageWrapper>
   );
 };
 

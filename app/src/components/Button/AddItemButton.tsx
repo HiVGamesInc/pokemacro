@@ -1,5 +1,5 @@
 import { PropsWithChildren } from "react";
-import Card from "../Card/Card";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 type AddItemButtonProps = {
   onClick: React.MouseEventHandler<HTMLButtonElement>;
@@ -10,12 +10,13 @@ const AddItemButton = ({
   children,
 }: PropsWithChildren<AddItemButtonProps>) => {
   return (
-    <Card
-      className="mb-4 bg-transparent border-1 w-full hover:border-slate-500 transition-all"
+    <button
       onClick={onClick}
+      className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
     >
-      {children}
-    </Card>
+      <PlusIcon className="w-4 h-4" />
+      {children || "Add Combo"}
+    </button>
   );
 };
 

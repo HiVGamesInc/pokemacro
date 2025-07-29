@@ -10,6 +10,7 @@ type InputProps = {
   placeholder?: string;
   readOnly?: boolean;
   autoFocus?: boolean;
+  type?: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 };

@@ -1,16 +1,15 @@
 import { PropsWithChildren } from "react";
-import Button from "../Button/Button";
 
 type CardProps = {
   as?: React.ElementType;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  onDoubleClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+  onDoubleClick?: React.MouseEventHandler<HTMLDivElement>;
   className?: string;
   active?: boolean;
 };
 
 const Card = ({
-  as,
+  as = "div",
   active,
   onClick,
   onDoubleClick,
@@ -18,20 +17,28 @@ const Card = ({
   children,
   ...rest
 }: PropsWithChildren<CardProps>) => {
-  const Comp = as || (Button as any);
+  const Component = as;
 
   return (
-    <Comp
-      className={`py-4 px-4 bg-slate-800 rounded-xl grow text-left ${className} border-1`}
-      active={active}
-      {...(Comp === Button && {
-        onClick: active && onDoubleClick ? onDoubleClick : onClick,
-      })}
-      inactiveClass="border-slate-100"
+    <Component
+      className={`
+        p-4 rounded-lg border transition-colors duration-150
+        ${
+          active
+            ? "bg-gray-900 hover:bg-gray-900 border-blue-500"
+            : "bg-gray-800 border-gray-700 hover:border-gray-600"
+        }
+        ${onClick ? "cursor-pointer" : ""}
+        ${className || ""}
+      `
+        .trim()
+        .replace(/\s+/g, " ")}
+      onClick={onClick}
+      onDoubleClick={onDoubleClick}
       {...rest}
     >
       {children}
-    </Comp>
+    </Component>
   );
 };
 

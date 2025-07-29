@@ -6,7 +6,6 @@ import Alert from "../pages/Alert";
 import AutoCatch from "../pages/AutoCatch";
 import Healing from "../pages/Healing";
 import Todo from "../pages/Todo";
-import Header from "../components/Header/Header";
 import UpdateDialog from "../components/UpdateDialog";
 import * as RouterContext from "../contexts/RouterContext";
 import * as GlobalContext from "../contexts/GlobalContext";
@@ -34,7 +33,6 @@ const Router = () => {
                     <AutoComboContext.Provider>
                       <AutoCatchProvider>
                         <AutoReviveProvider>
-                          <Header />
                           <Layout>
                             <Route path={RouterContext.Routes.AUTO_COMBO}>
                               <AutoComboTab />

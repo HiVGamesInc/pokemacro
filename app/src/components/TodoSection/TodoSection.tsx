@@ -257,16 +257,6 @@ const TodoSection = ({
     setNewTodoText("");
   };
 
-  const handleReset = () => {
-    if (
-      window.confirm(
-        `Are you sure you want to reset all ${title.toLowerCase()}? This will mark all tasks as incomplete.`
-      )
-    ) {
-      onReset();
-    }
-  };
-
   const completedCount = todos.filter((todo) => todo.completed).length;
   const totalCount = todos.length;
 
@@ -293,9 +283,6 @@ const TodoSection = ({
           </p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={handleReset} className={resetButtonColor}>
-            Reset All
-          </Button>
           <Button onClick={() => setIsAddingTodo(true)}>
             <PlusIcon className="w-4 h-4 mr-2" />
             Add Task
