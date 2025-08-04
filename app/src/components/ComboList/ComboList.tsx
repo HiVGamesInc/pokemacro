@@ -20,11 +20,27 @@ import colors from "tailwindcss/colors";
 
 type ComboListType = {
   combo: Combo;
+  editingIndex: number | null;
+  editedItem: any;
   onRemove: (index: number) => void;
+  onEdit: (index: number) => void;
+  onSaveEdit: (index: number, updatedItem: any) => void;
+  onCancelEdit: () => void;
+  onEditFieldChange: (field: string, value: any) => void;
   onReorder?: (newOrder: any[]) => void;
 };
 
-const ComboList: FC<ComboListType> = ({ combo, onRemove, onReorder }) => {
+const ComboList: FC<ComboListType> = ({
+  combo,
+  editingIndex,
+  editedItem,
+  onRemove,
+  onEdit,
+  onSaveEdit,
+  onCancelEdit,
+  onEditFieldChange,
+  onReorder,
+}) => {
   // We assume each move has a unique id. If not, generate one using index.
   const initialItems =
     combo.moveList?.map((item, index) => ({
@@ -82,7 +98,13 @@ const ComboList: FC<ComboListType> = ({ combo, onRemove, onReorder }) => {
                 key={item.id}
                 id={item.id}
                 item={item}
+                isEditing={editingIndex === index}
+                editedItem={editedItem}
                 onRemove={() => onRemove(index)}
+                onEdit={() => onEdit(index)}
+                onSaveEdit={(updatedItem) => onSaveEdit(index, updatedItem)}
+                onCancelEdit={onCancelEdit}
+                onEditFieldChange={onEditFieldChange}
                 {...(item.delay && {
                   style: { backgroundColor: colors.slate[900] },
                 })}

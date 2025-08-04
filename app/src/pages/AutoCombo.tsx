@@ -7,11 +7,13 @@ import { updateAutoCombo } from "../utils/actions";
 import AddItemButton from "../components/Button/AddItemButton";
 import PageWrapper from "../components/PageWrapper";
 import * as AutoComboContext from "../contexts/AutoComboContext";
+import * as KeybindingsContext from "../contexts/KeybindingsContext";
 
 const AutoComboTab = () => {
   const { combos, setCombos, currentCombo, setCurrentCombo } = useContext(
     AutoComboContext.Context
   );
+  const { keybindings } = useContext(KeybindingsContext.Context);
 
   const activeComboIndex = useMemo(
     () => combos.findIndex((c) => c.name === currentCombo?.name) ?? 0,
@@ -21,6 +23,46 @@ const AutoComboTab = () => {
   const [isEditing, setIsEditing] = useState<typeof activeComboIndex | null>(
     null
   );
+
+  const syncComboWithKeybindings = (combo: Combo): Combo => {
+    const updatedMoveList = combo.moveList.map((move) => {
+      if (move.skillName && keybindings[move.skillName]) {
+        return {
+          ...move,
+          hotkey: keybindings[move.skillName],
+        };
+      }
+      return move;
+    });
+
+    return {
+      ...combo,
+      moveList: updatedMoveList,
+    };
+  };
+
+  useEffect(() => {
+    if (
+      keybindings &&
+      Object.keys(keybindings).length > 0 &&
+      combos.length > 0
+    ) {
+      const updatedCombos = combos.map(syncComboWithKeybindings);
+
+      const hasChanges =
+        JSON.stringify(updatedCombos) !== JSON.stringify(combos);
+      if (hasChanges) {
+        console.log("Syncing combos with updated keybindings...");
+        setCombos(updatedCombos);
+
+        if (currentCombo) {
+          const updatedCurrentCombo = syncComboWithKeybindings(currentCombo);
+          setCurrentCombo(updatedCurrentCombo);
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keybindings]);
 
   useEffect(() => {
     if (currentCombo && Object.keys(currentCombo).length) {
@@ -142,15 +184,39 @@ const AutoComboTab = () => {
                   </div>
                 </div>
 
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsEditing(index);
-                  }}
-                  className="px-2 py-1 text-xs text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded transition-colors"
-                >
-                  Edit
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Create a duplicate combo
+                      const duplicatedCombo: Combo = {
+                        ...combo,
+                        name: `${combo.name} (Copy)`,
+                        // Deep copy the moveList to avoid reference issues
+                        moveList: combo.moveList.map((item) => ({
+                          ...item,
+                          // Remove any temporary IDs that might exist
+                          id: undefined,
+                        })),
+                      };
+                      const newCombos = [...combos, duplicatedCombo];
+                      setCombos(newCombos);
+                      setIsEditing(newCombos.length - 1); // Open the duplicated combo for editing
+                    }}
+                    className="px-2 py-1 text-xs text-blue-400 hover:text-blue-200 hover:bg-blue-900/30 rounded transition-colors"
+                  >
+                    Duplicate
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsEditing(index);
+                    }}
+                    className="px-2 py-1 text-xs text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded transition-colors"
+                  >
+                    Edit
+                  </button>
+                </div>
               </div>
             </Card>
           ))}
