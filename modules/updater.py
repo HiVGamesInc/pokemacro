@@ -210,23 +210,32 @@ class AutoUpdater:
                 with zipfile.ZipFile(temp_file_path, 'r') as zip_ref:
                     zip_ref.extractall(extract_dir)
                 
-                # Find the pokemacro folder in the extracted files
+                # Find the app directory in the extracted files by looking for the executable
                 update_source_dir = None
-                print("Looking for pokemacro directory...")
-                for root, dirs, files in os.walk(extract_dir):
-                    for dir_name in dirs:
-                        if 'pokemacro' in dir_name.lower():
-                            potential_dir = os.path.join(root, dir_name)
-                            # Check if this directory contains pokemacro.exe
-                            if os.path.exists(os.path.join(potential_dir, 'pokemacro.exe')):
-                                update_source_dir = potential_dir
-                                print(f"Found pokemacro directory: {update_source_dir}")
-                                break
-                    if update_source_dir:
-                        break
+                print("Looking for app directory with executable...")
+                
+                # Get the current executable name dynamically
+                if hasattr(sys, '_MEIPASS'):
+                    # Running from executable
+                    current_exe_name = os.path.basename(sys.executable)
+                else:
+                    # Running from script, assume it will be pokemacro.exe
+                    current_exe_name = "pokemacro.exe"
+                
+                # First, check if the executable is directly in the root of extracted files
+                if os.path.exists(os.path.join(extract_dir, current_exe_name)):
+                    update_source_dir = extract_dir
+                    print(f"Found executable in root: {update_source_dir}")
+                else:
+                    # Look for the executable in subdirectories
+                    for root, dirs, files in os.walk(extract_dir):
+                        if current_exe_name in files:
+                            update_source_dir = root
+                            print(f"Found app directory: {update_source_dir}")
+                            break
                 
                 if not update_source_dir:
-                    return {"error": True, "message": "Could not find pokemacro directory in update package"}
+                    return {"error": True, "message": f"Could not find {current_exe_name} in update package"}
                 
             else:
                 return {"error": True, "message": "Update package must be a zip file"}
@@ -252,12 +261,17 @@ class AutoUpdater:
         """
         Create a batch script to handle the complete directory update process
         """
-        current_exe_name = "pokemacro.exe"
+        # Get the current executable name dynamically
+        if hasattr(sys, '_MEIPASS'):
+            current_exe_name = os.path.basename(sys.executable)
+        else:
+            current_exe_name = "pokemacro.exe"
+            
         log_file = os.path.join(current_app_dir, "update_log.txt")
-        backup_dir = os.path.join(os.path.dirname(current_app_dir), "pokemacro_backup")
+        backup_dir = os.path.join(os.path.dirname(current_app_dir), f"{os.path.basename(current_app_dir)}_backup")
         
         script_content = f'''@echo off
-echo Updating Pokemacro (Full Directory)... > "{log_file}"
+echo Updating Application (Full Directory)... > "{log_file}"
 echo Current app dir: {current_app_dir} >> "{log_file}"
 echo New app dir: {new_app_dir} >> "{log_file}"
 echo Backup dir: {backup_dir} >> "{log_file}"
