@@ -43,7 +43,10 @@ const SortableItem: React.FC<SortableItemProps> = ({
   style,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id });
+    useSortable({
+      id,
+      disabled: isEditing, // Disable drag when editing
+    });
 
   const { keybindings } = useContext(KeybindingsContext.Context);
   const key = item.skillName ? keybindings[item.skillName] : undefined;
@@ -66,7 +69,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
     (
       item.delay || // delay items
       item.mouseClick || // mouse click items
-      (item.hotkey && !item.skillName) || // hotkey items
+      (item.hotkey && !item.skillName) || // hotkey items (pure hotkeys without skillName)
       (item.skillName &&
         !item.autoCatch &&
         !["Pokestop", "Medicine", "Revive", "Auto Loot", "Auto Catch"].includes(
@@ -85,7 +88,10 @@ const SortableItem: React.FC<SortableItemProps> = ({
           <div className="mb-2">
             <div className="text-sm text-gray-400">Editing item</div>
           </div>
-          <div className="flex gap-2 items-center">
+          <div
+            className="flex gap-2 items-center"
+            onClick={(e) => e.stopPropagation()} // Prevent event bubbling
+          >
             {/* Edit form based on item type */}
             {item.delay ? (
               <Input
@@ -145,7 +151,8 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   </div>
                 </div>
               </>
-            ) : item.hotkey ? (
+            ) : item.hotkey && !item.skillName ? (
+              // Pure hotkey items (hotkey without associated skillName)
               <Select
                 wrapperClassName="flex-1 !mt-0"
                 className="bg-black text-slate-50 border border-slate-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5"
@@ -156,7 +163,6 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   );
                   if (selectedKey) {
                     onEditFieldChange("hotkey", selectedKey);
-                    onEditFieldChange("skillName", selectedKey.keyName);
                   }
                 }}
                 options={Object.values(KeyboardKeys).map((key) => ({
@@ -165,6 +171,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                 }))}
               />
             ) : (
+              // Move items (skillName with moves)
               <Select
                 wrapperClassName="flex-1 !mt-0"
                 className="bg-black text-slate-50 border border-slate-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5"
@@ -181,14 +188,22 @@ const SortableItem: React.FC<SortableItemProps> = ({
 
             {/* Action buttons - matching the add form style */}
             <Button
-              className="bg-blue-00 p-4 rounded-lg text-green-400 h-[42px] hover:bg-green-900 hover:text-white"
-              onClick={() => onSaveEdit(editedItem)}
+              className="bg-blue-900 p-4 rounded-lg text-green-400 h-[42px] hover:bg-green-900 hover:text-white"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onSaveEdit(editedItem);
+              }}
             >
               <CheckIcon className="size-4" />
             </Button>
             <Button
               className="bg-blue-900 p-4 rounded-lg text-red-400 h-[42px] hover:bg-red-900 hover:text-white"
-              onClick={onCancelEdit}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onCancelEdit();
+              }}
             >
               <XMarkIcon className="size-4" />
             </Button>
@@ -199,7 +214,12 @@ const SortableItem: React.FC<SortableItemProps> = ({
   }
 
   return (
-    <div ref={setNodeRef} style={defaultStyle} {...attributes} {...listeners}>
+    <div
+      ref={setNodeRef}
+      style={defaultStyle}
+      {...attributes}
+      {...(!isEditing && listeners)} // Only apply listeners when not editing
+    >
       <Card
         as="div"
         className="m-0 bg-transparent text-left"

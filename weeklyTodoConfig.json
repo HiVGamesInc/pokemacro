@@ -1,15 +1,15 @@
 {
-  "lastReset": "2025-07-25 07:55:07",
+  "lastReset": "2025-07-30 18:39:39",
   "todos": [
     {
       "children": [],
-      "completed": true,
+      "completed": false,
       "id": "d4ad20cf-8c1c-46a9-ac1b-1225bd75d2d3",
       "text": "2000 MT Silver"
     },
     {
       "children": [],
-      "completed": false,
+      "completed": true,
       "id": "4935049b-3eae-43e0-9932-cdc1a551c386",
       "text": "2000 Outland"
     },
@@ -18,6 +18,61 @@
       "completed": false,
       "id": "f6b23df8-9070-4bfa-8d89-0db5b178c4ad",
       "text": "2000 Phenac"
+    },
+    {
+      "children": [
+        {
+          "children": [],
+          "completed": true,
+          "id": "3a94b486-25ff-42d1-96f8-2ddb98839ccb",
+          "text": "Violet"
+        },
+        {
+          "children": [],
+          "completed": true,
+          "id": "bbce61b7-ea7b-4523-95e0-7f570d14990a",
+          "text": "Goldenrod"
+        },
+        {
+          "children": [],
+          "completed": true,
+          "id": "54c05c64-8128-4216-8e64-f67451149a5b",
+          "text": "Ecruteak"
+        },
+        {
+          "children": [],
+          "completed": true,
+          "id": "e3c95415-745b-472e-91b1-a24260e40aff",
+          "text": "Azalea"
+        },
+        {
+          "children": [],
+          "completed": true,
+          "id": "7ee20d9d-241a-4851-baf1-a73fee7403a1",
+          "text": "Cianwood"
+        },
+        {
+          "children": [],
+          "completed": true,
+          "id": "8d55dafc-06c8-44a2-be2c-190c70574154",
+          "text": "Olivine"
+        },
+        {
+          "children": [],
+          "completed": true,
+          "id": "d290f480-a989-44e1-82af-378d91edcc97",
+          "text": "Mahogany"
+        },
+        {
+          "children": [],
+          "completed": true,
+          "id": "5cbdab05-e6ea-4f29-8ce4-deff6a469184",
+          "text": "Blackthorn"
+        }
+      ],
+      "completed": true,
+      "id": "6e9ce0cc-9704-40e8-98f1-b07f11765b43",
+      "text": "Gin\u00e1sios"
     }
   ]
 }

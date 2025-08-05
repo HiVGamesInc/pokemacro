@@ -326,7 +326,10 @@ const AutoComboEdit = ({
             {insertIndex !== null && ` at position ${insertIndex + 1}`}
           </div>
         </div>
-        <div className="flex gap-2 items-start">
+        <div
+          className="flex gap-2 items-start"
+          onClick={(e) => e.stopPropagation()} // Prevent event bubbling
+        >
           {isAdding === "move" && (
             <Select
               wrapperClassName="flex-1 !mt-0"
@@ -397,7 +400,11 @@ const AutoComboEdit = ({
                   className={`${
                     isTracking ? "bg-red-600" : "bg-blue-600"
                   } p-2 rounded-lg`}
-                  onClick={handleStartTracking}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleStartTracking();
+                  }}
                 >
                   {isTracking ? "Cancel" : "Track"}
                 </Button>
@@ -420,13 +427,19 @@ const AutoComboEdit = ({
           )}
           <Button
             className="bg-green-600 p-2 rounded-lg text-white h-[42px] hover:bg-green-700"
-            onClick={insertItemIntoCombo}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              insertItemIntoCombo();
+            }}
           >
             <CheckIcon className="size-4" />
           </Button>
           <Button
             className="bg-red-600 p-2 rounded-lg text-white h-[42px] hover:bg-red-700"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               setNewMove(defaultNewMove);
               setIsAdding(null);
               setInsertIndex(null);
@@ -439,6 +452,8 @@ const AutoComboEdit = ({
       </div>
     );
   };
+
+  console.log(insertIndex);
 
   return (
     <div className="flex gap-8">
@@ -503,15 +518,128 @@ const AutoComboEdit = ({
                   <div className="text-sm text-slate-300 mb-4">
                     No items in combo yet
                   </div>
-                  <div
-                    className="h-8 border-2 border-dashed border-blue-400 hover:border-blue-300 transition-colors cursor-pointer rounded-lg flex items-center justify-center bg-blue-900/20"
-                    onClick={() => setInsertIndex(0)}
-                    title="Click to add your first item"
-                  >
-                    <span className="text-xs text-blue-300">
-                      Click here to add first item
-                    </span>
-                  </div>
+                  {insertIndex === 0 ? (
+                    <div className="p-4 w-full">
+                      {isAdding && insertIndex === 0 ? (
+                        renderAddItemForm()
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs text-blue-300 font-medium">
+                              Add Your First Item
+                            </span>
+                            <Button
+                              className="text-xs px-2 py-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setInsertIndex(null);
+                              }}
+                            >
+                              ×
+                            </Button>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            <Button
+                              className="text-xs py-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addItemAtPosition("move", 0);
+                              }}
+                            >
+                              Move
+                            </Button>
+                            <Button
+                              className="text-xs py-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addItemAtPosition("delay", 0);
+                              }}
+                            >
+                              Delay
+                            </Button>
+                            <Button
+                              className="text-xs py-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addItemAtPosition("hotkey", 0);
+                              }}
+                            >
+                              Hotkey
+                            </Button>
+                            <Button
+                              className="text-xs py-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addItemAtPosition("mouseclick", 0);
+                              }}
+                            >
+                              Mouse Click
+                            </Button>
+                            <Button
+                              className="text-xs py-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addItemAtPosition("pokestop", 0);
+                              }}
+                            >
+                              Pokestop
+                            </Button>
+                            <Button
+                              className="text-xs py-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addItemAtPosition("medicine", 0);
+                              }}
+                            >
+                              Medicine
+                            </Button>
+                            <Button
+                              className="text-xs py-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addItemAtPosition("revive", 0);
+                              }}
+                            >
+                              Revive
+                            </Button>
+                            <Button
+                              className="text-xs py-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addItemAtPosition("autoloot", 0);
+                              }}
+                            >
+                              Auto Loot
+                            </Button>
+                            <Button
+                              className="text-xs py-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addItemAtPosition("autocatch", 0);
+                              }}
+                            >
+                              Auto Catch
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <div
+                      className="h-8 border-2 border-dashed border-blue-400 hover:border-blue-300 transition-colors cursor-pointer rounded-lg flex items-center justify-center bg-blue-900/20"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log("Clicked first item button");
+                        setInsertIndex(0);
+                      }}
+                      title="Click to add your first item"
+                    >
+                      <span className="text-xs text-blue-300">
+                        Click here to add first item
+                      </span>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <>
@@ -524,7 +652,11 @@ const AutoComboEdit = ({
                         ? "border-blue-400 bg-blue-900/30"
                         : "border-transparent hover:border-blue-500 hover:bg-blue-900/20"
                     }`}
-                    onClick={() => setInsertIndex(insertIndex === 0 ? null : 0)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setInsertIndex(insertIndex === 0 ? null : 0);
+                    }}
                     title="Click to insert item at the beginning"
                   >
                     {insertIndex === 0 ? (
@@ -667,11 +799,13 @@ const AutoComboEdit = ({
                             ? "border-blue-400 bg-blue-900/30"
                             : "border-transparent hover:border-blue-500 hover:bg-blue-900/20"
                         }`}
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           setInsertIndex(
                             insertIndex === index + 1 ? null : index + 1
-                          )
-                        }
+                          );
+                        }}
                         title={`Click to insert item after position ${
                           index + 1
                         }`}
