@@ -37,20 +37,56 @@ jobs:
       - name: Build .exe with PyInstaller
         run: |
           pipenv run build
+          echo "Build completed. Listing all files in dist directory:"
           dir dist
 
       - name: List build artifacts
         run: |
           echo "Contents of dist folder:"
           dir dist
-          echo "Contents of pokemacro folder:"
-          dir dist/pokemacro
-          echo "Size of executable:"
-          powershell "Get-ChildItem dist/pokemacro/pokemacro.exe | Select-Object Name, Length"
+          echo ""
+          echo "Checking for single executable (pokemacro.exe)..."
+          if (Test-Path "dist/pokemacro.exe") {
+            echo "✓ Single executable found: dist/pokemacro.exe"
+            $exe = Get-ChildItem "dist/pokemacro.exe"
+            echo "File size: $([math]::Round($exe.Length / 1MB, 2)) MB"
+            echo "Creation time: $($exe.CreationTime)"
+          } else {
+            echo "✗ Single executable NOT found at dist/pokemacro.exe"
+            echo "Checking for legacy folder structure..."
+            if (Test-Path "dist/pokemacro") {
+              echo "✓ Found legacy folder structure"
+              dir dist/pokemacro
+              if (Test-Path "dist/pokemacro/pokemacro.exe") {
+                $exe = Get-ChildItem "dist/pokemacro/pokemacro.exe"
+                echo "Executable size: $([math]::Round($exe.Length / 1MB, 2)) MB"
+              }
+            } else {
+              echo "✗ No executable found in either location!"
+              echo "Available files in dist:"
+              Get-ChildItem dist -Recurse | Format-Table Name, Length, FullName
+              exit 1
+            }
+          }
 
       - name: Create Release Archive
         run: |
-          powershell "Compress-Archive -Path 'dist/pokemacro/*' -DestinationPath 'pokemacro-release.zip'"
+          if (Test-Path "dist/pokemacro.exe") {
+            echo "Creating release archive with single executable..."
+            powershell "Compress-Archive -Path 'dist/pokemacro.exe' -DestinationPath 'pokemacro-release.zip'"
+            echo "✓ Archive created: pokemacro-release.zip"
+          } elseif (Test-Path "dist/pokemacro") {
+            echo "Creating release archive with folder structure..."
+            powershell "Compress-Archive -Path 'dist/pokemacro/*' -DestinationPath 'pokemacro-release.zip'"
+            echo "✓ Archive created: pokemacro-release.zip"
+          } else {
+            echo "✗ No files found to archive!"
+            exit 1
+          }
+          
+          echo "Final archive details:"
+          $archive = Get-ChildItem "pokemacro-release.zip"
+          echo "Archive size: $([math]::Round($archive.Length / 1MB, 2)) MB"
 
       - name: Create Release
         id: create_release
