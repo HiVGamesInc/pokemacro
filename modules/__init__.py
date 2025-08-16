@@ -9,6 +9,19 @@ def resource_path(relative_path):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.abspath("."), relative_path)
 
+def initialize_config_system():
+    """
+    Initialize the configuration system by ensuring AppData directory exists.
+    """
+    from modules.utils import get_appdata_path
+    
+    # Ensure AppData directory exists
+    appdata_path = get_appdata_path()
+    print(f"Pokemacro configuration directory: {appdata_path}")
+
+# Initialize the config system when the module is imported
+initialize_config_system()
+
 app = Flask(__name__, static_folder=resource_path('app/build'))
 
 from modules import routes

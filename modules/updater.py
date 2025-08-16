@@ -186,7 +186,7 @@ class AutoUpdater:
     
     def install_update(self, temp_file_path: str, temp_dir: str) -> Dict[str, Any]:
         """
-        Install the downloaded update
+        Install the downloaded update (optimized for single executable)
         
         Args:
             temp_file_path: Path to the downloaded update file
@@ -203,6 +203,14 @@ class AutoUpdater:
             print(f"Current directory: {current_dir}")
             print(f"Temp file path: {temp_file_path}")
             
+            # Get the current executable name dynamically
+            if hasattr(sys, '_MEIPASS'):
+                current_exe_name = os.path.basename(sys.executable)
+            else:
+                current_exe_name = "pokemacro.exe"
+            
+            new_exe_path = None
+            
             if temp_file_path.endswith('.zip'):
                 # Extract zip file
                 extract_dir = os.path.join(temp_dir, "extracted")
@@ -210,40 +218,36 @@ class AutoUpdater:
                 with zipfile.ZipFile(temp_file_path, 'r') as zip_ref:
                     zip_ref.extractall(extract_dir)
                 
-                # Find the app directory in the extracted files by looking for the executable
-                update_source_dir = None
-                print("Looking for app directory with executable...")
+                # Look for the new executable in extracted files
+                print("Looking for executable in extracted files...")
                 
-                # Get the current executable name dynamically
-                if hasattr(sys, '_MEIPASS'):
-                    # Running from executable
-                    current_exe_name = os.path.basename(sys.executable)
-                else:
-                    # Running from script, assume it will be pokemacro.exe
-                    current_exe_name = "pokemacro.exe"
-                
-                # First, check if the executable is directly in the root of extracted files
-                if os.path.exists(os.path.join(extract_dir, current_exe_name)):
-                    update_source_dir = extract_dir
-                    print(f"Found executable in root: {update_source_dir}")
+                # Check if the executable is directly in the root of extracted files
+                direct_exe_path = os.path.join(extract_dir, current_exe_name)
+                if os.path.exists(direct_exe_path):
+                    new_exe_path = direct_exe_path
+                    print(f"Found executable at: {new_exe_path}")
                 else:
                     # Look for the executable in subdirectories
                     for root, dirs, files in os.walk(extract_dir):
                         if current_exe_name in files:
-                            update_source_dir = root
-                            print(f"Found app directory: {update_source_dir}")
+                            new_exe_path = os.path.join(root, current_exe_name)
+                            print(f"Found executable at: {new_exe_path}")
                             break
                 
-                if not update_source_dir:
+                if not new_exe_path:
                     return {"error": True, "message": f"Could not find {current_exe_name} in update package"}
                 
+            elif temp_file_path.endswith('.exe'):
+                # Direct executable file
+                new_exe_path = temp_file_path
+                print(f"Using direct executable: {new_exe_path}")
             else:
-                return {"error": True, "message": "Update package must be a zip file"}
+                return {"error": True, "message": "Update package must be a zip file or executable"}
             
-            print(f"Update source directory: {update_source_dir}")
+            print(f"New executable path: {new_exe_path}")
             
-            # Create update script to replace entire directory
-            update_script = self._create_directory_update_script(current_dir, update_source_dir)
+            # Create simplified update script for single executable
+            update_script = self._create_simple_exe_update_script(current_exe_path, new_exe_path)
             print(f"Created update script: {update_script}")
             
             # Execute update script and exit current application
@@ -256,6 +260,95 @@ class AutoUpdater:
             
         except Exception as e:
             return {"error": True, "message": f"Failed to install update: {str(e)}"}
+    
+    def _create_simple_exe_update_script(self, current_exe: str, new_exe: str) -> str:
+        """
+        Create a batch script to handle single executable update process
+        """
+        current_exe_name = os.path.basename(current_exe)
+        current_dir = os.path.dirname(current_exe)
+        log_file = os.path.join(current_dir, "update_log.txt")
+        backup_exe = f"{current_exe}.backup"
+        
+        script_content = f'''@echo off
+echo Updating Pokemacro (Single Executable)... > "{log_file}"
+echo Current exe: {current_exe} >> "{log_file}"
+echo New exe: {new_exe} >> "{log_file}"
+echo Backup exe: {backup_exe} >> "{log_file}"
+echo Current time: %date% %time% >> "{log_file}"
+
+REM Wait for the application to close
+echo Waiting for app to close... >> "{log_file}"
+timeout /t 3 /nobreak > nul
+
+REM Kill any running instances of the application
+echo Killing running instances... >> "{log_file}"
+taskkill /F /IM "{current_exe_name}" >> "{log_file}" 2>&1
+
+REM Wait a bit more
+timeout /t 2 /nobreak > nul
+
+REM Create backup of current executable
+if exist "{current_exe}" (
+    echo Creating backup of current executable... >> "{log_file}"
+    copy "{current_exe}" "{backup_exe}" >> "{log_file}" 2>&1
+) else (
+    echo Warning: Current exe not found! >> "{log_file}"
+)
+
+REM Check if new exe exists
+if exist "{new_exe}" (
+    echo New exe found, replacing current executable... >> "{log_file}"
+    copy "{new_exe}" "{current_exe}" >> "{log_file}" 2>&1
+) else (
+    echo ERROR: New exe not found at {new_exe}! >> "{log_file}"
+    goto :restore_backup
+)
+
+REM Verify the copy worked
+if exist "{current_exe}" (
+    echo Update successful! >> "{log_file}"
+    echo Starting updated application... >> "{log_file}"
+    start "" "{current_exe}"
+    
+    REM Clean up backup after successful start
+    timeout /t 3 /nobreak > nul
+    if exist "{backup_exe}" (
+        echo Cleaning up backup... >> "{log_file}"
+        del "{backup_exe}" >> "{log_file}" 2>&1
+    )
+) else (
+    echo Update failed! Restoring backup... >> "{log_file}"
+    goto :restore_backup
+)
+
+goto :cleanup
+
+:restore_backup
+if exist "{backup_exe}" (
+    echo Restoring backup... >> "{log_file}"
+    copy "{backup_exe}" "{current_exe}" >> "{log_file}" 2>&1
+    echo Starting original application... >> "{log_file}"
+    start "" "{current_exe}"
+) else (
+    echo ERROR: No backup found to restore! >> "{log_file}"
+)
+
+:cleanup
+REM Clean up temp files
+echo Cleaning up temp files... >> "{log_file}"
+rmdir /S /Q "{os.path.dirname(new_exe)}" >> "{log_file}" 2>&1
+
+REM Clean up this script (after a delay)
+timeout /t 5 /nobreak > nul
+del "%~f0" > nul 2>&1
+'''
+        
+        script_path = os.path.join(current_dir, "update_pokemacro.bat")
+        with open(script_path, 'w') as f:
+            f.write(script_content)
+        
+        return script_path
     
     def _create_directory_update_script(self, current_app_dir: str, new_app_dir: str) -> str:
         """
