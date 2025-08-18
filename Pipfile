@@ -26,6 +26,7 @@ pywin32 = "*"
 pefile = "*"
 requests = "*"
 packaging = "*"
+pynput = "*"
 
 [dev-packages]
 

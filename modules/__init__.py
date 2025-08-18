@@ -17,7 +17,6 @@ def initialize_config_system():
     
     # Ensure AppData directory exists
     appdata_path = get_appdata_path()
-    print(f"Pokemacro configuration directory: {appdata_path}")
 
 # Initialize the config system when the module is imported
 initialize_config_system()

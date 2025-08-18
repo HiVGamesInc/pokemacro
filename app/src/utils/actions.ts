@@ -76,10 +76,10 @@ export const loadConfig = async (filename?: string) => {
 };
 
 export const handleAutoCatch = async () => {
-  console.log('toggle')
+  console.log("toggle");
   const response = await fetch("/auto-catch", { method: "POST" });
   const data = await response.json();
-  console.log(data)
+  console.log(data);
   return data;
 };
 
@@ -96,7 +96,9 @@ export const getImages = async () => {
 };
 
 export const deleteImage = async (filename: string) => {
-  const response = await fetch(`/delete-image/${filename}`, { method: "DELETE" });
+  const response = await fetch(`/delete-image/${filename}`, {
+    method: "DELETE",
+  });
   const data = await response.json();
   return data;
 };
@@ -121,6 +123,20 @@ export const toggleMouseTracking = async () => {
 
 export const getMouseCoordinates = async () => {
   const response = await fetch("/get-mouse-coords", { method: "GET" });
+  const data = await response.json();
+  return data;
+};
+
+export const clearMouseCoordinates = async () => {
+  const response = await fetch("/clear-mouse-coords", { method: "POST" });
+  const data = await response.json();
+  return data;
+};
+
+export const getMouseTrackingCapabilities = async () => {
+  const response = await fetch("/mouse-tracking-capabilities", {
+    method: "GET",
+  });
   const data = await response.json();
   return data;
 };

@@ -51,7 +51,8 @@ const AutoCatchProvider = ({ children }: PropsWithChildren) => {
       }
       setInitialized(true);
     })();
-  }, [loadConfig]); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (initialized) {

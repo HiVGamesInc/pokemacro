@@ -12,7 +12,19 @@ a = Analysis(
         ('configs', 'configs'),
         ('tesseract-ocr', 'tesseract-ocr'),
     ],
-    hiddenimports=['keyboard', 'pkg_resources.extern', 'webview'],  # Adicione imports ocultos se necessário
+    hiddenimports=[
+        'keyboard', 
+        'pkg_resources.extern', 
+        'webview',
+        'win32api',
+        'win32con',
+        'win32gui',
+        'pywintypes',
+        'pythoncom',
+        'pynput',
+        'pynput.mouse',
+        'pynput.keyboard'
+    ],  # Adicione imports ocultos se necessário
     hookspath=[],                # Adicione caminhos para hooks customizados se necessário
     runtime_hooks=[],            # Adicione runtime hooks se necessário
     excludes=[],

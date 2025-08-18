@@ -18,6 +18,7 @@ module.exports = function (app: any) {
         "/rename-image",
         "/toggle-mouse-tracking",
         "/get-mouse-coords",
+        "/mouse-tracking-capabilities",
         "/auto-revive",
         "/todo",
       ],

@@ -1,7 +1,7 @@
 import os
 from flask import request, jsonify, send_from_directory
 from modules import app
-from modules.events import toggle_auto_combo, toggle_anti_logout, toggle_alert, toggle_healing, update_current_combo, save_config, load_config, execute_crop_area, toggle_auto_catch, toggle_mouse_tracking, get_mouse_coords, toggle_auto_revive, add_todo_item, toggle_todo_item, delete_todo_item, update_todo_item, reset_all_todos, get_todo_stats, add_weekly_todo_item, toggle_weekly_todo_item, delete_weekly_todo_item, update_weekly_todo_item, reset_all_weekly_todos, get_weekly_todo_stats
+from modules.events import toggle_auto_combo, toggle_anti_logout, toggle_alert, toggle_healing, update_current_combo, save_config, load_config, execute_crop_area, toggle_auto_catch, toggle_mouse_tracking, get_mouse_coords, clear_mouse_coords, toggle_auto_revive, add_todo_item, toggle_todo_item, delete_todo_item, update_todo_item, reset_all_todos, get_todo_stats, add_weekly_todo_item, toggle_weekly_todo_item, delete_weekly_todo_item, update_weekly_todo_item, reset_all_weekly_todos, get_weekly_todo_stats
 from modules.key_mapper import convert_key_name
 from modules.updater import get_updater
 
@@ -145,6 +145,24 @@ def mouse_tracking():
 def mouse_coordinates():
     coords = get_mouse_coords()
     return jsonify(coords)
+
+@app.route('/clear-mouse-coords', methods=['POST'])
+def clear_mouse_coordinates():
+    result = clear_mouse_coords()
+    return jsonify(result)
+
+@app.route('/mouse-tracking-capabilities', methods=['GET'])
+def mouse_tracking_capabilities():
+    """Return information about available mouse tracking methods"""
+    from modules.events import WIN32_AVAILABLE, PYNPUT_AVAILABLE
+    return jsonify({
+        "win32_available": WIN32_AVAILABLE,
+        "pynput_available": PYNPUT_AVAILABLE,
+        "methods": [
+            {"name": "mouse_click", "available": PYNPUT_AVAILABLE or WIN32_AVAILABLE, "description": "Click detection"},
+            {"name": "enter_key", "available": True, "description": "Enter key fallback"}
+        ]
+    })
 
 @app.route('/auto-revive', methods=['POST'])
 def auto_revive():

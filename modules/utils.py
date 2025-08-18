@@ -81,22 +81,18 @@ def save_to_file(combo, filename='config.json'):
         
         with open(path, 'w', encoding='utf-8') as file:
             json.dump(combo, file, indent=2)
-        print(f"File saved successfully to {path}")
     except Exception as e:
-        print(f"Failed to save file: {str(e)}")
+        return {}
 
 def load_from_file(filename='config.json'):
     path = resource_path(filename)
     try:
         with open(path, 'r', encoding='utf-8') as file:
             data = json.load(file)
-        print(f"File loaded successfully from {path}")
         return data
     except FileNotFoundError:
-        print(f"File {filename} not found at {path}. Returning an empty object.")
         return {}
     except Exception as e:
-        print(f"Failed to load file: {str(e)}")
         return {}
 
 def capture_screen(bbox=None):
@@ -113,7 +109,6 @@ def save_debug_image(image, iteration):
     os.makedirs(debug_dir, exist_ok=True)
     debug_image_path = os.path.join(debug_dir, f"debug_{iteration}.png")
     image.save(debug_image_path)
-    print(f"Debug image saved: {debug_image_path}")
 
 def play_alert_sound():
     """Play a sound alert."""
